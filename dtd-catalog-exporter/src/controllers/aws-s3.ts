@@ -9,7 +9,7 @@ export async function uploadJSONToS3Bucket(data: unknown) {
   const s3 = new S3Client({});
   await s3.send(
     new PutObjectCommand({
-      Bucket: env.STORAGE_BUCKET,
+      Bucket: env.DTD_CATALOG_STORAGE_BUCKET,
       Key: env.FILENAME,
       Body: JSON.stringify(data),
     })

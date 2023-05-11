@@ -11,7 +11,7 @@ export const envSchema = z.object({
   READ_MODEL_DB_PORT: z.string(),
   READ_MODEL_DB_NAME: z.string(),
 
-  STORAGE_BUCKET: z.string(),
+  DTD_CATALOG_STORAGE_BUCKET: z.string(),
   FILENAME: z.string(),
 });
 
