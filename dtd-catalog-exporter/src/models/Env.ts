@@ -12,6 +12,7 @@ export const envSchema = z.object({
   READ_MODEL_DB_NAME: z.string(),
 
   DTD_CATALOG_STORAGE_BUCKET: z.string(),
+  DTD_CATALOG_STORAGE_PATH: z.string(),
   FILENAME: z.string(),
 });
 

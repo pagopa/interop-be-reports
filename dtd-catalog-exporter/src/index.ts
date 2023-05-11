@@ -40,11 +40,7 @@ async function main() {
   const attributesMap = getMappedRecords(attributes);
   const tenantsMap = getMappedRecords(tenants);
   const publicEServices = eservices.map((eservice) => {
-    log(
-      `Remapping ${chalk.blueBright(eservice.name)} - ${chalk.yellow(
-        eservice.id
-      )} ...`
-    );
+    log(`Remapping ${chalk.blueBright(eservice.name)} - ${chalk.yellow(eservice.id)} ...`);
     return remapEServiceToPublicEService(eservice, attributesMap, tenantsMap);
   });
 

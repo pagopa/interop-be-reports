@@ -10,7 +10,7 @@ export async function uploadJSONToS3Bucket(data: unknown) {
   await s3.send(
     new PutObjectCommand({
       Bucket: env.DTD_CATALOG_STORAGE_BUCKET,
-      Key: env.FILENAME,
+      Key: `${env.DTD_CATALOG_STORAGE_PATH}/${env.FILENAME}`,
       Body: JSON.stringify(data),
     })
   );

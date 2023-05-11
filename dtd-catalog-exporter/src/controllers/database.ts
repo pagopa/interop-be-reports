@@ -56,10 +56,7 @@ export async function getEServices(client: MongoClient) {
  * @param attributeIds - The array of attributes ids
  * @returns The array of attributes
  **/
-export async function getEServicesAttributes(
-  client: MongoClient,
-  attributeIds: Array<string>
-) {
+export async function getEServicesAttributes(client: MongoClient, attributeIds: Array<string>) {
   return await client
     .db(env.READ_MODEL_DB_NAME)
     .collection<Attribute>(env.ATTRIBUTES_COLLECTION_NAME)
@@ -97,10 +94,7 @@ export async function getEServicesAttributes(
  * @param eservices - The array of e-services which all the attributes ids will be taken from
  * @returns The array of attributes
  **/
-export async function getEServicesTenants(
-  client: MongoClient,
-  tenantIds: Array<string>
-) {
+export async function getEServicesTenants(client: MongoClient, tenantIds: Array<string>) {
   return await client
     .db(env.READ_MODEL_DB_NAME)
     .collection<Tenant>(env.TENANTS_COLLECTION_NAME)
