@@ -6,7 +6,7 @@ import { env } from "../env.js";
  * @param data - The data to be uploaded.
  */
 export async function uploadJSONToS3Bucket(data: unknown) {
-  const s3 = new S3Client({ region: env.AWS_REGION });
+  const s3 = new S3Client({});
   await s3.send(
     new PutObjectCommand({
       Bucket: env.STORAGE_BUCKET,
