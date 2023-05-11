@@ -1,0 +1,32 @@
+{
+  "name": "dtd-catalog-exporter",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "start": "node dist",
+    "test": "vitest run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/lodash": "^4.14.194",
+    "@types/node": "^20.1.2",
+    "@typescript-eslint/eslint-plugin": "^5.59.5",
+    "@typescript-eslint/parser": "^5.59.5",
+    "eslint": "^8.40.0",
+    "typescript": "^5.0.4",
+    "vitest": "^0.31.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.331.0",
+    "chalk": "^5.2.0",
+    "dotenv": "^16.0.3",
+    "lodash": "^4.17.21",
+    "mongodb": "^5.4.0",
+    "zod": "^3.21.4"
+  }
+}
