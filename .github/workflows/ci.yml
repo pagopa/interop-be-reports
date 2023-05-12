@@ -18,7 +18,7 @@ jobs:
           dtd-catalog-exporter
         ]
         node: 18.15.0
-    uses: ./.github/workflows/single-job.yaml
+    uses: ./.github/workflows/single-job.yml
     secrets: inherit
     with:
       job-name: ${{ matrix.jobs }}
