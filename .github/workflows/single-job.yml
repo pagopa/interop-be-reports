@@ -19,6 +19,9 @@ jobs:
   build:
     name: ${{ inputs.job-name }} - Build and Test
     runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ./${{ inputs.job-name }}
     steps:
       - name: Checkout current branch (full)
         uses: actions/checkout@v2
@@ -29,9 +32,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ inputs.node-version }}
-
-      - name: Checkout ${{ inputs.job-name }} folder
-        run: cd ${{ inputs.job-name }}
 
       - name: Installing
         run: npm install
@@ -46,6 +46,9 @@ jobs:
     name: Publish Artifacts
     needs: [build]
     runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ./${{ inputs.job-name }}
     permissions:
       id-token: write
       contents: read
@@ -81,9 +84,6 @@ jobs:
           else
             echo "version=${{ github.ref_name }}-latest" >> $GITHUB_OUTPUT
           fi
-
-      - name: Checkout ${{ inputs.job-name }} folder
-        run: cd ${{ inputs.job-name }}
 
       - name: Build docker image
         run: docker build --network host -t $ECR_REGISTRY/interop-be-${{ inputs.job-name }}:$VERSION .
