@@ -1,0 +1,25 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["**"]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  single-job:
+    name: Continuos Integration
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        jobs: [
+          dtd-catalog-exporter
+        ]
+        node: 18.15.0
+    uses: ./.github/workflows/single-job.yaml
+    secrets: inherit
+    with:
+      job-name: ${{ matrix.jobs }}
+      node-version: ${{ matrix.node }}
