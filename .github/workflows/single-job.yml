@@ -17,7 +17,8 @@ env:
 
 jobs:
   build:
-    name: ${{ input.job-name }} - Build and Test
+    name: ${{ inputs.job-name }} - Build and Test
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout current branch (full)
         uses: actions/checkout@v2
@@ -27,10 +28,10 @@ jobs:
       - name: Install node 18
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ input.node-version }}
+          node-version: ${{ inputs.node-version }}
 
-      - name: Checkout ${{ input.job-name }} folder
-        run: cd ${{ input.job-name }}
+      - name: Checkout ${{ inputs.job-name }} folder
+        run: cd ${{ inputs.job-name }}
 
       - name: Installing
         run: npm install
@@ -44,6 +45,7 @@ jobs:
   publish:
     name: Publish Artifacts
     needs: [build]
+    runs-on: ubuntu-22.04
     permissions:
       id-token: write
       contents: read
@@ -58,14 +60,14 @@ jobs:
       - name: Install node 18
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ input.node-version }}
+          node-version: ${{ inputs.node-version }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: eu-central-1
           role-to-assume: "arn:aws:iam::505630707203:role/interop-github-ecr-dev"
-          role-session-name: interop-be-${{ input.job-name }}-${{ github.job }}
+          role-session-name: interop-be-${{ inputs.job-name }}-${{ github.job }}
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -80,17 +82,17 @@ jobs:
             echo "version=${{ github.ref_name }}-latest" >> $GITHUB_OUTPUT
           fi
 
-      - name: Checkout ${{ input.job-name }} folder
-        run: cd ${{ input.job-name }}
+      - name: Checkout ${{ inputs.job-name }} folder
+        run: cd ${{ inputs.job-name }}
 
       - name: Build docker image
-        run: docker build --network host -t $ECR_REGISTRY/interop-be-${{ input.job-name }}:$VERSION .
+        run: docker build --network host -t $ECR_REGISTRY/interop-be-${{ inputs.job-name }}:$VERSION .
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           VERSION: ${{ steps.version.outputs.version }}
 
       - name: Push image to Amazon ECR
-        run: docker push $ECR_REGISTRY/interop-be-${{ input.job-name }}:$VERSION
+        run: docker push $ECR_REGISTRY/interop-be-${{ inputs.job-name }}:$VERSION
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           VERSION: ${{ steps.version.outputs.version }}
