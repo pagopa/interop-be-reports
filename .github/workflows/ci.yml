@@ -14,7 +14,8 @@ jobs:
     strategy:
       matrix:
         jobs: [
-          dtd-catalog-exporter
+          dtd-catalog-exporter,
+          one-trust-notices,
         ]
         node: [18.15.0]
     uses: ./.github/workflows/single-job.yml
