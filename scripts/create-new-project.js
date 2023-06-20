@@ -1,3 +1,5 @@
+'use strict'
+
 const fs = require('fs')
 const { execSync } = require('child_process')
 
@@ -11,7 +13,7 @@ const log = console.log
 const REGEX_PROJECT_NAME = /^[a-z0-9-]+$/
 const MAX_PROJECT_NAME_LENGTH = 50
 const MIN_PROJECT_NAME_LENGTH = 5
-const DEPENDENCIES = ['chalk', 'dotenv', 'lodash', 'mongodb', 'zod']
+const DEPENDENCIES = ['chalk', 'dotenv', 'lodash', 'zod']
 const DEV_DEPENDENCIES = [
   '@types/node',
   '@types/lodash',
@@ -38,6 +40,8 @@ function createNewProject(projectName) {
     createESLintConfig(projectName)
     createDockerfile(projectName)
     appendNewProjectWorkspaceInPackageJson(projectName)
+    installDefaultDependencies(projectName)
+    addToGitHubCIActions(projectName)
   } catch (err) {
     log(chalk.red(`\nError: ${err.message}`))
     cleanUpOnError(projectName)
@@ -168,6 +172,33 @@ function appendNewProjectWorkspaceInPackageJson(projectName) {
   const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'))
   packageJson.workspaces.push(projectName)
   fs.writeFileSync('./package.json', JSON.stringify(packageJson, null, 2))
+}
+
+function installDefaultDependencies(projectName) {
+  log(chalk.yellow('Installing default dependencies...'))
+  execSync(
+    `cd ./${projectName} && npm install --package-lock-only --no-package-lock${DEPENDENCIES.join(
+      ' '
+    )}`
+  )
+  execSync(
+    `cd ./${projectName} && npm install -D --package-lock-only --no-package-lock ${DEV_DEPENDENCIES.join(
+      ' '
+    )}`
+  )
+}
+
+function addToGitHubCIActions(projectName) {
+  const githubCIActions = fs.readFileSync('./.github/workflows/ci.yml', 'utf8')
+  const fileArray = githubCIActions.split('\n')
+  const index = fileArray.findIndex((line) => line.includes('jobs: ['))
+  for (let i = index + 1; i < fileArray.length; i++) {
+    if (fileArray[i].includes(']')) {
+      fileArray.splice(i, 0, `          ${projectName},`)
+      break
+    }
+  }
+  fs.writeFileSync('./.github/workflows/ci.yml', fileArray.join('\n'))
 }
 
 function cleanUpOnError(projectName) {
