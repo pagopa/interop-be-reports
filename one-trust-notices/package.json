@@ -6,7 +6,8 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "rm -rf dist && tsc",
-    "start": "node dist"
+    "start": "node dist",
+    "test": "echo \"Error: no test specified\""
   },
   
   "keywords": [],

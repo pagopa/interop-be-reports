@@ -94,6 +94,7 @@ function createPackageJson(projectName) {
     scripts: {
       build: 'rm -rf dist && tsc',
       start: 'node dist',
+      test: 'echo "Error: no test specified"',
     },
     keywords: [],
     author: '',
