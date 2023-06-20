@@ -5,6 +5,6 @@
   },
   "workspaces": [
     "dtd-catalog-exporter",
-    "test-project"
+    "one-trust-notices"
   ]
 }
