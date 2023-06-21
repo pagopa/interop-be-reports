@@ -92,9 +92,7 @@ async function main() {
     } catch (error) {
       log(chalk.red(`Error while processing ${chalk.blue(oneTrustNotice.name)}:`))
       log(chalk.red(resolveError(error)))
-      log(chalk.red(`\n> Deleting ${chalk.blue(oneTrustNotice.name)} data from DynamoDB...\n`))
-      // If an error occurs, delete the notice from the database.
-      await dynamoDbTableClient.deleteItem({ privacyNoticeId: oneTrustNotice.id })
+      log(chalk.red(`Skipping ${chalk.blue(oneTrustNotice.name)}...\n`))
     }
   }
 
