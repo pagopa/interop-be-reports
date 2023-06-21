@@ -34,16 +34,21 @@ export function remapOneTrustNoticeVersionToDynamoDBSchemaUpdateObject(
 ): Omit<OneTrustNoticeDBSchema, 'privacyNoticeId'> {
   const {
     id: _privacyNoticeId,
-    version: { id: versionId, ...versionRest },
-    ...rest
+    createdDate,
+    lastPublishedDate,
+    version: { id: versionId, publishedDate, ...versionRest },
+    organizationId,
   } = oneTrustNoticeVersion
 
   return {
-    persistedAt: new Date().toUTCString(),
+    persistedAt: new Date().toISOString(),
+    createdDate: new Date(createdDate).toISOString(),
+    lastPublishedDate: new Date(lastPublishedDate).toISOString(),
     privacyNoticeVersion: {
       versionId,
+      publishedDate: new Date(publishedDate).toISOString(),
       ...versionRest,
     },
-    ...rest,
+    organizationId,
   }
 }
