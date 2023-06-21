@@ -7,6 +7,7 @@ import {
   getBucketPath,
   getNoticeContent,
   remapOneTrustNoticeVersionToDynamoDBSchemaUpdateObject,
+  resolveError,
 } from './utils/index.js'
 
 const log = console.log
@@ -89,12 +90,14 @@ async function main() {
 
       log(chalk.green(`Finished ${chalk.blue(oneTrustNotice.name)}!\n`))
     } catch (error) {
-      log(chalk.red(`Error while processing ${chalk.blue(oneTrustNotice.name)}.`))
+      log(chalk.red(`Error while processing ${chalk.blue(oneTrustNotice.name)}:`))
+      log(chalk.red(resolveError(error)))
+      log(chalk.red(`\n> Deleting ${chalk.blue(oneTrustNotice.name)} data from DynamoDB...\n`))
       // If an error occurs, delete the notice from the database.
       await dynamoDbTableClient.deleteItem({ privacyNoticeId: oneTrustNotice.id })
-      throw error
     }
   }
+
   log('End of program.')
 }
 
