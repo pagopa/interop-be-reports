@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import { z } from "zod";
 
 export const envSchema = z.object({
@@ -17,3 +18,6 @@ export const envSchema = z.object({
 });
 
 export type Env = z.infer<typeof envSchema>;
+
+dotenv.config();
+export const env = envSchema.parse(process.env);

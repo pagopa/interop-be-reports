@@ -14,24 +14,9 @@ const publicEServiceAttributesGroupSchema = z.object({
 });
 
 const publicEServiceAttributesSchema = z.object({
-  certified: z.array(
-    z.union([
-      publicEServiceAttributeSingleSchema,
-      publicEServiceAttributesGroupSchema,
-    ])
-  ),
-  verified: z.array(
-    z.union([
-      publicEServiceAttributeSingleSchema,
-      publicEServiceAttributesGroupSchema,
-    ])
-  ),
-  declared: z.array(
-    z.union([
-      publicEServiceAttributeSingleSchema,
-      publicEServiceAttributesGroupSchema,
-    ])
-  ),
+  certified: z.array(z.union([publicEServiceAttributeSingleSchema, publicEServiceAttributesGroupSchema])),
+  verified: z.array(z.union([publicEServiceAttributeSingleSchema, publicEServiceAttributesGroupSchema])),
+  declared: z.array(z.union([publicEServiceAttributeSingleSchema, publicEServiceAttributesGroupSchema])),
 });
 
 const publicEServiceDocSchema = z.object({
@@ -57,15 +42,9 @@ export const publicEServiceSchema = z.object({
 
 export type PublicEService = z.infer<typeof publicEServiceSchema>;
 export type PublicEServiceDoc = z.infer<typeof publicEServiceDocSchema>;
-export type PublicEServiceActiveDescriptor = z.infer<
-  typeof publicEServiceActiveDescriptorSchema
->;
-export type PublicEServiceAttribute = z.infer<
-  typeof publicEServiceAttributeSchema
->;
-export type PublicEServiceAttributes = z.infer<
-  typeof publicEServiceAttributesSchema
->;
+export type PublicEServiceActiveDescriptor = z.infer<typeof publicEServiceActiveDescriptorSchema>;
+export type PublicEServiceAttribute = z.infer<typeof publicEServiceAttributeSchema>;
+export type PublicEServiceAttributes = z.infer<typeof publicEServiceAttributesSchema>;
 
 export const publicEServicesSchema = z.array(publicEServiceSchema);
 export type PublicEServices = z.infer<typeof publicEServicesSchema>;

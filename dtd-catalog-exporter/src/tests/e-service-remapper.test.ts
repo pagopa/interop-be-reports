@@ -1,5 +1,5 @@
 import { getEServiceMock } from "./data.mocks.js";
-import { remapEServiceToPublicEService } from "../controllers/e-service-remapper.js";
+import { remapEServiceToPublicEService } from "../services/index.js";
 import { getMappedRecords } from "../utils";
 
 describe("remapping e-service to public e-service tests", () => {
@@ -30,11 +30,7 @@ describe("remapping e-service to public e-service tests", () => {
     ];
     const tenantsMap = getMappedRecords(tenant);
 
-    const result = remapEServiceToPublicEService(
-      getEServiceMock(),
-      attributesMap,
-      tenantsMap
-    );
+    const result = remapEServiceToPublicEService(getEServiceMock(), attributesMap, tenantsMap);
 
     expect(result).toEqual({
       activeDescriptor: {

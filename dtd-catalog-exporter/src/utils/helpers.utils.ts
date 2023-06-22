@@ -1,35 +1,3 @@
-import { EServices } from "./models/EService.js";
-
-/**
- * Returns all attributes ids inside an array of eservices
- * @param eservices - The array of eservices
- * @returns The array of attributes ids
- */
-export function getAllAttributesIdsInEServices(eservices: EServices) {
-  const attributesIds: Set<string> = new Set();
-  eservices.forEach((eservice) => {
-    const { certified, verified, declared } = eservice.attributes;
-    [...certified, ...verified, ...declared].forEach((attribute) => {
-      if ("ids" in attribute) {
-        attribute.ids.forEach(({ id }) => attributesIds.add(id));
-      }
-      if ("id" in attribute) {
-        attributesIds.add(attribute.id.id);
-      }
-    });
-  });
-  return Array.from(attributesIds);
-}
-
-/**
- * Returns all tenants ids inside an array of eservices
- * @param eservices - The array of eservices
- * @returns The array of tenants ids
- */
-export function getAllTenantsIdsInEServices(eservices: EServices) {
-  return Array.from(new Set(eservices.map((eservice) => eservice.producerId)));
-}
-
 /**
  * Transforms an array of identifiable records into a map of records
  * @param records - The array of records
@@ -40,9 +8,7 @@ export function getAllTenantsIdsInEServices(eservices: EServices) {
  * console.log(recordsMap.get("1")); // { id: "1", name: "John" }
  * console.log(recordsMap.get("2")); // { id: "2", name: "Jane" }
  */
-export function getMappedRecords<TRecord extends { id: string }>(
-  records: Array<TRecord>
-) {
+export function getMappedRecords<TRecord extends { id: string }>(records: Array<TRecord>) {
   const result = new Map<string, TRecord>();
   records.forEach((record) => {
     result.set(record.id, record);
@@ -57,10 +23,7 @@ export function getMappedRecords<TRecord extends { id: string }>(
  * @param map - The map to check
  * @returns The record
  */
-export function safelyGetDataFromMap<TData>(
-  id: string,
-  map: Map<string, TData>
-) {
+export function safelyGetDataFromMap<TData>(id: string, map: Map<string, TData>) {
   const data = map.get(id);
   if (!data) {
     throw new Error(`No data found for ${id}`);

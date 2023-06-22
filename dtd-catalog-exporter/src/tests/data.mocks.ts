@@ -1,8 +1,6 @@
 import cloneDeep from "lodash/cloneDeep.js";
 import merge from "lodash/merge.js";
-import { EService } from "../models/EService.js";
-import { Attribute } from "../models/Attribute.js";
-import { Tenant } from "../models/Tenant.js";
+import { EService, Attribute, Tenant } from "../models/index.js";
 
 /**
  * Create and returns a mock factory function
@@ -129,10 +127,7 @@ export const getEServiceMock = createMockFactory<EService>({
         prettyName: "Specifica API",
         uploadDate: "2023-03-23T13:46:58.42932Z",
       },
-      serverUrls: [
-        "http://petstore.swagger.io/api/v1",
-        "http://petstore.swagger.io/api/v2",
-      ],
+      serverUrls: ["http://petstore.swagger.io/api/v1", "http://petstore.swagger.io/api/v2"],
       state: "Published",
       version: "1",
       voucherLifespan: 600,

@@ -1,17 +1,13 @@
-import { safelyGetDataFromMap } from "../utils.js";
-import { Attribute } from "../models/Attribute.js";
+import { safelyGetDataFromMap } from '../utils/index.js'
 import {
+  Attribute,
   EService,
   EServiceAttributes,
-  // EServiceDoc,
-} from "../models/EService.js";
-import { Tenant } from "../models/Tenant.js";
-import {
   PublicEService,
   PublicEServiceActiveDescriptor,
   PublicEServiceAttributes,
-  // PublicEServiceDoc,
-} from "../models/PublicEService.js";
+} from '../models/index.js'
+import { Tenant } from '../models/tenants.models.js'
 
 /**
  * Remaps an e-service to a public e-service
@@ -29,14 +25,14 @@ export function remapEServiceToPublicEService(
     id: eservice.id,
     name: eservice.name,
     description: eservice.description,
-    technology: eservice.technology.toUpperCase() as "REST" | "SOAP",
+    technology: eservice.technology.toUpperCase() as 'REST' | 'SOAP',
     producerName: safelyGetDataFromMap(eservice.producerId, producersMap).name,
     attributes: remapEServiceAttributesToPublicEServiceAttributes(
       eservice.attributes,
       attributesMap
     ),
     activeDescriptor: getActiveDescriptor(eservice),
-  };
+  }
 }
 
 /**
@@ -50,39 +46,35 @@ function remapEServiceAttributesToPublicEServiceAttributes(
   attributes: EServiceAttributes,
   attributesMap: Map<string, Attribute>
 ): PublicEServiceAttributes {
-  const { certified, verified, declared } = attributes;
+  const { certified, verified, declared } = attributes
 
   function remapEserviceAttributesToPublicEServiceAttributes(
-    attribute: EServiceAttributes["certified"][0]
+    attribute: EServiceAttributes['certified'][0]
   ) {
     function remapEserviceAttributeToPublicEServiceAttribute(id: string) {
-      const attributeData = safelyGetDataFromMap(id, attributesMap);
+      const attributeData = safelyGetDataFromMap(id, attributesMap)
       return {
         description: attributeData.description,
         name: attributeData.name,
-      };
+      }
     }
 
-    if ("id" in attribute) {
+    if ('id' in attribute) {
       return {
-        single: remapEserviceAttributeToPublicEServiceAttribute(
-          attribute.id.id
-        ),
-      };
+        single: remapEserviceAttributeToPublicEServiceAttribute(attribute.id.id),
+      }
     }
 
     return {
-      group: attribute.ids.map(({ id }) =>
-        remapEserviceAttributeToPublicEServiceAttribute(id)
-      ),
-    };
+      group: attribute.ids.map(({ id }) => remapEserviceAttributeToPublicEServiceAttribute(id)),
+    }
   }
 
   return {
     certified: certified.map(remapEserviceAttributesToPublicEServiceAttributes),
     verified: verified.map(remapEserviceAttributesToPublicEServiceAttributes),
     declared: declared.map(remapEserviceAttributesToPublicEServiceAttributes),
-  };
+  }
 }
 
 /**
@@ -92,20 +84,18 @@ function remapEServiceAttributesToPublicEServiceAttributes(
  * @param eservice - The e-service
  * @returns The active descriptor
  */
-function getActiveDescriptor(
-  eservice: EService
-): PublicEServiceActiveDescriptor {
+function getActiveDescriptor(eservice: EService): PublicEServiceActiveDescriptor {
   const activeDescriptor = eservice.descriptors.find(
-    ({ state }) => state === "Published" || state === "Suspended"
-  );
+    ({ state }) => state === 'Published' || state === 'Suspended'
+  )
 
-  if (!activeDescriptor || !activeDescriptor.interface) {
-    throw new Error(`No active descriptor found for e-service ${eservice.id}`);
+  if (!activeDescriptor) {
+    throw new Error(`No active descriptor found for e-service ${eservice.id}`)
   }
 
   return {
     id: activeDescriptor.id,
-    state: activeDescriptor.state.toUpperCase() as "PUBLISHED" | "SUSPENDED",
+    state: activeDescriptor.state.toUpperCase() as 'PUBLISHED' | 'SUSPENDED',
     version: activeDescriptor.version,
-  };
+  }
 }

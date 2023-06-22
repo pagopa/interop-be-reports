@@ -1,5 +1,5 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { env } from "../env.js";
+import { env } from "../configs/env.js";
 
 /**
  * Uploads a JSON file to an S3 bucket.

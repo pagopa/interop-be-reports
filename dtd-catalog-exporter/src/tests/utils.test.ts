@@ -3,7 +3,7 @@ import {
   getAllAttributesIdsInEServices,
   getMappedRecords,
   safelyGetDataFromMap,
-} from "../utils.js";
+} from "../utils/index.js";
 import { getEServiceMock } from "./data.mocks.js";
 
 describe("getAttributesIdsInEServices util", () => {
@@ -28,11 +28,7 @@ describe("getAttributesIdsInEServices util", () => {
   });
 
   it("should remove duplicates", () => {
-    const result = getAllAttributesIdsInEServices([
-      getEServiceMock(),
-      getEServiceMock(),
-      getEServiceMock(),
-    ]);
+    const result = getAllAttributesIdsInEServices([getEServiceMock(), getEServiceMock(), getEServiceMock()]);
     expect(result).toEqual([
       "929188a4-bbc8-4509-8999-b2d424de3870",
       "f9d7acb2-dc06-4ff2-be76-498179e7f2e9",
@@ -106,8 +102,6 @@ describe("safelyGetDataFromMap util", () => {
       { id: "2", name: "Jane" },
     ];
     const recordsMap = getMappedRecords(records);
-    expect(() => safelyGetDataFromMap("3", recordsMap)).toThrowError(
-      "No data found for 3"
-    );
+    expect(() => safelyGetDataFromMap("3", recordsMap)).toThrowError("No data found for 3");
   });
 });
