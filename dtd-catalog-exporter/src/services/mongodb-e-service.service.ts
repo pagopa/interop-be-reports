@@ -41,9 +41,9 @@ export class MongoDBEServiceClient {
   async getEServices() {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
-      .collection<EService>(env.ESERVICES_COLLECTION_NAME)
-      .find({ "data.descriptors.state": { $in: ["Published", "Suspended"] } })
-      .map(eserviceSchema.parse)
+      .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
+      .find({ "data.descriptors.state": { $in: ["Published", "Suspended"] } }, { projection: { _id: 0, metadata: 0 } })
+      .map(({ data }) => eserviceSchema.parse(data))
       .toArray();
   }
 
@@ -59,12 +59,12 @@ export class MongoDBEServiceClient {
   async getEServicesAttributes(attributeIds: Array<string>) {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
-      .collection<Attribute>(env.ATTRIBUTES_COLLECTION_NAME)
+      .collection<{ data: Attribute }>(env.ATTRIBUTES_COLLECTION_NAME)
       .find(
         { "data.id": { $in: attributeIds } },
         { projection: { _id: 0, "data.id": 1, "data.name": 1, "data.description": 1 } }
       )
-      .map(attributeSchema.parse)
+      .map(({ data }) => attributeSchema.parse(data))
       .toArray();
   }
   /**
@@ -79,9 +79,9 @@ export class MongoDBEServiceClient {
   async getEServicesTenants(tenantIds: Array<string>) {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
-      .collection<Tenant>(env.TENANTS_COLLECTION_NAME)
+      .collection<{ data: Tenant }>(env.TENANTS_COLLECTION_NAME)
       .find({ "data.id": { $in: tenantIds } }, { projection: { _id: 0, "data.id": 1, "data.name": 1 } })
-      .map(tenantSchema.parse)
+      .map(({ data }) => tenantSchema.parse(data))
       .toArray();
   }
 
