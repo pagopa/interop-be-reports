@@ -28,24 +28,7 @@ export class MongoDBEServiceClient {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<EService>(env.ESERVICES_COLLECTION_NAME)
-      .aggregate([
-        {
-          $match: {
-            "data.descriptors": {
-              $elemMatch: {
-                state: {
-                  $in: ["Published", "Suspended"],
-                },
-              },
-            },
-          },
-        },
-        {
-          $replaceRoot: {
-            newRoot: "$data",
-          },
-        },
-      ])
+      .find({ "data.descriptors.state": { $in: ["Published", "Suspended"] } })
       .map(eserviceSchema.parse)
       .toArray();
   }
@@ -63,26 +46,10 @@ export class MongoDBEServiceClient {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<Attribute>(env.ATTRIBUTES_COLLECTION_NAME)
-      .aggregate([
-        {
-          $match: {
-            "data.id": { $in: attributeIds },
-          },
-        },
-        {
-          $replaceRoot: {
-            newRoot: "$data",
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            id: 1,
-            name: 1,
-            description: 1,
-          },
-        },
-      ])
+      .find(
+        { "data.id": { $in: attributeIds } },
+        { projection: { _id: 0, "data.id": 1, "data.name": 1, "data.description": 1 } }
+      )
       .map(attributeSchema.parse)
       .toArray();
   }
@@ -99,25 +66,7 @@ export class MongoDBEServiceClient {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<Tenant>(env.TENANTS_COLLECTION_NAME)
-      .aggregate([
-        {
-          $match: {
-            "data.id": { $in: tenantIds },
-          },
-        },
-        {
-          $replaceRoot: {
-            newRoot: "$data",
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            id: 1,
-            name: 1,
-          },
-        },
-      ])
+      .find({ "data.id": { $in: tenantIds } }, { projection: { _id: 0, "data.id": 1, "data.name": 1 } })
       .map(tenantSchema.parse)
       .toArray();
   }
