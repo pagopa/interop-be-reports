@@ -20,9 +20,9 @@ export class MongoDBEServiceClient {
 
     // Use this config instead if you want to connect to a mongodb instance locally using a tunnel
     // const connectionConfig = {
-    //   directConnection: true,
+    //   directConnection: "true",
     //   readPreference: "secondaryPreferred",
-    //   retryWrites: false,
+    //   retryWrites: "false",
     // };
 
     const connectionParams = new URLSearchParams(connectionConfig).toString();
