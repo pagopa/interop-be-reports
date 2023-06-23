@@ -10,7 +10,7 @@ export class AwsS3Client {
 
   /**
    * Uploads a JSON file to an S3 bucket.
-   * @param bucked The name of the bucked.
+   * @param bucket The name of the bucket.
    * @param data The data to be uploaded. The data will be stringified if it is not a string.
    * @param path The path in which the data will be stored in the bucket.
    */
