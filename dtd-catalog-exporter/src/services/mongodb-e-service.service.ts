@@ -49,7 +49,7 @@ export class MongoDBEServiceClient {
 
   /**
    * Does the following:
-   * - Then fetches all the attributes from the database filtering by the passed attribute ids;
+   * - Fetches all the attributes from the database filtering by the passed attribute ids;
    * - Validates the array of attributes;
    * - Transforms the array of attributes into a map of attributes (id -> attribute) and returns it;
    *
@@ -69,7 +69,7 @@ export class MongoDBEServiceClient {
   }
   /**
    * Does the following:
-   * - Then fetches all the tenants from the database filtering by the passed tenant ids;
+   * - Fetches all the tenants from the database filtering by the passed tenant ids;
    * - Validates the array of tenants;
    * - Transforms the array of tenants into a map of tenants (id -> tenant) and returns it;
    *
