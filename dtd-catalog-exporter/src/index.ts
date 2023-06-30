@@ -1,6 +1,6 @@
 import { MongoDBEServiceClient, uploadJSONToS3Bucket, remapEServiceToPublicEService } from "./services/index.js";
 import {
-  getAllAttributesIdsInEServices,
+  getAllAttributesIdsInEServicesActiveDescriptors,
   getAllTenantsIdsInEServices,
   getExecutionTime,
   getMappedRecords,
@@ -21,7 +21,7 @@ async function main() {
   const eservices = await mongoDBEServiceClient.getEServices();
 
   log("Fetching e-service's tenants and attributes data from database...");
-  const eserviceAttributeIds = getAllAttributesIdsInEServices(eservices);
+  const eserviceAttributeIds = getAllAttributesIdsInEServicesActiveDescriptors(eservices);
   const tenantIds = getAllTenantsIdsInEServices(eservices);
 
   const attributes = await mongoDBEServiceClient.getEServicesAttributes(eserviceAttributeIds);

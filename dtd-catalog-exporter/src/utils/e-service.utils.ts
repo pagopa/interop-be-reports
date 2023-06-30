@@ -1,14 +1,33 @@
-import { EServices } from "../models/index.js";
+import { EService, EServiceDescriptor, EServices } from "../models/index.js";
 
 /**
- * Returns all attributes ids inside an array of eservices
+ * Gets the active descriptor of an e-service.
+ * To get the active descriptor, we look for the first descriptor with state "Published" or "Suspended".
+ * If no descriptor is found, an error is thrown.
+ * @param eservice - The e-service
+ * @returns The active descriptor
+ */
+export function getEServiceActiveDescriptor(eservice: EService): EServiceDescriptor {
+  const activeDescriptor = eservice.descriptors.find(({ state }) => state === "Published" || state === "Suspended");
+
+  if (!activeDescriptor) {
+    throw new Error(`No active descriptor found for e-service ${eservice.id}`);
+  }
+
+  return activeDescriptor;
+}
+
+/**
+ * Gets the active descriptor from each eservice and returns all attributes ids inside them
  * @param eservices - The array of eservices
  * @returns The array of attributes ids
  */
-export function getAllAttributesIdsInEServices(eservices: EServices) {
+export function getAllAttributesIdsInEServicesActiveDescriptors(eservices: EServices) {
   const attributesIds: Set<string> = new Set();
+
   eservices.forEach((eservice) => {
-    const { certified, verified, declared } = eservice.attributes;
+    const activeDescriptor = getEServiceActiveDescriptor(eservice);
+    const { certified, verified, declared } = activeDescriptor.attributes;
     [...certified, ...verified, ...declared].forEach((attribute) => {
       if ("ids" in attribute) {
         attribute.ids.forEach(({ id }) => attributesIds.add(id));
@@ -18,6 +37,7 @@ export function getAllAttributesIdsInEServices(eservices: EServices) {
       }
     });
   });
+
   return Array.from(attributesIds);
 }
 

@@ -24,14 +24,14 @@ const publicEServiceDocSchema = z.object({
   prettyName: z.string(),
 });
 
-const publicEServiceActiveDescriptorSchema = z.object({
+const publicEServiceDescriptorSchema = z.object({
   id: z.string(),
   state: z.enum(["PUBLISHED", "SUSPENDED"]),
   version: z.string(),
 });
 
 export const publicEServiceSchema = z.object({
-  activeDescriptor: publicEServiceActiveDescriptorSchema,
+  activeDescriptor: publicEServiceDescriptorSchema,
   technology: z.enum(["REST", "SOAP"]),
   producerName: z.string(),
   id: z.string(),
@@ -42,7 +42,7 @@ export const publicEServiceSchema = z.object({
 
 export type PublicEService = z.infer<typeof publicEServiceSchema>;
 export type PublicEServiceDoc = z.infer<typeof publicEServiceDocSchema>;
-export type PublicEServiceActiveDescriptor = z.infer<typeof publicEServiceActiveDescriptorSchema>;
+export type PublicEServiceDescriptor = z.infer<typeof publicEServiceDescriptorSchema>;
 export type PublicEServiceAttribute = z.infer<typeof publicEServiceAttributeSchema>;
 export type PublicEServiceAttributes = z.infer<typeof publicEServiceAttributesSchema>;
 

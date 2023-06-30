@@ -43,7 +43,10 @@ export class MongoDBEServiceClient {
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
       .find({ "data.descriptors.state": { $in: ["Published", "Suspended"] } }, { projection: { _id: 0, metadata: 0 } })
-      .map(({ data }) => eserviceSchema.parse(data))
+      .map(({ data }) => {
+        console.log(data);
+        return eserviceSchema.parse(data);
+      })
       .toArray();
   }
 

@@ -1,43 +1,44 @@
-import { z } from 'zod'
+import { z } from "zod";
 
-const eserviceAttributeSchema = z.object({
+const descriptorAttributeSchema = z.object({
   explicitAttributeVerification: z.boolean(),
   id: z.string(),
-})
+});
 
-const eserviceAttributeSingleSchema = z.object({
-  id: eserviceAttributeSchema,
-})
+const descriptorAttributeSingleSchema = z.object({
+  id: descriptorAttributeSchema,
+});
 
-const eserviceAttributesGroupSchema = z.object({
-  ids: z.array(eserviceAttributeSchema),
-})
+const descriptorAttributesGroupSchema = z.object({
+  ids: z.array(descriptorAttributeSchema),
+});
 
-const eserviceAttributesSchema = z.object({
-  certified: z.array(z.union([eserviceAttributeSingleSchema, eserviceAttributesGroupSchema])),
-  verified: z.array(z.union([eserviceAttributeSingleSchema, eserviceAttributesGroupSchema])),
-  declared: z.array(z.union([eserviceAttributeSingleSchema, eserviceAttributesGroupSchema])),
-})
+const descriptorAttributesSchema = z.object({
+  certified: z.array(z.union([descriptorAttributeSingleSchema, descriptorAttributesGroupSchema])),
+  verified: z.array(z.union([descriptorAttributeSingleSchema, descriptorAttributesGroupSchema])),
+  declared: z.array(z.union([descriptorAttributeSingleSchema, descriptorAttributesGroupSchema])),
+});
 
-const descriptorSchema = z.object({
+export const eserviceDescriptorSchema = z.object({
   id: z.string(),
-  state: z.enum(['Published', 'Draft', 'Deprecated', 'Suspended']),
+  state: z.enum(["Published", "Draft", "Deprecated", "Suspended"]),
   version: z.string(),
-})
+  attributes: descriptorAttributesSchema,
+});
 
 export const eserviceSchema = z.object({
-  attributes: eserviceAttributesSchema,
   description: z.string(),
-  descriptors: z.array(descriptorSchema),
+  descriptors: z.array(eserviceDescriptorSchema),
   id: z.string(),
   name: z.string(),
   producerId: z.string(),
-  technology: z.enum(['Rest', 'Soap']),
-})
+  technology: z.enum(["Rest", "Soap"]),
+});
 
-export type EService = z.infer<typeof eserviceSchema>
-export type EServiceAttribute = z.infer<typeof eserviceAttributeSchema>
-export type EServiceAttributes = z.infer<typeof eserviceAttributesSchema>
+export type EService = z.infer<typeof eserviceSchema>;
+export type EServiceDescriptor = z.infer<typeof eserviceDescriptorSchema>;
+export type DescriptorAttribute = z.infer<typeof descriptorAttributeSchema>;
+export type DescriptorAttributes = z.infer<typeof descriptorAttributesSchema>;
 
-export const eservicesSchema = z.array(eserviceSchema)
-export type EServices = z.infer<typeof eservicesSchema>
+export const eservicesSchema = z.array(eserviceSchema);
+export type EServices = z.infer<typeof eservicesSchema>;

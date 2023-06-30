@@ -1,14 +1,14 @@
 import {
+  getAllAttributesIdsInEServicesActiveDescriptors,
   getAllTenantsIdsInEServices,
-  getAllAttributesIdsInEServices,
   getMappedRecords,
   safelyGetDataFromMap,
 } from "../utils/index.js";
 import { getEServiceMock } from "./data.mocks.js";
 
-describe("getAttributesIdsInEServices util", () => {
+describe("getAllAttributesIdsInEServicesActiveDescriptors util", () => {
   it("should return an array of attributes ids", () => {
-    const result = getAllAttributesIdsInEServices([getEServiceMock()]);
+    const result = getAllAttributesIdsInEServicesActiveDescriptors([getEServiceMock()]);
     expect(result).toEqual([
       "929188a4-bbc8-4509-8999-b2d424de3870",
       "f9d7acb2-dc06-4ff2-be76-498179e7f2e9",
@@ -23,12 +23,16 @@ describe("getAttributesIdsInEServices util", () => {
   });
 
   it("should return an empty array if no eServices are provided", () => {
-    const result = getAllAttributesIdsInEServices([]);
+    const result = getAllAttributesIdsInEServicesActiveDescriptors([]);
     expect(result).toEqual([]);
   });
 
   it("should remove duplicates", () => {
-    const result = getAllAttributesIdsInEServices([getEServiceMock(), getEServiceMock(), getEServiceMock()]);
+    const result = getAllAttributesIdsInEServicesActiveDescriptors([
+      getEServiceMock(),
+      getEServiceMock(),
+      getEServiceMock(),
+    ]);
     expect(result).toEqual([
       "929188a4-bbc8-4509-8999-b2d424de3870",
       "f9d7acb2-dc06-4ff2-be76-498179e7f2e9",

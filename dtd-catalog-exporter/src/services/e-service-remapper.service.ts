@@ -1,13 +1,12 @@
-import { safelyGetDataFromMap } from '../utils/index.js'
+import { getEServiceActiveDescriptor, safelyGetDataFromMap } from "../utils/index.js";
 import {
   Attribute,
   EService,
-  EServiceAttributes,
   PublicEService,
-  PublicEServiceActiveDescriptor,
+  DescriptorAttributes,
   PublicEServiceAttributes,
-} from '../models/index.js'
-import { Tenant } from '../models/tenants.models.js'
+} from "../models/index.js";
+import { Tenant } from "../models/tenants.models.js";
 
 /**
  * Remaps an e-service to a public e-service
@@ -21,18 +20,21 @@ export function remapEServiceToPublicEService(
   attributesMap: Map<string, Attribute>,
   producersMap: Map<string, Tenant>
 ): PublicEService {
+  const activeDescriptor = getEServiceActiveDescriptor(eservice);
+
   return {
     id: eservice.id,
     name: eservice.name,
     description: eservice.description,
-    technology: eservice.technology.toUpperCase() as 'REST' | 'SOAP',
+    technology: eservice.technology.toUpperCase() as "REST" | "SOAP",
     producerName: safelyGetDataFromMap(eservice.producerId, producersMap).name,
-    attributes: remapEServiceAttributesToPublicEServiceAttributes(
-      eservice.attributes,
-      attributesMap
-    ),
-    activeDescriptor: getActiveDescriptor(eservice),
-  }
+    attributes: remapDescriptorAttributesToPublicAttributes(activeDescriptor.attributes, attributesMap),
+    activeDescriptor: {
+      id: activeDescriptor.id,
+      state: activeDescriptor.state.toUpperCase() as "PUBLISHED" | "SUSPENDED",
+      version: activeDescriptor.version,
+    },
+  };
 }
 
 /**
@@ -42,60 +44,35 @@ export function remapEServiceToPublicEService(
  * @returns The array of public e-service attributes
  *
  **/
-function remapEServiceAttributesToPublicEServiceAttributes(
-  attributes: EServiceAttributes,
+function remapDescriptorAttributesToPublicAttributes(
+  attributes: DescriptorAttributes,
   attributesMap: Map<string, Attribute>
 ): PublicEServiceAttributes {
-  const { certified, verified, declared } = attributes
+  const { certified, verified, declared } = attributes;
 
-  function remapEserviceAttributesToPublicEServiceAttributes(
-    attribute: EServiceAttributes['certified'][0]
-  ) {
+  function remapDescriptorAttributesToPublicAttributes(attribute: DescriptorAttributes["certified"][0]) {
     function remapEserviceAttributeToPublicEServiceAttribute(id: string) {
-      const attributeData = safelyGetDataFromMap(id, attributesMap)
+      const attributeData = safelyGetDataFromMap(id, attributesMap);
       return {
         description: attributeData.description,
         name: attributeData.name,
-      }
+      };
     }
 
-    if ('id' in attribute) {
+    if ("id" in attribute) {
       return {
         single: remapEserviceAttributeToPublicEServiceAttribute(attribute.id.id),
-      }
+      };
     }
 
     return {
       group: attribute.ids.map(({ id }) => remapEserviceAttributeToPublicEServiceAttribute(id)),
-    }
+    };
   }
 
   return {
-    certified: certified.map(remapEserviceAttributesToPublicEServiceAttributes),
-    verified: verified.map(remapEserviceAttributesToPublicEServiceAttributes),
-    declared: declared.map(remapEserviceAttributesToPublicEServiceAttributes),
-  }
-}
-
-/**
- * Gets the active descriptor of an e-service.
- * To get the active descriptor, we look for the first descriptor with state "Published" or "Suspended".
- * If no descriptor is found, an error is thrown.
- * @param eservice - The e-service
- * @returns The active descriptor
- */
-function getActiveDescriptor(eservice: EService): PublicEServiceActiveDescriptor {
-  const activeDescriptor = eservice.descriptors.find(
-    ({ state }) => state === 'Published' || state === 'Suspended'
-  )
-
-  if (!activeDescriptor) {
-    throw new Error(`No active descriptor found for e-service ${eservice.id}`)
-  }
-
-  return {
-    id: activeDescriptor.id,
-    state: activeDescriptor.state.toUpperCase() as 'PUBLISHED' | 'SUSPENDED',
-    version: activeDescriptor.version,
-  }
+    certified: certified.map(remapDescriptorAttributesToPublicAttributes),
+    verified: verified.map(remapDescriptorAttributesToPublicAttributes),
+    declared: declared.map(remapDescriptorAttributesToPublicAttributes),
+  };
 }
