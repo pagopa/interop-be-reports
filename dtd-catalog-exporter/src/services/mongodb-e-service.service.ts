@@ -16,19 +16,17 @@ export class MongoDBEServiceClient {
     const connectionConfig = {
       replicaSet: "rs0",
       readPreference: "secondaryPreferred",
-    };
+    } as const;
 
     // Use this config instead if you want to connect to a mongodb instance locally using a tunnel
     // const connectionConfig = {
     //   directConnection: "true",
     //   readPreference: "secondaryPreferred",
     //   retryWrites: "false",
-    // };
+    // } as const;
 
-    const connectionParams = new URLSearchParams(connectionConfig).toString();
-
-    const connectionString = `mongodb://${env.READ_MODEL_DB_USER}:${env.READ_MODEL_DB_PASSWORD}@${env.READ_MODEL_DB_HOST}:${env.READ_MODEL_DB_PORT}?${connectionParams}`;
-    const client = await new MongoClient(connectionString).connect();
+    const connectionString = `mongodb://${env.READ_MODEL_DB_USER}:${env.READ_MODEL_DB_PASSWORD}@${env.READ_MODEL_DB_HOST}:${env.READ_MODEL_DB_PORT}`;
+    const client = await new MongoClient(connectionString, connectionConfig).connect();
     return new MongoDBEServiceClient(client);
   }
 
