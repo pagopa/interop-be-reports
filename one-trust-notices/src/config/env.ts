@@ -8,8 +8,8 @@ const envSchema = z.object({
   CONTENT_STORAGE_BUCKET: z.string(),
   HISTORY_STORAGE_BUCKET: z.string(),
 
-  ONE_TRUST_CLIENT_ID: z.string(),
-  ONE_TRUST_CLIENT_SECRET: z.string(),
+  ONETRUST_CLIENT_ID: z.string(),
+  ONETRUST_CLIENT_SECRET: z.string(),
 
   PRIVACY_NOTICES_UPDATER_TERMS_OF_SERVICE_UUID: z.string(),
   PRIVACY_NOTICES_UPDATER_PRIVACY_POLICY_UUID: z.string(),

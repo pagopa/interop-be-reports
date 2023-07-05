@@ -24,8 +24,8 @@ export class OneTrustClient {
    */
   public static async connect() {
     const form = new FormData()
-    form.append('client_id', env.ONE_TRUST_CLIENT_ID)
-    form.append('client_secret', env.ONE_TRUST_CLIENT_SECRET)
+    form.append('client_id', env.ONETRUST_CLIENT_ID)
+    form.append('client_secret', env.ONETRUST_CLIENT_SECRET)
     form.append('grant_type', 'client_credentials')
     try {
       const response = await axios.post(`${ONE_STRUST_API_ENDPOINT}/access/v1/oauth/token`, form, {
