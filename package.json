@@ -1,0 +1,10 @@
+{
+  "name": "interop-be-reports",
+  "scripts": {
+    "new-project": "node ./scripts/create-new-project.js"
+  },
+  "workspaces": [
+    "dtd-catalog-exporter",
+    "one-trust-notices"
+  ]
+}
