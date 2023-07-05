@@ -11,8 +11,8 @@ const envSchema = z.object({
   ONE_TRUST_CLIENT_ID: z.string(),
   ONE_TRUST_CLIENT_SECRET: z.string(),
 
-  TERMS_OF_SERVICE_NOTICE_ID: z.string(),
-  PRIVACY_POLICY_NOTICE_ID: z.string(),
+  PRIVACY_NOTICES_UPDATER_TERMS_OF_SERVICE_UUID: z.string(),
+  PRIVACY_NOTICES_UPDATER_PRIVACY_POLICY_UUID: z.string(),
   PRIVACY_NOTICES_DYNAMO_TABLE_NAME: z.string(),
 })
 
