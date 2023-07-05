@@ -108,11 +108,20 @@ function createTsConfig(projectName) {
     `./${projectName}/tsconfig.json`,
     JSON.stringify(
       {
-        extends: '../tsconfig.base.json',
-        include: ['src/**/*'],
         compilerOptions: {
           outDir: 'dist',
+          target: 'ESNext',
+          module: 'ESNext',
+          moduleResolution: 'nodenext',
+          forceConsistentCasingInFileNames: true,
+          strict: true,
+          noImplicitAny: true,
+          skipDefaultLibCheck: true,
+          skipLibCheck: true,
+          noErrorTruncation: true,
         },
+        exclude: ['**/src/tests/**/*'],
+        include: ['src/**/*'],
       },
       null,
       2

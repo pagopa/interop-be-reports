@@ -1,7 +1,16 @@
 {
-  "extends": "../tsconfig.base.json",
-  "include": ["src/**/*"],
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "nodenext",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true, 
+    "noErrorTruncation": true,
   },
+  "exclude": ["**/src/tests/**/*"],
+  "include": ["src/**/*"],
 }
