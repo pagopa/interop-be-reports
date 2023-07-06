@@ -5,6 +5,7 @@ export const attributeSchema = z.object({
   name: z.string(),
   description: z.string(),
 });
+
 export type Attribute = z.infer<typeof attributeSchema>;
 
 export const attributesSchema = z.array(attributeSchema);
