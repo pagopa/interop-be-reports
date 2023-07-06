@@ -10,7 +10,7 @@
     "skipDefaultLibCheck": true,
     "skipLibCheck": true, 
     "noErrorTruncation": true,
+    "types": ["vitest/globals"]
   },
-  "exclude": ["**/src/tests/**/*"],
   "include": ["src/**/*"],
 }

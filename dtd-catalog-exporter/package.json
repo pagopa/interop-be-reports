@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "rm -rf dist && tsc",
+    "build": "rm -rf dist && tsc --project tsconfig.build.json",
     "start": "node dist",
     "test": "vitest run"
   },
