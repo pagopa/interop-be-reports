@@ -3,7 +3,6 @@ import dotenv from 'dotenv'
 
 const envSchema = z.object({
   LANGS: z.string().transform((value) => value.split(',')),
-  PUBLIC_STORAGE_PATH: z.string(),
 
   CONTENT_STORAGE_BUCKET: z.string(),
   HISTORY_STORAGE_BUCKET: z.string(),
