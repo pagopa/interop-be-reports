@@ -20,7 +20,7 @@ export function getNoticeContent(oneTrustResponseBody: GetNoticeContentResponseD
  * @param oneTrustResponseBody The OneTrust notice data.
  */
 export function getBucketPath(lang: string, oneTrustPublicNotice: OneTrustPublicNotice): string {
-  return `/consent/${oneTrustPublicNotice.id}/${oneTrustPublicNotice.versionId}/${lang}/notice.json`
+  return `consent/${oneTrustPublicNotice.id}/${oneTrustPublicNotice.versionId}/${lang}/notice.json`
 }
 
 /**
