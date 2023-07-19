@@ -15,12 +15,28 @@ export function getNoticeContent(oneTrustResponseBody: GetNoticeContentResponseD
 }
 
 /**
- * Get the path in which the notice data will be stored in the buckets.
+ * Generates the bucket path in which the notice data will be stored privately.
+ * The private bucket path is generated using the notice id and version id.
+ * This way the BFF can access a specific version of the notice.
  * @param lang The language of the notice.
  * @param oneTrustResponseBody The OneTrust notice data.
  */
-export function getBucketPath(lang: string, oneTrustPublicNotice: OneTrustPublicNotice): string {
+export function getVersionedNoticeBucketPath(
+  lang: string,
+  oneTrustPublicNotice: OneTrustPublicNotice
+): string {
   return `consent/${oneTrustPublicNotice.id}/${oneTrustPublicNotice.versionId}/${lang}/notice.json`
+}
+
+/**
+ * Get the path in which the notice data will be stored in the buckets.
+ * The public bucket path is generated using a fixed path and will always point to the latest version of the notice.
+ * This is used by the FE to access to the latest version of the notice without having to know the ids.
+ * @param lang The language of the notice.
+ * @param type The type of the notice, tos or pp.
+ */
+export function getLatestNoticeBucketPath(lang: string, type: 'tos' | 'pp'): string {
+  return `consent/latest/${lang}/${type}.json`
 }
 
 /**

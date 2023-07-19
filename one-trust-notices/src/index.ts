@@ -4,10 +4,11 @@ import { env, ONE_TRUST_NOTICES } from './config/index.js'
 import { OneTrustNoticeDBSchema } from './models/index.js'
 import {
   checkForNewVersion,
-  getBucketPath,
   getNoticeContent,
   remapOneTrustNoticeVersionToDynamoDBSchemaUpdateObject,
   resolveError,
+  getVersionedNoticeBucketPath,
+  getLatestNoticeBucketPath,
 } from './utils/index.js'
 
 const log = console.log
@@ -38,18 +39,24 @@ async function main() {
       ])
 
       // Extracts the notice content for each language.
-      const noticeContents = localizedNoticeContentResponses.map(getNoticeContent)
+      const localizedNoticeContents = localizedNoticeContentResponses.map(getNoticeContent)
 
       // Generate the bucket paths for each language.
-      const bucketPaths = noticeContents.map((noticeContent, index) =>
-        getBucketPath(env.LANGS[index], noticeContent)
+      const versionedContentBucketPaths = localizedNoticeContents.map((noticeContent, index) =>
+        getVersionedNoticeBucketPath(env.LANGS[index], noticeContent)
+      )
+      const latestContentBucketPaths = env.LANGS.map((lang) =>
+        getLatestNoticeBucketPath(lang, oneTrustNotice.type)
       )
 
       log('> Checking if it is a new version...')
 
+      // We check if there is a new version by checking if the history bucket already has one of the versioned paths.
       const isNewVersion = (
         await Promise.all(
-          bucketPaths.map((bucketPath) => checkForNewVersion(awsS3Client, bucketPath))
+          versionedContentBucketPaths.map((bucketPath) =>
+            checkForNewVersion(awsS3Client, bucketPath)
+          )
         )
       ).some(Boolean)
 
@@ -60,7 +67,7 @@ async function main() {
             awsS3Client.uploadJSONToS3Bucket(
               env.HISTORY_STORAGE_BUCKET,
               noticeContentResponse,
-              bucketPaths[index]
+              versionedContentBucketPaths[index]
             )
           )
         )
@@ -70,16 +77,24 @@ async function main() {
 
       log(`> Uploading notice content to ${chalk.blue(env.CONTENT_STORAGE_BUCKET)} bucket...`)
 
-      const jsonHtmlNodes = noticeContents.map(({ content }) => html2json(content))
-      await Promise.all(
-        jsonHtmlNodes.map((jsonHtmlNode, index) =>
+      const jsonHtmlNodes = localizedNoticeContents.map(({ content }) => html2json(content))
+
+      await Promise.all([
+        ...jsonHtmlNodes.map((jsonHtmlNode, index) =>
           awsS3Client.uploadJSONToS3Bucket(
             env.CONTENT_STORAGE_BUCKET,
             jsonHtmlNode,
-            bucketPaths[index]
+            versionedContentBucketPaths[index]
           )
-        )
-      )
+        ),
+        ...jsonHtmlNodes.map((jsonHtmlNode, index) =>
+          awsS3Client.uploadJSONToS3Bucket(
+            env.CONTENT_STORAGE_BUCKET,
+            jsonHtmlNode,
+            latestContentBucketPaths[index]
+          )
+        ),
+      ])
 
       log(`> Updating ${chalk.blue(oneTrustNotice.name)} data in DynamoDB...`)
 
