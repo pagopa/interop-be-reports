@@ -11,11 +11,11 @@ async function main() {
   log('Program started.\n')
 
   log('> Connecting to database...')
-  const mongoDBEServiceClient = await ReadModelQueriesClient.connect()
+  const readModelsQueriesClient = await ReadModelQueriesClient.connect()
   log(chalk.green('> Connected to database!\n'))
 
   log('> Getting data...')
-  const purposes = await mongoDBEServiceClient.getPNEServicePurposes()
+  const purposes = await readModelsQueriesClient.getPNEServicePurposes()
 
   if (purposes.length === 0) {
     log(chalk.yellow('> No purposes data found. Exiting program.'))
@@ -23,7 +23,7 @@ async function main() {
   }
 
   const tenantsIds = new Set(purposes.map((purpose) => purpose.consumerId))
-  const tenants = await mongoDBEServiceClient.getComuniByTenantsIds(tenantsIds)
+  const tenants = await readModelsQueriesClient.getComuniByTenantsIds(tenantsIds)
 
   const tenantNamesMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant.name]))
   const csvData = purposes.map(toCsvDataRow.bind(null, tenantNamesMap))
@@ -57,7 +57,7 @@ async function main() {
   log(chalk.green('> Success!\n'))
   log('End of program.')
 
-  await mongoDBEServiceClient.close()
+  await readModelsQueriesClient.close()
   process.exit(0)
 }
 
