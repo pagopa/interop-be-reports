@@ -41,7 +41,7 @@ export class ReadModelQueriesClient {
   async getPNEServicePurposes() {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
-      .collection<{ data: Purpose }>('purposes')
+      .collection<{ data: Purpose }>(env.PURPOSES_COLLECTION_NAME)
       .find(
         {
           'data.eserviceId': PN_ESERVICE_ID,
