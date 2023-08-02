@@ -32,7 +32,7 @@ async function main() {
   log('> Sending emails...')
 
   const mailer = new Mailer({
-    host: env.SMTP_HOST,
+    host: env.SMTP_ADDRESS,
     port: env.SMTP_PORT,
     secure: env.SMTP_SECURE,
     auth: {

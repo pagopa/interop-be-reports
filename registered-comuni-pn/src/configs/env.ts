@@ -11,7 +11,7 @@ export const envSchema = z.object({
   READ_MODEL_DB_PORT: z.string(),
   READ_MODEL_DB_NAME: z.string(),
 
-  SMTP_HOST: z.string(),
+  SMTP_ADDRESS: z.string(),
   SMTP_PORT: z.string().transform((value) => Number(value)),
   SMTP_USER: z.string(),
   SMTP_PASSWORD: z.string(),
