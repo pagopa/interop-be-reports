@@ -42,17 +42,13 @@ async function main() {
     },
   })
 
-  await Promise.all(
-    env.MAIL_RECIPIENTS.map((recipient) =>
-      mailer.sendMail({
-        from: env.SMTP_USER,
-        to: recipient,
-        subject: MAIL_SUBJECT,
-        text: MAIL_BODY,
-        attachments: [{ filename: CSV_FILENAME, content: toCSV(csvData) }],
-      })
-    )
-  )
+  mailer.sendMail({
+    from: env.SMTP_USER,
+    to: env.MAIL_RECIPIENTS,
+    subject: MAIL_SUBJECT,
+    text: MAIL_BODY,
+    attachments: [{ filename: CSV_FILENAME, content: toCSV(csvData) }],
+  })
 
   log(chalk.green('> Success!\n'))
   log('End of program.')
