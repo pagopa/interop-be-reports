@@ -1,10 +1,6 @@
 import { MongoClient } from 'mongodb'
 import { env } from '../configs/env.js'
 import { Tenant, tenantSchema, purposeSchema, Purpose } from '../models/index.js'
-import {
-  COMUNI_E_LORO_CONSORZI_E_ASSOCIAZIONI_ATTRIBUTE_ID,
-  PN_ESERVICE_ID,
-} from '../configs/constants.js'
 
 export class ReadModelQueriesClient {
   private client: MongoClient
@@ -44,7 +40,7 @@ export class ReadModelQueriesClient {
       .collection<{ data: Purpose }>(env.PURPOSES_COLLECTION_NAME)
       .find(
         {
-          'data.eserviceId': PN_ESERVICE_ID,
+          'data.eserviceId': env.PN_ESERVICE_ID,
           'data.versions': {
             $elemMatch: {
               state: { $in: ['Active', 'Suspended', 'WaitingForApproval'] },
@@ -80,7 +76,7 @@ export class ReadModelQueriesClient {
         {
           'data.id': { $in: tenantsIds },
           'data.attributes': {
-            $elemMatch: { id: COMUNI_E_LORO_CONSORZI_E_ASSOCIAZIONI_ATTRIBUTE_ID },
+            $elemMatch: { id: env.COMUNI_E_LORO_CONSORZI_E_ASSOCIAZIONI_ATTRIBUTE_ID },
           },
         },
         {

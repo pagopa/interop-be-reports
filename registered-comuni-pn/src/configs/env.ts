@@ -17,6 +17,9 @@ export const envSchema = z.object({
   SMTP_PASSWORD: z.string(),
   SMTP_SECURE: z.string().transform((value) => value === 'true'),
   MAIL_RECIPIENTS: z.string().transform((value) => value.split(',')),
+
+  PN_ESERVICE_ID: z.string(),
+  COMUNI_E_LORO_CONSORZI_E_ASSOCIAZIONI_ATTRIBUTE_ID: z.string(),
 })
 
 export type Env = z.infer<typeof envSchema>
