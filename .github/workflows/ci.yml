@@ -2,8 +2,8 @@ name: Continuous Integration
 
 on:
   push:
-    branches: ["**"]
-    tags: ["**"]
+    branches: ['**']
+    tags: ['**']
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -21,7 +21,7 @@ jobs:
       - name: Install node 18
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ inputs.node-version }}
+          node-version: 18
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -36,16 +36,12 @@ jobs:
 
       - name: Testing
         run: pnpm test
-        
+
   single-job:
     name: Continuos Integration
     strategy:
       matrix:
-        jobs: [
-          dtd-catalog-exporter,
-          one-trust-notices,
-          registered-comuni-pn,
-        ]
+        jobs: [dtd-catalog-exporter, one-trust-notices, registered-comuni-pn]
         node: [18.15.0]
     uses: ./.github/workflows/single-job.yml
     secrets: inherit
