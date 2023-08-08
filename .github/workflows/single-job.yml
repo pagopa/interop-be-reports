@@ -18,7 +18,6 @@ env:
 jobs:
   publish:
     name: ${{ inputs.job-name }} - Publish Artifacts
-    needs: [build]
     runs-on: ubuntu-22.04
 
     permissions:
@@ -52,7 +51,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: eu-central-1
-          role-to-assume: "arn:aws:iam::505630707203:role/interop-github-ecr-dev"
+          role-to-assume: 'arn:aws:iam::505630707203:role/interop-github-ecr-dev'
           role-session-name: interop-be-${{ inputs.job-name }}-${{ github.job }}
 
       - name: Login to Amazon ECR
