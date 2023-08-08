@@ -1,5 +1,5 @@
 import { getSafeMapFromIdentifiableRecords, getEServiceMock } from '@interop-be-reports/commons'
-import { remapEServiceToPublicEService } from '../utils/e-service.utils'
+import { remapEServiceToPublicEService } from '../e-service.utils.js'
 
 describe('remapping e-service to public e-service tests', () => {
   it('should correctly map an e-service to a public e-service', () => {

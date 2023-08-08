@@ -1,13 +1,13 @@
-import { OneTrustClient, html2json } from './services'
-import { env, ONE_TRUST_NOTICES } from './config'
-import { OneTrustNoticeDBSchema } from './models'
+import { OneTrustClient, html2json } from './services/index.js'
+import { env, ONE_TRUST_NOTICES } from './config/index.js'
+import { OneTrustNoticeDBSchema } from './models/index.js'
 import {
   getNoticeContent,
   remapOneTrustNoticeVersionToDynamoDBSchemaUpdateObject,
   resolveError,
   getVersionedNoticeBucketPath,
   getLatestNoticeBucketPath,
-} from './utils'
+} from './utils/index.js'
 import {
   AwsS3BucketClient,
   DynamoDbTableClient,

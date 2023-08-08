@@ -1,2 +1,2 @@
-export * from './html-2-json.service'
-export * from './one-trust.service'
+export * from './html-2-json.service.js'
+export * from './one-trust.service.js'

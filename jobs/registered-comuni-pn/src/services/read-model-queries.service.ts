@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb'
-import { env } from '../configs/env'
-import { Tenant, tenantSchema, purposeSchema, Purpose } from '../models'
+import { env } from '../configs/env.js'
+import { Tenant, tenantSchema, purposeSchema, Purpose } from '@interop-be-reports/commons'
 
 export class ReadModelQueriesClient {
   private client: MongoClient

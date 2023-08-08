@@ -1,16 +1,16 @@
-import { MongoDBEServiceClient } from './services'
+import { MongoDBEServiceClient } from './services/index.js'
 import {
   getAllAttributesIdsInEServicesActiveDescriptors,
   getAllTenantsIdsInEServices,
   remapEServiceToPublicEService,
-} from './utils'
-import { publicEServicesSchema } from './models'
+} from './utils/index.js'
+import { publicEServicesSchema } from './models/index.js'
 import {
   getSafeMapFromIdentifiableRecords,
   withExecutionTime,
   AwsS3BucketClient,
 } from '@interop-be-reports/commons'
-import { env } from './configs/env'
+import { env } from './configs/env.js'
 
 const log = console.log
 

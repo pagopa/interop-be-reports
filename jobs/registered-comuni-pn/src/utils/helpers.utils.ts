@@ -1,36 +1,4 @@
-import { Purpose, PurposeState } from '../models/purposes.models'
-
-/**
- * Converts an array of objects to CSV format.
- * If the array is empty, an empty string is returned.
- *
- * @param data - The array of objects to convert to CSV
- * @returns The CSV string
- */
-export function toCSV(data: Array<Record<string, string>>) {
-  if (data.length === 0) return ''
-
-  const headers = Object.keys(data[0]).join(',') + '\n'
-  const columns = data.map((row) => Object.values(row).join(',')).join('\n')
-
-  return headers + columns
-}
-
-/**
- * An extended Map that throws an error if the key is not found.
- */
-export class SafeMap<K, V> extends Map<K, V> {
-  constructor(...args: ConstructorParameters<typeof Map<K, V>>) {
-    super(...args)
-  }
-
-  get(key: K): V {
-    const value = super.get(key)
-    if (!value) throw new Error(`Value not found for key: ${key}`)
-
-    return value
-  }
-}
+import { Purpose, PurposeState, SafeMap } from '@interop-be-reports/commons'
 
 /**
  * Transforms a purpose to a CSV output row.

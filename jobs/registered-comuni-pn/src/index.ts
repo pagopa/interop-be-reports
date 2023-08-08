@@ -1,8 +1,7 @@
-import { ReadModelQueriesClient } from './services/read-model-queries.service'
-import { SafeMap, toCSV, toCsvDataRow } from './utils/helpers.utils'
-import { Mailer } from './services/mailer.service'
-import { env } from './configs/env'
-import { CSV_FILENAME, MAIL_BODY, MAIL_SUBJECT } from './configs/constants'
+import { ReadModelQueriesClient } from './services/index.js'
+import { toCsvDataRow } from './utils/index.js'
+import { CSV_FILENAME, MAIL_BODY, MAIL_SUBJECT, env } from './configs/index.js'
+import { Mailer, SafeMap, toCSV } from '@interop-be-reports/commons'
 
 const log = console.log
 

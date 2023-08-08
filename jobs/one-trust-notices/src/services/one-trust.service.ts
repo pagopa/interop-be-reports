@@ -1,10 +1,10 @@
-import axios, { AxiosInstance } from 'axios'
-import { env, ONE_STRUST_API_ENDPOINT } from '../config'
+import axios, { AxiosInstance, toFormData } from 'axios'
+import { env, ONE_STRUST_API_ENDPOINT } from '../config/index.js'
 import {
   GetNoticeContentResponseData,
   getNoticeContentResponseDataSchema,
   oneTrustNoticeVersion,
-} from '../models'
+} from '../models/index.js'
 
 export class OneTrustClient {
   private otAxiosInstance: AxiosInstance
@@ -23,10 +23,11 @@ export class OneTrustClient {
    * @returns A new OneTrustClient instance.
    */
   public static async connect() {
-    const form = new FormData()
-    form.append('client_id', env.ONETRUST_CLIENT_ID)
-    form.append('client_secret', env.ONETRUST_CLIENT_SECRET)
-    form.append('grant_type', 'client_credentials')
+    const form = toFormData({
+      client_id: env.ONETRUST_CLIENT_ID,
+      client_secret: env.ONETRUST_CLIENT_SECRET,
+      grant_type: 'client_credentials',
+    })
     try {
       const response = await axios.post(`${ONE_STRUST_API_ENDPOINT}/access/v1/oauth/token`, form, {
         headers: {

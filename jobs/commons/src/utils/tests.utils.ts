@@ -1,6 +1,6 @@
-import cloneDeep from 'lodash/cloneDeep'
-import merge from 'lodash/merge'
-import { EService, Attribute, Tenant } from '../models'
+import cloneDeep from 'lodash/cloneDeep.js'
+import merge from 'lodash/merge.js'
+import { EService, Attribute, Tenant } from '../models/index.js'
 
 /**
  * Create and returns a mock factory function

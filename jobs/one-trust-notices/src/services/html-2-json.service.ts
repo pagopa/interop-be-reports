@@ -1,5 +1,5 @@
 import h2j from 'html2json'
-import isEmpty from 'lodash/isEmpty'
+import isEmpty from 'lodash/isEmpty.js'
 
 export function html2json(html: string) {
   const jsonHtlmNodes = h2j.html2json(html)
