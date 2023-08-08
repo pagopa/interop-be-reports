@@ -31,11 +31,11 @@ jobs:
       - name: Installing
         run: pnpm install
 
-      - name: Testing
-        run: pnpm test
-
       - name: Building
         run: pnpm build
+        
+      - name: Testing
+        run: pnpm test
         
   # single-job:
   #   name: Continuos Integration
