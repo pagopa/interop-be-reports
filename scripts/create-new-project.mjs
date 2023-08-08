@@ -11,6 +11,29 @@ const readline = _readline.createInterface({
 
 const log = console.log
 
+const DEV_DEPENDENCIES = {
+  '@types/lodash': '4.14.196',
+  '@types/node': '20.4.8',
+  '@typescript-eslint/eslint-plugin': '6.3.0',
+  '@typescript-eslint/parser': '6.3.0',
+  eslint: '8.46.0',
+  prettier: '^3.0.1',
+  'ts-node': '^10.9.1',
+  typescript: '5.1.6',
+  vitest: '0.34.1',
+}
+
+const DEPENDENCIES = {
+  '@aws-sdk/client-s3': '^3.386.0',
+  axios: '^1.4.0',
+  chalk: '^5.3.0',
+  dotenv: '^16.3.1',
+  lodash: '^4.17.21',
+  mongodb: '^5.7.0',
+  zod: '^3.21.4',
+  '@interop-be-reports/commons': 'workspace:*',
+}
+
 const REGEX_PROJECT_NAME = /^[a-z0-9-]+$/
 const MAX_PROJECT_NAME_LENGTH = 50
 const MIN_PROJECT_NAME_LENGTH = 5
@@ -27,18 +50,24 @@ function createNewProject(projectName) {
   log(`\n> Creating new job named ${chalk.blue(projectName)}...`)
 
   try {
+    log('> Creating project structure...')
     setupProjectStructure(projectName)
+    log(`> Creating ${chalk.blue('package.json')} with default deps...`)
     createPackageJson(projectName)
+    log(`> Creating ${chalk.blue('tsconfig.json')}...`)
     createTsConfig(projectName)
+    log(`> Creating ${chalk.blue('Dockerfile')}...`)
     createDockerfile(projectName)
+    log(`> Adding new job to ci/cd...`)
     addToGitHubCIActions(projectName)
-    addToRootTsConfigReferences(projectName)
+    log('> Installing dependencies...')
+    execSync(`pnpm i`)
   } catch (err) {
     cleanUpOnError(projectName)
     throw err
   }
 
-  log(chalk.green(`> Project ${projectName} created successfully!`))
+  log(chalk.green(`\n> Project ${projectName} created successfully!`))
 }
 
 function validateProjectName(projectName) {
@@ -71,7 +100,6 @@ function validateProjectName(projectName) {
 
 function setupProjectStructure(projectName) {
   fs.mkdirSync(`${JOB_BASE_PATH}/${projectName}/src`, { recursive: true })
-  fs.writeFileSync(`${JOB_BASE_PATH}/${projectName}/.env`, ``)
   fs.writeFileSync(`${JOB_BASE_PATH}/${projectName}/src/index.ts`, `console.log("Hello World")`)
 }
 
@@ -79,14 +107,18 @@ function createPackageJson(projectName) {
   const packageJson = {
     name: projectName,
     main: './dist/index.js',
+    type: 'module',
     scripts: {
-      build: 'rm -rf dist && tsc',
-      start: 'node dist',
       test: 'vitest run',
+      lint: 'eslint . --ext .ts,.tsx',
+      'lint:autofix': 'eslint . --ext .ts,.tsx --fix',
+      'format:check': 'prettier --check src',
+      'format:write': 'prettier --write src',
+      start: 'node --watch --no-warnings --loader ts-node/esm ./src/index.ts',
+      build: 'tsc',
     },
-    dependencies: {
-      '@interop-be-reports/commons': '1.0.0',
-    },
+    devDependencies: DEV_DEPENDENCIES,
+    dependencies: DEPENDENCIES,
   }
 
   fs.writeFileSync(
@@ -104,7 +136,7 @@ function createTsConfig(projectName) {
         compilerOptions: {
           outDir: 'dist',
         },
-        include: ['src/**/*'],
+        include: ['src'],
       },
       null,
       2
@@ -115,20 +147,7 @@ function createTsConfig(projectName) {
 function createDockerfile(projectName) {
   fs.writeFileSync(
     `${JOB_BASE_PATH}/${projectName}/Dockerfile`,
-    [
-      'FROM node:18.15.0-alpine',
-      '',
-      'WORKDIR /app',
-      'COPY . .',
-      '',
-      'RUN npm install',
-      'RUN npm run build',
-    ].join('\n')
-  )
-
-  fs.writeFileSync(
-    `${JOB_BASE_PATH}/${projectName}/.dockerignore`,
-    'dist\nnode_modules\nREADME.md\n'
+    ['FROM node:18.15.0-alpine', '', 'WORKDIR /app', 'COPY . .', ''].join('\n')
   )
 }
 
@@ -143,12 +162,6 @@ function addToGitHubCIActions(projectName) {
     }
   }
   fs.writeFileSync('./.github/workflows/ci.yml', fileArray.join('\n'))
-}
-
-function addToRootTsConfigReferences(projectName) {
-  const rootTsConfig = JSON.parse(fs.readFileSync('./tsconfig.json', 'utf8'))
-  rootTsConfig.references.push({ path: `${JOB_BASE_PATH}/${projectName}` })
-  fs.writeFileSync('./tsconfig.json', JSON.stringify(rootTsConfig, null, 2))
 }
 
 function cleanUpOnError(projectName) {

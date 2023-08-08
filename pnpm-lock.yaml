@@ -204,7 +204,7 @@ importers:
         specifier: ^3.386.0
         version: 3.386.0
       '@interop-be-reports/commons':
-        specifier: 1.0.0
+        specifier: workspace:*
         version: link:../commons
       axios:
         specifier: ^1.4.0
@@ -215,9 +215,6 @@ importers:
       dotenv:
         specifier: ^16.3.1
         version: 16.3.1
-      html2json:
-        specifier: ^1.0.2
-        version: 1.0.2
       lodash:
         specifier: ^4.17.21
         version: 4.17.21

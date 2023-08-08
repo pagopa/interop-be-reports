@@ -41,7 +41,11 @@ jobs:
     name: Continuos Integration
     strategy:
       matrix:
-        jobs: [dtd-catalog-exporter, one-trust-notices, registered-comuni-pn]
+        jobs: [
+          dtd-catalog-exporter, 
+          one-trust-notices, 
+          registered-comuni-pn,
+        ]
         node: [18.15.0]
     uses: ./.github/workflows/single-job.yml
     secrets: inherit
