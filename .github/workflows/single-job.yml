@@ -20,9 +20,7 @@ jobs:
     name: ${{ inputs.job-name }} - Publish Artifacts
     needs: [build]
     runs-on: ubuntu-22.04
-    defaults:
-      run:
-        working-directory: ./${{ inputs.job-name }}
+
     permissions:
       id-token: write
       contents: read
@@ -38,6 +36,17 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ inputs.node-version }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Installing
+        run: pnpm install
+
+      - name: Building
+        run: pnpm build
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -58,6 +67,9 @@ jobs:
           else
             echo "version=${{ github.ref_name }}-latest" >> $GITHUB_OUTPUT
           fi
+
+      - name: Change directory
+        run: cd ./jobs/${{ inputs.job-name }}
 
       - name: Build docker image
         run: docker build --network host -t $ECR_REGISTRY/interop-be-${{ inputs.job-name }}:$VERSION .
