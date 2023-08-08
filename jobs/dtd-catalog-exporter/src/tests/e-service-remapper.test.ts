@@ -1,6 +1,5 @@
-import { getEServiceMock } from './data.mocks.js'
-import { remapEServiceToPublicEService } from '../services/index.js'
-import { getMappedRecords } from '../utils/helpers.utils.js'
+import { getSafeMapFromIdentifiableRecords, getEServiceMock } from '@interop-be-reports/commons'
+import { remapEServiceToPublicEService } from '../utils/e-service.utils.js'
 
 describe('remapping e-service to public e-service tests', () => {
   it('should correctly map an e-service to a public e-service', () => {
@@ -20,7 +19,7 @@ describe('remapping e-service to public e-service tests', () => {
       description: `attribute-${i}-description`,
     }))
 
-    const attributesMap = getMappedRecords(attributes)
+    const attributesMap = getSafeMapFromIdentifiableRecords(attributes)
 
     const tenant = [
       {
@@ -28,7 +27,7 @@ describe('remapping e-service to public e-service tests', () => {
         name: 'tenant-name',
       },
     ]
-    const tenantsMap = getMappedRecords(tenant)
+    const tenantsMap = getSafeMapFromIdentifiableRecords(tenant)
 
     const result = remapEServiceToPublicEService(getEServiceMock(), attributesMap, tenantsMap)
 

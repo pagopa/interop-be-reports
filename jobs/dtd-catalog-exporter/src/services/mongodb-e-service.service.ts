@@ -7,7 +7,7 @@ import {
   attributeSchema,
   Tenant,
   tenantSchema,
-} from '../models/index.js'
+} from '@interop-be-reports/commons'
 
 export class MongoDBEServiceClient {
   private client: MongoClient

@@ -31,8 +31,8 @@ export class SafeMap<K, V> extends Map<K, V> {
 }
 
 /**
- * Transforms an array of identifiable records into a safe map of records.
- * A is an extended Map that throws an error if the key is not found.
+ * Transforms an array of identifiable records into a `SafeMap`.
+ * A `SafeMap` is an extended Map that throws an error if the key is not found.
  * Identifiable records are records that have an `id` property.
  *
  * @param records - The array of records
@@ -55,9 +55,11 @@ export function getSafeMapFromIdentifiableRecords<T extends { id: string }>(
  * @param fn The function to call
  * @returns The result of the function
  */
-export function withExecutionTime(fn: () => void) {
+export async function withExecutionTime(fn: () => void | Promise<void>) {
   const t0 = performance.now()
-  fn()
+  await fn()
   const t1 = performance.now()
-  console.log(`Execution time: ${t1 - t0}ms`)
+  const executionTimeMs = t1 - t0
+  const executionTimeSeconds = Math.round((executionTimeMs / 1000) * 10) / 10
+  console.log(`Execution time: ${executionTimeSeconds}s`)
 }

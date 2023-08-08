@@ -1,21 +1,21 @@
-import {
-  MongoDBEServiceClient,
-  uploadJSONToS3Bucket,
-  remapEServiceToPublicEService,
-} from './services/index.js'
+import { MongoDBEServiceClient } from './services'
 import {
   getAllAttributesIdsInEServicesActiveDescriptors,
   getAllTenantsIdsInEServices,
-  getExecutionTime,
-  getMappedRecords,
-} from './utils/index.js'
-import { publicEServicesSchema } from './models/index.js'
+  remapEServiceToPublicEService,
+} from './utils'
+import { publicEServicesSchema } from './models'
+import {
+  getSafeMapFromIdentifiableRecords,
+  withExecutionTime,
+  AwsS3BucketClient,
+} from '@interop-be-reports/commons'
+import { env } from './configs/env'
 
 const log = console.log
 
 async function main() {
-  const startTime = process.hrtime()
-
+  const dtdCatalogBucketClient = new AwsS3BucketClient(env.DTD_CATALOG_STORAGE_BUCKET)
   log('Connecting to database...')
   const mongoDBEServiceClient = await MongoDBEServiceClient.connect()
   log('Connected to database!\n')
@@ -33,8 +33,8 @@ async function main() {
   log('Data successfully fetched!\n')
 
   log('Remapping e-services to public e-services...\n')
-  const attributesMap = getMappedRecords(attributes)
-  const tenantsMap = getMappedRecords(tenants)
+  const attributesMap = getSafeMapFromIdentifiableRecords(attributes)
+  const tenantsMap = getSafeMapFromIdentifiableRecords(tenants)
   const publicEServices = eservices.map((eservice) => {
     log(`Remapping ${eservice.name} - ${eservice.id} ...`)
     return remapEServiceToPublicEService(eservice, attributesMap, tenantsMap)
@@ -44,11 +44,13 @@ async function main() {
   publicEServicesSchema.parse(publicEServices)
 
   log('\nUploading result to S3 bucket...')
-  await uploadJSONToS3Bucket(publicEServices)
+  await dtdCatalogBucketClient.uploadData(
+    publicEServices,
+    `${env.DTD_CATALOG_STORAGE_PATH}/${env.FILENAME}`
+  )
 
   await mongoDBEServiceClient.close()
-  log(`\nDone! Execution time: ${getExecutionTime(startTime)}\n`)
-  process.exit(0)
+  log('\nDone!')
 }
 
-main()
+withExecutionTime(main)
