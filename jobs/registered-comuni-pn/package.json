@@ -1,0 +1,12 @@
+{
+  "name": "registered-comuni-pn",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "start": "node dist",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@interop-be-reports/commons": "1.0.0"
+  }
+}

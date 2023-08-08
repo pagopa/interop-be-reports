@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "target": "es2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": false,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "skipDefaultLibCheck": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noErrorTruncation": true,
+    "types": [
+      "vitest/globals"
+    ]
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./jobs/commons"
+    },
+    {
+      "path": "./jobs/dtd-catalog-exporter"
+    },
+    {
+      "path": "./jobs/one-trust-notices"
+    },
+    {
+      "path": "./jobs/registered-comuni-pn"
+    }
+  ]
+}

@@ -1,11 +1,36 @@
 {
   "name": "interop-be-reports",
   "scripts": {
-    "new-project": "node ./scripts/create-new-project.js"
+    "build": "tsc --build --verbose",
+    "new-project": "node ./scripts/create-new-project.mjs",
+    "test": "vitest run"
   },
   "workspaces": [
-    "dtd-catalog-exporter",
-    "one-trust-notices",
-    "registered-comuni-pn"
-  ]
+    "jobs/*"
+  ],
+  "devDependencies": {
+    "@types/html2json": "1.0.1",
+    "@types/lodash": "4.14.196",
+    "@types/node": "20.4.8",
+    "@types/nodemailer": "6.4.9",
+    "@typescript-eslint/eslint-plugin": "6.3.0",
+    "@typescript-eslint/parser": "6.3.0",
+    "eslint": "8.46.0",
+    "prettier": "^3.0.1",
+    "typescript": "5.1.6",
+    "vitest": "0.34.1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.386.0",
+    "@aws-sdk/client-s3": "^3.386.0",
+    "@aws-sdk/util-dynamodb": "^3.386.0",
+    "axios": "^1.4.0",
+    "chalk": "^5.3.0",
+    "dotenv": "^16.3.1",
+    "html2json": "^1.0.2",
+    "lodash": "^4.17.21",
+    "mongodb": "^5.7.0",
+    "nodemailer": "^6.9.4",
+    "zod": "^3.21.4"
+  }
 }
