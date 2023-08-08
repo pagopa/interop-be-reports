@@ -16,32 +16,6 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  build:
-    name: ${{ inputs.job-name }} - Build and Test
-    runs-on: ubuntu-22.04
-    defaults:
-      run:
-        working-directory: ./${{ inputs.job-name }}
-    steps:
-      - name: Checkout current branch (full)
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Install node 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ inputs.node-version }}
-
-      - name: Installing
-        run: npm install
-
-      - name: Building
-        run: npm run build
-
-      - name: Testing
-        run: npm run test
-
   publish:
     name: ${{ inputs.job-name }} - Publish Artifacts
     needs: [build]
