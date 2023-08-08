@@ -1,10 +1,10 @@
 import axios, { AxiosInstance } from 'axios'
-import { env, ONE_STRUST_API_ENDPOINT } from '../config/index.js'
+import { env, ONE_STRUST_API_ENDPOINT } from '../config'
 import {
   GetNoticeContentResponseData,
   getNoticeContentResponseDataSchema,
   oneTrustNoticeVersion,
-} from '../models/index.js'
+} from '../models'
 
 export class OneTrustClient {
   private otAxiosInstance: AxiosInstance

@@ -1,19 +1,24 @@
-import { AwsS3Client, DynamoDbTableClient, OneTrustClient, html2json } from './services/index.js'
-import { env, ONE_TRUST_NOTICES } from './config/index.js'
-import { OneTrustNoticeDBSchema } from './models/index.js'
+import { OneTrustClient, html2json } from './services'
+import { env, ONE_TRUST_NOTICES } from './config'
+import { OneTrustNoticeDBSchema } from './models'
 import {
-  checkForNewVersion,
   getNoticeContent,
   remapOneTrustNoticeVersionToDynamoDBSchemaUpdateObject,
   resolveError,
   getVersionedNoticeBucketPath,
   getLatestNoticeBucketPath,
-} from './utils/index.js'
+} from './utils'
+import {
+  AwsS3BucketClient,
+  DynamoDbTableClient,
+  withExecutionTime,
+} from '@interop-be-reports/commons'
 
 const log = console.log
 
 async function main() {
-  const awsS3Client = new AwsS3Client()
+  const historyBucketClient = new AwsS3BucketClient(env.HISTORY_STORAGE_BUCKET)
+  const contentBucketClient = new AwsS3BucketClient(env.CONTENT_STORAGE_BUCKET)
   const dynamoDbTableClient = new DynamoDbTableClient<OneTrustNoticeDBSchema>(
     env.PRIVACY_NOTICES_DYNAMO_TABLE_NAME
   )
@@ -51,20 +56,16 @@ async function main() {
       log('> Checking if it is a new version...')
 
       // We check if there is a new version by checking if the history bucket already has one of the versioned paths.
-      const isNewVersion = (
-        await Promise.all(
-          versionedContentBucketPaths.map((bucketPath) =>
-            checkForNewVersion(awsS3Client, bucketPath)
-          )
-        )
-      ).some(Boolean)
+      const versionBucketContentList = await historyBucketClient.getBucketContentList()
+      const isNewVersion = versionedContentBucketPaths.some((bucketPath) =>
+        versionBucketContentList.includes(bucketPath)
+      )
 
       if (isNewVersion) {
         log(`> New version found! Uploading to ${env.HISTORY_STORAGE_BUCKET} bucket...`)
         await Promise.all(
           localizedNoticeContentResponses.map((noticeContentResponse, index) =>
-            awsS3Client.uploadJSONToS3Bucket(
-              env.HISTORY_STORAGE_BUCKET,
+            historyBucketClient.uploadData(
               noticeContentResponse,
               versionedContentBucketPaths[index]
             )
@@ -80,18 +81,10 @@ async function main() {
 
       await Promise.all([
         ...jsonHtmlNodes.map((jsonHtmlNode, index) =>
-          awsS3Client.uploadJSONToS3Bucket(
-            env.CONTENT_STORAGE_BUCKET,
-            jsonHtmlNode,
-            versionedContentBucketPaths[index]
-          )
+          contentBucketClient.uploadData(jsonHtmlNode, versionedContentBucketPaths[index])
         ),
         ...jsonHtmlNodes.map((jsonHtmlNode, index) =>
-          awsS3Client.uploadJSONToS3Bucket(
-            env.CONTENT_STORAGE_BUCKET,
-            jsonHtmlNode,
-            latestContentBucketPaths[index]
-          )
+          contentBucketClient.uploadData(jsonHtmlNode, latestContentBucketPaths[index])
         ),
       ])
 
@@ -110,7 +103,7 @@ async function main() {
     }
   }
 
-  log('End of program.')
+  log('Done!.')
 }
 
-main()
+withExecutionTime(main)

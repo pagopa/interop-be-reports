@@ -1,4 +1,4 @@
-import { PublicEService, PublicEServiceAttributes } from '../models/index.js'
+import { PublicEService, PublicEServiceAttributes } from '../models'
 import {
   SafeMap,
   EService,

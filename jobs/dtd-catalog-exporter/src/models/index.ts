@@ -1,1 +1,1 @@
-export * from './public-e-service.models.js'
+export * from './public-e-service.models'

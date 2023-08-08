@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb'
-import { env } from '../configs/env.js'
+import { env } from '../configs/env'
 import {
   EService,
   eserviceSchema,

@@ -5,7 +5,7 @@ import {
   SendMailOptions,
   createTestAccount,
 } from 'nodemailer'
-import * as SMTPTransport from 'nodemailer/lib/smtp-transport/index.js'
+import * as SMTPTransport from 'nodemailer/lib/smtp-transport'
 
 /**
  * A wrapper around nodemailer's Transporter.

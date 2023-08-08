@@ -1,4 +1,4 @@
-import { env } from './env.js'
+import { env } from './env'
 
 export const ONE_STRUST_API_ENDPOINT = 'https://app-de.onetrust.com/api'
 export const ONE_TRUST_NOTICES = [

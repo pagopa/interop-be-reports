@@ -1,8 +1,8 @@
-import { ReadModelQueriesClient } from './services/read-model-queries.service.js'
-import { SafeMap, toCSV, toCsvDataRow } from './utils/helpers.utils.js'
-import { Mailer } from './services/mailer.service.js'
-import { env } from './configs/env.js'
-import { CSV_FILENAME, MAIL_BODY, MAIL_SUBJECT } from './configs/constants.js'
+import { ReadModelQueriesClient } from './services/read-model-queries.service'
+import { SafeMap, toCSV, toCsvDataRow } from './utils/helpers.utils'
+import { Mailer } from './services/mailer.service'
+import { env } from './configs/env'
+import { CSV_FILENAME, MAIL_BODY, MAIL_SUBJECT } from './configs/constants'
 
 const log = console.log
 

@@ -1,1 +1,1 @@
-export * from './mongodb-e-service.service.js'
+export * from './mongodb-e-service.service'

@@ -1,1 +1,1 @@
-export * from './e-service.utils.js'
+export * from './e-service.utils'

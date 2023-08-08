@@ -3,7 +3,7 @@ import {
   OneTrustNoticeVersion,
   OneTrustPublicNotice,
   OneTrustNoticeDBSchema,
-} from '../models/index.js'
+} from '../models'
 
 /**
  * Get the notice html content from the OneTrust notice data.

@@ -1,5 +1,5 @@
-import { Purpose } from '../models/purposes.models.js'
-import { SafeMap, toCSV, toCsvDataRow } from '../utils/helpers.utils.js'
+import { Purpose } from '../models/purposes.models'
+import { SafeMap, toCSV, toCsvDataRow } from '../utils/helpers.utils'
 
 describe('toCSV', () => {
   it('should return a CSV string from an array of objects', () => {

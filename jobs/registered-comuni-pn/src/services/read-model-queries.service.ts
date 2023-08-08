@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb'
-import { env } from '../configs/env.js'
-import { Tenant, tenantSchema, purposeSchema, Purpose, PurposeState } from '../models/index.js'
+import { env } from '../configs/env'
+import { Tenant, tenantSchema, purposeSchema, Purpose } from '../models'
 
 export class ReadModelQueriesClient {
   private client: MongoClient
@@ -41,8 +41,10 @@ export class ReadModelQueriesClient {
       .find(
         {
           'data.eserviceId': env.PN_ESERVICE_ID,
-          'data.versions.state': {
-            $in: ['Active', 'Suspended', 'WaitingForApproval'] satisfies Array<PurposeState>,
+          'data.versions': {
+            $elemMatch: {
+              state: { $in: ['Active', 'Suspended', 'WaitingForApproval'] },
+            },
           },
         },
         {
@@ -66,7 +68,7 @@ export class ReadModelQueriesClient {
    * @param tenantsIds - The ids of the tenants to retrieve
    * @returns The tenants
    **/
-  async getComuniByTenantsIds(tenantsIds: Array<string>) {
+  async getComuniByTenantsIds(tenantsIds: Set<string>) {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: Tenant }>(env.TENANTS_COLLECTION_NAME)

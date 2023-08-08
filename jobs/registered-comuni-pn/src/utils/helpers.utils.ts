@@ -1,4 +1,4 @@
-import { Purpose, PurposeState } from '../models/purposes.models.js'
+import { Purpose, PurposeState } from '../models/purposes.models'
 
 /**
  * Converts an array of objects to CSV format.

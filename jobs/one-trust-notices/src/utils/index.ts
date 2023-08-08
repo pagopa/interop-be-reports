@@ -1,3 +1,2 @@
-export * from './helpers.utils.js'
-export * from './one-trust.utils.js'
-export * from './errors.utils.js'
+export * from './one-trust.utils'
+export * from './errors.utils'

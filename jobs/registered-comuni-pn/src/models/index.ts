@@ -1,2 +1,2 @@
-export * from './purposes.models.js'
-export * from './tenants.models.js'
+export * from './purposes.models'
+export * from './tenants.models'
