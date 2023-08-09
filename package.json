@@ -5,6 +5,7 @@
   },
   "workspaces": [
     "dtd-catalog-exporter",
-    "one-trust-notices"
+    "one-trust-notices",
+    "registered-comuni-pn"
   ]
 }
