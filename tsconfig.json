@@ -1,0 +1,12 @@
+{
+  "extends": "@tsconfig/node-lts",
+  "compilerOptions": {
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "types": [
+      "vitest/globals"
+    ]
+  }
+}

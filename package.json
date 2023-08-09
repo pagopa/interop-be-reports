@@ -1,11 +1,27 @@
 {
-  "name": "interop-be-reports",
-  "scripts": {
-    "new-project": "node ./scripts/create-new-project.js"
+  "name": "root",
+  "engines": {
+    "node": ">=18"
   },
-  "workspaces": [
-    "dtd-catalog-exporter",
-    "one-trust-notices",
-    "registered-comuni-pn"
-  ]
+  "scripts": {
+    "start:dtd-catalog-exporter": "turbo start --filter dtd-catalog-exporter",
+    "start:one-trust-notices": "turbo start --filter one-trust-notices",
+    "start:pn-consumers": "turbo start --filter pn-consumers",
+    "build:dtd-catalog-exporter": "turbo build --filter dtd-catalog-exporter",
+    "build:one-trust-notices": "turbo build --filter one-trust-notices",
+    "build:pn-consumers": "turbo build --filter pn-consumers",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "lint:autofix": "turbo lint:autofix",
+    "format:check": "turbo format:check",
+    "format:write": "turbo format:write",
+    "create-new-job": "node ./scripts/create-new-job.mjs"
+  },
+  "devDependencies": {
+    "@tsconfig/node-lts": "^18.12.3",
+    "turbo": "^1.10.12",
+    "vitest": "0.34.1"
+  },
+  "packageManager": "pnpm@8.6.12"
 }

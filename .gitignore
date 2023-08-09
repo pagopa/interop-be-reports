@@ -29,6 +29,7 @@ dist-ssr
 .env.test.local
 .env.production.local
 .env
+.turbo
 
 npm-debug.log*
 yarn-debug.log*
