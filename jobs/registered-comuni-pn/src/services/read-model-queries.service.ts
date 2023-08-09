@@ -1,6 +1,12 @@
-import { MongoClient } from 'mongodb'
+import { MongoClient, MongoClientOptions, ReadPreferenceMode } from 'mongodb'
 import { env } from '../configs/env.js'
-import { Tenant, tenantSchema, purposeSchema, Purpose } from '@interop-be-reports/commons'
+import {
+  Tenant,
+  tenantSchema,
+  purposeSchema,
+  Purpose,
+  PurposeState,
+} from '@interop-be-reports/commons'
 
 export class ReadModelQueriesClient {
   private client: MongoClient
@@ -13,17 +19,12 @@ export class ReadModelQueriesClient {
    * Connects to the mongodb database
    */
   public static async connect() {
-    // const connectionConfig = {
-    //   replicaSet: 'rs0',
-    //   readPreference: 'secondaryPreferred',
-    // } as const
-
-    // Use this config instead if you want to connect to a mongodb instance locally using a tunnel
     const connectionConfig = {
-      directConnection: true,
-      readPreference: 'secondaryPreferred',
-      retryWrites: false,
-    } as const
+      replicaSet: env.MONGODB_REPLICA_SET,
+      directConnection: env.MONGODB_DIRECT_CONNECTION,
+      readPreference: env.MONGODB_READ_PREFERENCE as ReadPreferenceMode,
+      retryWrites: env.MONGODB_RETRY_WRITES,
+    } satisfies MongoClientOptions
 
     const connectionString = `mongodb://${env.READ_MODEL_DB_USER}:${env.READ_MODEL_DB_PASSWORD}@${env.READ_MODEL_DB_HOST}:${env.READ_MODEL_DB_PORT}`
     const client = await new MongoClient(connectionString, connectionConfig).connect()
@@ -41,10 +42,8 @@ export class ReadModelQueriesClient {
       .find(
         {
           'data.eserviceId': env.PN_ESERVICE_ID,
-          'data.versions': {
-            $elemMatch: {
-              state: { $in: ['Active', 'Suspended', 'WaitingForApproval'] },
-            },
+          'data.versions.state': {
+            $in: ['Active', 'Suspended', 'WaitingForApproval'] satisfies Array<PurposeState>,
           },
         },
         {
@@ -68,7 +67,7 @@ export class ReadModelQueriesClient {
    * @param tenantsIds - The ids of the tenants to retrieve
    * @returns The tenants
    **/
-  async getComuniByTenantsIds(tenantsIds: Set<string>) {
+  async getComuniByTenantsIds(tenantsIds: Array<string>) {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: Tenant }>(env.TENANTS_COLLECTION_NAME)
