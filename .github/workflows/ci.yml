@@ -39,6 +39,7 @@ jobs:
 
   publish:
     name: Publish ${{ matrix.image_name }}
+    needs: [build]
     runs-on: ubuntu-22.04
 
     strategy:
@@ -62,8 +63,8 @@ jobs:
       - name: Checkout current branch (full)
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
-
+          fetch-depth: 0  
+        
       - name: Install node 18
         uses: actions/setup-node@v3
         with:
@@ -100,9 +101,9 @@ jobs:
           if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
             echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           else
-            echo "version=${{ github.ref_name }}-latest" >> $GITHUB_OUTPUT
+            echo "version=$(echo "$GITHUB_REF_NAME" | tr -s "/" "-")" >> $GITHUB_OUTPUT
           fi
-
+          
       - name: Build docker image
         run: docker build --network host -t $ECR_REGISTRY/interop-be-${{ matrix.image_name }}:$VERSION .
         working-directory: ${{ matrix.package_path }}          
