@@ -7,7 +7,7 @@ import { env } from "./config/env.js";
 console.log("Starting consumer...")
 
 const kafka = new Kafka({
-  clientId: env.BROKER_CLIENT_ID,
+  clientId: env.KAFKA_CLIENT_ID,
   brokers: env.SELFCARE_BROKER_URLS,
   ssl: true,
   sasl: {
@@ -17,7 +17,7 @@ const kafka = new Kafka({
   },
 })
 
-const consumer = kafka.consumer({ groupId: 'interop-institutions' })
+const consumer = kafka.consumer({ groupId: env.KAFKA_GROUP_ID })
 
 function exitGracefully(): void {
   consumer.disconnect().finally(() => {
