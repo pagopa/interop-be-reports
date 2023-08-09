@@ -92,7 +92,7 @@ function validateJobName(jobName) {
     process.exit(1)
   }
 
-  if (fs.existsSync(`./${jobName}`)) {
+  if (fs.existsSync(`./${JOB_BASE_PATH}/${jobName}`)) {
     log(chalk.red(`Job ${jobName} already exists.\n`))
     process.exit(1)
   }
