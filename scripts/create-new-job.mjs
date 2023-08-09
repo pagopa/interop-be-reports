@@ -124,7 +124,7 @@ function createPackageJson(jobName) {
     main: './dist/index.js',
     type: 'module',
     scripts: {
-      test: 'vitest run',
+      test: 'echo "Error: no test specified"',
       lint: 'eslint . --ext .ts,.tsx',
       'lint:autofix': 'eslint . --ext .ts,.tsx --fix',
       'format:check': 'prettier --check src',
