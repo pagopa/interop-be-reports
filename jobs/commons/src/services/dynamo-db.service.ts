@@ -15,12 +15,18 @@ export type DeepPartial<T> = T extends object
   : T
 
 export class DynamoDbTableClient<
-  TSchema extends Record<string, unknown> = Record<string, AttributeValue>
+  TSchema extends Record<string, unknown> = Record<string, AttributeValue>,
 > {
   private client: DynamoDB
 
-  constructor(private tableName: string, config: DynamoDBClientConfig = {}) {
-    this.client = new DynamoDB(config)
+  constructor(
+    private tableName: string,
+    config: Omit<DynamoDBClientConfig, 'region'> = {}
+  ) {
+    this.client = new DynamoDB({
+      region: 'eu-central-1',
+      ...config,
+    })
   }
 
   /**

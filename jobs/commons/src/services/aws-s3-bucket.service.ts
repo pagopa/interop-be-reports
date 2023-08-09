@@ -5,7 +5,9 @@ export class AwsS3BucketClient {
   private s3Client: S3Client
 
   constructor(private bucket: string) {
-    this.s3Client = new S3Client({})
+    this.s3Client = new S3Client({
+      region: 'eu-central-1',
+    })
   }
 
   /**
