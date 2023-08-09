@@ -16,7 +16,7 @@
     "lint:autofix": "turbo lint:autofix",
     "format:check": "turbo format:check",
     "format:write": "turbo format:write",
-    "new-project": "node ./scripts/create-new-project.mjs"
+    "create-new-job": "node ./scripts/create-new-job.mjs"
   },
   "devDependencies": {
     "@tsconfig/node-lts": "^18.12.3",

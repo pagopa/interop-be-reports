@@ -1,8 +1,8 @@
 /**
  * This script handles all the boilerplate code needed to create a new job.
  * It does the following:
- * - Asks and then validates the project name;
- * - Creates the project structure, with the src folder and index.ts file in the jobs folder;
+ * - Asks and then validates the job name;
+ * - Creates the job structure, with the src folder and index.ts file in the jobs folder;
  * - Creates the package.json with default dependencies;
  * - Creates the tsconfig.json;
  * - Creates the Dockerfile;
@@ -47,9 +47,9 @@ const DEPENDENCIES = {
   '@interop-be-reports/commons': 'workspace:*',
 }
 
-const REGEX_PROJECT_NAME = /^[a-z0-9-]+$/
-const MAX_PROJECT_NAME_LENGTH = 50
-const MIN_PROJECT_NAME_LENGTH = 5
+const REGEX_JOB_NAME = /^[a-z0-9-]+$/
+const MAX_JOB_NAME_LENGTH = 50
+const MIN_JOB_NAME_LENGTH = 5
 const JOB_BASE_PATH = './jobs'
 
 const chalk = {
@@ -59,68 +59,68 @@ const chalk = {
   blue: (text) => `\x1b[34m${text}\x1b[0m`,
 }
 
-function createNewProject(projectName) {
-  log(`\n> Creating new job named ${chalk.blue(projectName)}...`)
+function createNewJob(jobName) {
+  log(`\n> Creating new job named ${chalk.blue(jobName)}...`)
 
   try {
-    log('> Creating project structure...')
-    setupProjectStructure(projectName)
+    log('> Creating job structure...')
+    setupJobStructure(jobName)
     log(`> Creating ${chalk.blue('package.json')} with default deps...`)
-    createPackageJson(projectName)
+    createPackageJson(jobName)
     log(`> Creating ${chalk.blue('tsconfig.json')}...`)
-    createTsConfig(projectName)
+    createTsConfig(jobName)
     log(`> Creating ${chalk.blue('Dockerfile')}...`)
-    createDockerfile(projectName)
+    createDockerfile(jobName)
     log(`> Adding new job to root package.json scripts...`)
-    addToRootPackageJsonScripts(projectName)
+    addToRootPackageJsonScripts(jobName)
     log(`> Adding new job to ci/cd...`)
-    addToGitHubCIActions(projectName)
+    addToGitHubCIActions(jobName)
     log('> Installing dependencies...')
     execSync(`pnpm i`)
   } catch (err) {
-    cleanUpOnError(projectName)
+    cleanUpOnError(jobName)
     throw err
   }
 
-  log(chalk.green(`\n> Project ${projectName} created successfully!`))
+  log(chalk.green(`\n> Job ${jobName} created successfully!`))
 }
 
-function validateProjectName(projectName) {
-  if (!projectName) {
-    log(chalk.red('Project name is required, please provide it as an argument.'))
+function validateJobName(jobName) {
+  if (!jobName) {
+    log(chalk.red('Job name is required, please provide it as an argument.'))
     log(chalk.blue("Example: 'node create-new-job my-new-job'\n"))
     process.exit(1)
   }
 
-  if (fs.existsSync(`./${projectName}`)) {
-    log(chalk.red(`Project ${projectName} already exists.\n`))
+  if (fs.existsSync(`./${jobName}`)) {
+    log(chalk.red(`Job ${jobName} already exists.\n`))
     process.exit(1)
   }
 
-  if (projectName.length > MAX_PROJECT_NAME_LENGTH) {
-    log(chalk.red(`Project name must be less than ${MAX_PROJECT_NAME_LENGTH} characters.\n`))
+  if (jobName.length > MAX_JOB_NAME_LENGTH) {
+    log(chalk.red(`Job name must be less than ${MAX_JOB_NAME_LENGTH} characters.\n`))
     process.exit(1)
   }
 
-  if (projectName.length < MIN_PROJECT_NAME_LENGTH) {
-    log(chalk.red(`Project name must be at least ${MIN_PROJECT_NAME_LENGTH} characters.\n`))
+  if (jobName.length < MIN_JOB_NAME_LENGTH) {
+    log(chalk.red(`Job name must be at least ${MIN_JOB_NAME_LENGTH} characters.\n`))
     process.exit(1)
   }
 
-  if (!REGEX_PROJECT_NAME.test(projectName)) {
-    log(chalk.red('Project name must be lowercase, alphanumeric and can contain dashes.\n'))
+  if (!REGEX_JOB_NAME.test(jobName)) {
+    log(chalk.red('Job name must be lowercase, alphanumeric and can contain dashes.\n'))
     process.exit(1)
   }
 }
 
-function setupProjectStructure(projectName) {
-  fs.mkdirSync(`${JOB_BASE_PATH}/${projectName}/src`, { recursive: true })
-  fs.writeFileSync(`${JOB_BASE_PATH}/${projectName}/src/index.ts`, `console.log("Hello World")`)
+function setupJobStructure(jobName) {
+  fs.mkdirSync(`${JOB_BASE_PATH}/${jobName}/src`, { recursive: true })
+  fs.writeFileSync(`${JOB_BASE_PATH}/${jobName}/src/index.ts`, `console.log("Hello World")`)
 }
 
-function createPackageJson(projectName) {
+function createPackageJson(jobName) {
   const packageJson = {
-    name: projectName,
+    name: jobName,
     main: './dist/index.js',
     type: 'module',
     scripts: {
@@ -136,15 +136,12 @@ function createPackageJson(projectName) {
     dependencies: DEPENDENCIES,
   }
 
-  fs.writeFileSync(
-    `${JOB_BASE_PATH}/${projectName}/package.json`,
-    JSON.stringify(packageJson, null, 2)
-  )
+  fs.writeFileSync(`${JOB_BASE_PATH}/${jobName}/package.json`, JSON.stringify(packageJson, null, 2))
 }
 
-function createTsConfig(projectName) {
+function createTsConfig(jobName) {
   fs.writeFileSync(
-    `${JOB_BASE_PATH}/${projectName}/tsconfig.json`,
+    `${JOB_BASE_PATH}/${jobName}/tsconfig.json`,
     JSON.stringify(
       {
         extends: '../../tsconfig.json',
@@ -159,14 +156,14 @@ function createTsConfig(projectName) {
   )
 }
 
-function createDockerfile(projectName) {
+function createDockerfile(jobName) {
   fs.writeFileSync(
-    `${JOB_BASE_PATH}/${projectName}/Dockerfile`,
+    `${JOB_BASE_PATH}/${jobName}/Dockerfile`,
     ['FROM node:18.15.0-alpine', '', 'WORKDIR /app', 'COPY . .', ''].join('\n')
   )
 }
 
-function addToGitHubCIActions(projectName) {
+function addToGitHubCIActions(jobName) {
   const githubCIActions = fs.readFileSync('./.github/workflows/ci.yml', 'utf8')
   const fileArray = githubCIActions.split('\n')
   const index = fileArray.findIndex((line) => line.includes('include:'))
@@ -175,8 +172,8 @@ function addToGitHubCIActions(projectName) {
       fileArray.splice(
         i,
         0,
-        `          - image_name: ${projectName}
-            package_path: ./jobs/${projectName}`
+        `          - image_name: ${jobName}
+            package_path: ./jobs/${jobName}`
       )
       break
     }
@@ -184,14 +181,14 @@ function addToGitHubCIActions(projectName) {
   fs.writeFileSync('./.github/workflows/ci.yml', fileArray.join('\n'))
 }
 
-function addToRootPackageJsonScripts(projectName) {
+function addToRootPackageJsonScripts(jobName) {
   const packageJson = fs.readFileSync('./package.json', 'utf8')
   const fileArray = packageJson.split('\n')
   const startLineIndex = fileArray.findIndex((line) => line.includes('"start:'))
 
   for (let i = startLineIndex + 1; i < fileArray.length; i++) {
     if (!fileArray[i].includes('start:')) {
-      fileArray.splice(i, 0, `    "start:${projectName}": "turbo start --filter ${projectName}",`)
+      fileArray.splice(i, 0, `    "start:${jobName}": "turbo start --filter ${jobName}",`)
       break
     }
   }
@@ -200,7 +197,7 @@ function addToRootPackageJsonScripts(projectName) {
 
   for (let i = buildLineIndex + 1; i < fileArray.length; i++) {
     if (!fileArray[i].includes('build:')) {
-      fileArray.splice(i, 0, `    "build:${projectName}": "turbo build --filter ${projectName}",`)
+      fileArray.splice(i, 0, `    "build:${jobName}": "turbo build --filter ${jobName}",`)
       break
     }
   }
@@ -208,12 +205,12 @@ function addToRootPackageJsonScripts(projectName) {
   fs.writeFileSync('./package.json', fileArray.join('\n'))
 }
 
-function cleanUpOnError(projectName) {
-  execSync(`rm -rf ${JOB_BASE_PATH}/${projectName}`)
+function cleanUpOnError(jobName) {
+  execSync(`rm -rf ${JOB_BASE_PATH}/${jobName}`)
 }
 
 readline.question('Insert job name\n> ', (name) => {
   readline.close()
-  validateProjectName(name)
-  createNewProject(name)
+  validateJobName(name)
+  createNewJob(name)
 })
