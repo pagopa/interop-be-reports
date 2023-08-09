@@ -2,7 +2,7 @@
  * This script handles all the boilerplate code needed to create a new job.
  * It does the following:
  * - Asks and then validates the project name;
- * - Creates the project structure, with the src folder and index.ts file;
+ * - Creates the project structure, with the src folder and index.ts file in the jobs folder;
  * - Creates the package.json with default dependencies;
  * - Creates the tsconfig.json;
  * - Creates the Dockerfile;
