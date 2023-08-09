@@ -35,8 +35,8 @@ pnpm test
 
 ## How to create a new job
 
-There is a script that will generate a new job for you:
+There is a script that will scaffold a new job for you:
 
 ```
-pnpm new-job
+pnpm create-new-job
 ```
