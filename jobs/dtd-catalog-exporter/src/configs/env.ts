@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
-import { z } from "zod";
+import dotenv from 'dotenv'
+import { z } from 'zod'
 
 export const envSchema = z.object({
   ESERVICES_COLLECTION_NAME: z.string(),
@@ -15,15 +15,15 @@ export const envSchema = z.object({
   DTD_CATALOG_STORAGE_BUCKET: z.string(),
   DTD_CATALOG_STORAGE_PATH: z.string(),
   FILENAME: z.string(),
-});
+})
 
-export type Env = z.infer<typeof envSchema>;
+export type Env = z.infer<typeof envSchema>
 
-dotenv.config();
+dotenv.config()
 
 // Skip env runtime check if we are in test environment
-if (process.env.NODE_ENV !== "test") {
-  envSchema.parse(process.env);
+if (process.env.NODE_ENV !== 'test') {
+  envSchema.parse(process.env)
 }
 
-export const env = process.env as Env;
+export const env = process.env as Env
