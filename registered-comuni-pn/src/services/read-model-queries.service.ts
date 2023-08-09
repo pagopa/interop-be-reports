@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb'
+import { MongoClient, MongoClientOptions, ReadPreferenceMode } from 'mongodb'
 import { env } from '../configs/env.js'
 import { Tenant, tenantSchema, purposeSchema, Purpose } from '../models/index.js'
 
@@ -14,16 +14,11 @@ export class ReadModelQueriesClient {
    */
   public static async connect() {
     const connectionConfig = {
-      replicaSet: 'rs0',
-      readPreference: 'secondaryPreferred',
-    } as const
-
-    // Use this config instead if you want to connect to a mongodb instance locally using a tunnel
-    // const connectionConfig = {
-    //   directConnection: true,
-    //   readPreference: 'secondaryPreferred',
-    //   retryWrites: false,
-    // } as const
+      replicaSet: env.MONGODB_REPLICA_SET,
+      directConnection: env.MONGODB_DIRECT_CONNECTION,
+      readPreference: env.MONGODB_READ_PREFERENCE as ReadPreferenceMode,
+      retryWrites: env.MONGODB_RETRY_WRITES,
+    } satisfies MongoClientOptions
 
     const connectionString = `mongodb://${env.READ_MODEL_DB_USER}:${env.READ_MODEL_DB_PASSWORD}@${env.READ_MODEL_DB_HOST}:${env.READ_MODEL_DB_PORT}`
     const client = await new MongoClient(connectionString, connectionConfig).connect()

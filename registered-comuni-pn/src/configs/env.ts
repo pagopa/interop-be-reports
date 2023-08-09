@@ -20,6 +20,11 @@ export const envSchema = z.object({
 
   PN_ESERVICE_ID: z.string(),
   COMUNI_E_LORO_CONSORZI_E_ASSOCIAZIONI_ATTRIBUTE_ID: z.string(),
+
+  MONGODB_REPLICA_SET: z.string(),
+  MONGODB_READ_PREFERENCE: z.string(),
+  MONGODB_DIRECT_CONNECTION: z.string().transform((value) => value === 'true'),
+  MONGODB_RETRY_WRITES: z.string().transform((value) => value === 'true'),
 })
 
 export type Env = z.infer<typeof envSchema>
