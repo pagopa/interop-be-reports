@@ -50,8 +50,8 @@ jobs:
             package_path: ./jobs/dtd-catalog-exporter
           - image_name: one-trust-notices
             package_path: ./jobs/one-trust-notices
-          # - image_name: registered-comuni-pn
-          #   package_path: ./jobs/registered-comuni-pn
+          - image_name: registered-comuni-pn
+            package_path: ./jobs/registered-comuni-pn
 
     permissions:
       id-token: write
@@ -78,11 +78,8 @@ jobs:
       - name: Installing
         run: pnpm install
 
-      - name: Building commons
-        run: npx turbo build --filter commons
-
       - name: Building job
-        run: npx turbo build --filter ${{ matrix.image_name }}
+        run: pnpm build:${{ matrix.image_name }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
