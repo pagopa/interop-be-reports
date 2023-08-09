@@ -89,7 +89,6 @@ jobs:
           
       - name: Build docker image
         run: docker build --network host -t $ECR_REGISTRY/interop-be-${{ matrix.image_name }}:$VERSION  -f ./jobs/${{ matrix.image_name }}/Dockerfile .
-        working-directory: ${{ matrix.package_path }}          
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           VERSION: ${{ steps.version.outputs.version }}
