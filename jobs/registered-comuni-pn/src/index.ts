@@ -1,7 +1,7 @@
 import { ReadModelQueriesClient } from './services/index.js'
 import { toCsvDataRow } from './utils/index.js'
 import { CSV_FILENAME, MAIL_BODY, MAIL_SUBJECT, env } from './configs/index.js'
-import { Mailer, SafeMap, toCSV } from '@interop-be-reports/commons'
+import { Mailer, SafeMap, toCSV, withExecutionTime } from '@interop-be-reports/commons'
 
 const log = console.log
 
@@ -55,4 +55,4 @@ async function main() {
   process.exit(0)
 }
 
-main()
+withExecutionTime(main)
