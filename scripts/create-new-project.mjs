@@ -13,7 +13,7 @@ const log = console.log
 
 const DEV_DEPENDENCIES = {
   '@types/lodash': '4.14.196',
-  '@types/node': '20.4.8',
+  '@types/node': '20.4.9',
   '@typescript-eslint/eslint-plugin': '6.3.0',
   '@typescript-eslint/parser': '6.3.0',
   eslint: '8.46.0',
@@ -24,7 +24,7 @@ const DEV_DEPENDENCIES = {
 }
 
 const DEPENDENCIES = {
-  '@aws-sdk/client-s3': '^3.386.0',
+  '@aws-sdk/client-s3': '^3.387.0',
   axios: '^1.4.0',
   chalk: '^5.3.0',
   dotenv: '^16.3.1',
@@ -58,6 +58,8 @@ function createNewProject(projectName) {
     createTsConfig(projectName)
     log(`> Creating ${chalk.blue('Dockerfile')}...`)
     createDockerfile(projectName)
+    log(`> Adding new job to root package.json scripts...`)
+    addToRootPackageJsonScripts(projectName)
     log(`> Adding new job to ci/cd...`)
     addToGitHubCIActions(projectName)
     log('> Installing dependencies...')
@@ -154,14 +156,43 @@ function createDockerfile(projectName) {
 function addToGitHubCIActions(projectName) {
   const githubCIActions = fs.readFileSync('./.github/workflows/ci.yml', 'utf8')
   const fileArray = githubCIActions.split('\n')
-  const index = fileArray.findIndex((line) => line.includes('jobs: ['))
+  const index = fileArray.findIndex((line) => line.includes('include:'))
   for (let i = index + 1; i < fileArray.length; i++) {
-    if (fileArray[i].includes(']')) {
-      fileArray.splice(i, 0, `          ${projectName},`)
+    if (!fileArray[i].includes('image_name:') && !fileArray[i].includes('package_path:')) {
+      fileArray.splice(
+        i,
+        0,
+        `          - image_name: ${projectName}
+            package_path: ./jobs/${projectName}`
+      )
       break
     }
   }
   fs.writeFileSync('./.github/workflows/ci.yml', fileArray.join('\n'))
+}
+
+function addToRootPackageJsonScripts(projectName) {
+  const packageJson = fs.readFileSync('./package.json', 'utf8')
+  const fileArray = packageJson.split('\n')
+  const startLineIndex = fileArray.findIndex((line) => line.includes('"start:'))
+
+  for (let i = startLineIndex + 1; i < fileArray.length; i++) {
+    if (!fileArray[i].includes('start:')) {
+      fileArray.splice(i, 0, `    "start:${projectName}": "turbo start --filter ${projectName}",`)
+      break
+    }
+  }
+
+  const buildLineIndex = fileArray.findIndex((line) => line.includes('"build:'))
+
+  for (let i = buildLineIndex + 1; i < fileArray.length; i++) {
+    if (!fileArray[i].includes('build:')) {
+      fileArray.splice(i, 0, `    "build:${projectName}": "turbo build --filter ${projectName}",`)
+      break
+    }
+  }
+
+  fs.writeFileSync('./package.json', fileArray.join('\n'))
 }
 
 function cleanUpOnError(projectName) {
