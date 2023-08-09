@@ -50,8 +50,8 @@ jobs:
             package_path: ./jobs/dtd-catalog-exporter
           - image_name: one-trust-notices
             package_path: ./jobs/one-trust-notices
-          - image_name: registered-comuni-pn
-            package_path: ./jobs/registered-comuni-pn
+          - image_name: pn-consumers
+            package_path: ./jobs/pn-consumers
 
     permissions:
       id-token: write

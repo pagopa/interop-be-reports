@@ -6,10 +6,10 @@
   "scripts": {
     "start:dtd-catalog-exporter": "turbo start --filter dtd-catalog-exporter",
     "start:one-trust-notices": "turbo start --filter one-trust-notices",
-    "start:registered-comuni-pn": "turbo start --filter registered-comuni-pn",
+    "start:pn-consumers": "turbo start --filter pn-consumers",
     "build:dtd-catalog-exporter": "turbo build --filter dtd-catalog-exporter",
     "build:one-trust-notices": "turbo build --filter one-trust-notices",
-    "build:registered-comuni-pn": "turbo build --filter registered-comuni-pn",
+    "build:pn-consumers": "turbo build --filter pn-consumers",
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",

@@ -1,5 +1,5 @@
 {
-  "name": "registered-comuni-pn",
+  "name": "pn-consumers",
   "main": "./dist/index.js",
   "type": "module",
   "scripts": {
