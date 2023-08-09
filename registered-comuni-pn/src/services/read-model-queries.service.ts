@@ -61,6 +61,7 @@ export class ReadModelQueriesClient {
    * @param tenantsIds - The ids of the tenants to retrieve
    * @returns The tenants
    **/
+  async getComuniByTenantsIds(tenantsIds: Array<string>) {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: Tenant }>(env.TENANTS_COLLECTION_NAME)

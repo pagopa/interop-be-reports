@@ -13,7 +13,7 @@ export const purposeSchema = z.object({
   consumerId: z.string(),
   versions: z.array(
     z.object({
-      firstActivationAt: z.string(),
+      firstActivationAt: z.string().optional(),
       state: purposeStateSchema,
     })
   ),

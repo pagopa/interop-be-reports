@@ -21,7 +21,7 @@ async function main() {
     process.exit(0)
   }
 
-  const tenantsIds = new Set(purposes.map((purpose) => purpose.consumerId))
+  const tenantsIds = [...new Set(purposes.map((purpose) => purpose.consumerId))]
   const tenants = await readModelsQueriesClient.getComuniByTenantsIds(tenantsIds)
 
   const tenantNamesMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant.name]))

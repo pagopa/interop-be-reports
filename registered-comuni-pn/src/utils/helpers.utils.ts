@@ -65,6 +65,6 @@ export function toCsvDataRow(tenantNamesMap: SafeMap<string, string>, purpose: P
   return {
     nome_comune: tenantNamesMap.get(purpose.consumerId),
     stato_finalita_migliore: state,
-    data_attivazione: relevantVersion.firstActivationAt,
+    data_attivazione: relevantVersion.firstActivationAt as string,
   }
 }
