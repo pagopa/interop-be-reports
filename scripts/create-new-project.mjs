@@ -1,3 +1,16 @@
+/**
+ * This script handles all the boilerplate code needed to create a new job.
+ * It does the following:
+ * - Asks and then validates the project name;
+ * - Creates the project structure, with the src folder and index.ts file;
+ * - Creates the package.json with default dependencies;
+ * - Creates the tsconfig.json;
+ * - Creates the Dockerfile;
+ * - Adds the new job to the root package.json scripts, ex: "start:my-new-job": "turbo start --filter my-new-job"
+ * - Adds the new job to the CI/CD, meaning adding it to the .github/workflows/ci.yml file, in the matrix action that publishes the jobs;
+ * - Installs dependencies with pnpm;
+ */
+
 'use strict'
 
 import * as fs from 'fs'
