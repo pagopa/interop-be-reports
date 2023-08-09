@@ -101,7 +101,7 @@ jobs:
           if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
             echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref_name }}" == "1.0.x" ]]; then
-            echo "version=latest" >> $GITHUB_OUTPUT
+            echo "version=${{ github.ref_name }}-latest" >> $GITHUB_OUTPUT
           else
             echo "version=$(echo "$GITHUB_REF_NAME" | tr -s "/" "-")" >> $GITHUB_OUTPUT
           fi
