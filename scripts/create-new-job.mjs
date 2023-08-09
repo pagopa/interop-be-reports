@@ -193,16 +193,6 @@ COPY --from=builder /app/out/full/ .
 RUN pnpm dlx turbo run build --filter=${jobName}
 `
   )
-
-  fs.writeFileSync(
-    `${JOB_BASE_PATH}/${jobName}/.dockerignore`,
-    `
-**/node_modules
-.git
-.gitignore
-**/dist
-`
-  )
 }
 
 function addToGitHubCIActions(jobName) {

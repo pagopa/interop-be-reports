@@ -10,9 +10,6 @@ RUN corepack enable
 COPY . .
 RUN pnpm --package=turbo dlx turbo prune --scope=pn-consumers --docker
 
-# remove all empty node_modules folder structure
-RUN rm -rf /app/out/full/*/*/node_modules
-
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
 RUN apk add --no-cache libc6-compat
