@@ -3,13 +3,10 @@ import {
   getAllAttributesIdsInEServicesActiveDescriptors,
   getAllTenantsIdsInEServices,
   remapEServiceToPublicEService,
+  getSafeMapFromIdentifiableRecords,
 } from './utils/index.js'
 import { publicEServicesSchema } from './models/index.js'
-import {
-  getSafeMapFromIdentifiableRecords,
-  withExecutionTime,
-  AwsS3BucketClient,
-} from '@interop-be-reports/commons'
+import { withExecutionTime, AwsS3BucketClient } from '@interop-be-reports/commons'
 import { env } from './configs/env.js'
 
 const log = console.log
