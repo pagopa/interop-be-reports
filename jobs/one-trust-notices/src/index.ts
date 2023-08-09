@@ -56,13 +56,14 @@ async function main() {
       log('> Checking if it is a new version...')
 
       // We check if there is a new version by checking if the history bucket already has one of the versioned paths.
-      const versionBucketContentList = await historyBucketClient.getBucketContentList()
-      const isNewVersion = versionedContentBucketPaths.some((bucketPath) =>
-        versionBucketContentList.includes(bucketPath)
+      const versionedBucketContentList = await historyBucketClient.getBucketContentList()
+      const isNewVersion = !versionedContentBucketPaths.some((bucketPath) =>
+        versionedBucketContentList.includes(bucketPath)
       )
 
       if (isNewVersion) {
-        log(`> New version found! Uploading to ${env.HISTORY_STORAGE_BUCKET} bucket...`)
+        log(`\nNew version found!`)
+        log(`> Uploading to ${env.HISTORY_STORAGE_BUCKET} bucket...\n`)
         await Promise.all(
           localizedNoticeContentResponses.map((noticeContentResponse, index) =>
             historyBucketClient.uploadData(
@@ -72,7 +73,7 @@ async function main() {
           )
         )
       } else {
-        log('No new version found.')
+        log('\nNo new version found.\n')
       }
 
       log(`> Uploading notice content to ${env.CONTENT_STORAGE_BUCKET} bucket...`)
