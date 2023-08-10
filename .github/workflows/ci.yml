@@ -64,22 +64,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0  
-        
-      - name: Install node 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - name: Installing
-        run: pnpm install
-
-      - name: Building job
-        run: pnpm build:${{ matrix.image_name }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -104,8 +88,7 @@ jobs:
           fi
           
       - name: Build docker image
-        run: docker build --network host -t $ECR_REGISTRY/interop-be-${{ matrix.image_name }}:$VERSION .
-        working-directory: ${{ matrix.package_path }}          
+        run: docker build --network host -t $ECR_REGISTRY/interop-be-${{ matrix.image_name }}:$VERSION  -f ./jobs/${{ matrix.image_name }}/Dockerfile .
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           VERSION: ${{ steps.version.outputs.version }}
