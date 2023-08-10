@@ -1,56 +1,12 @@
-import { Kafka, KafkaMessage } from "kafkajs";
-import { EventPayload } from "./model/InstitutionEvent.js";
 import { env } from "./config/env.js";
+import { initConsumer } from "./consumer.js";
+import { processMessage } from "./processor.js";
 
 // TODO Logger
 
 console.log("Starting consumer...")
 
-const kafka = new Kafka({
-  clientId: env.KAFKA_CLIENT_ID,
-  brokers: env.SELFCARE_BROKER_URLS,
-  ssl: true,
-  sasl: {
-    mechanism: 'plain',
-    username: '$ConnectionString',
-    password: env.BROKER_CONNECTION_STRING
-  },
-})
-
-const consumer = kafka.consumer({ groupId: env.KAFKA_GROUP_ID })
-
-function exitGracefully(): void {
-  consumer.disconnect().finally(() => {
-    console.log("Consumer disconnected");
-    process.exit(0);
-  });
-}
-
-process.on("SIGINT", exitGracefully);
-process.on("SIGTERM", exitGracefully);
-
-async function processMessage(message: KafkaMessage): Promise<void> {
-  if (message.value) {
-    const stringPayload = message.value.toString()
-    const jsonPayload = JSON.parse(stringPayload);
-    const parsed = EventPayload.safeParse(jsonPayload);
-    if (parsed.success) {
-      // TODO Filter by product
-      console.log(`Message with offset ${message.offset} correctly received`);
-    } else {
-      console.log(`Error consuming message with offset ${message.offset}. Reason: ${parsed.error}. Message: ${stringPayload}`)
-      throw parsed.error;
-    }
-  } else {
-    // TODO Should this throw an error or log warning and ignore?
-    throw Error(`Empty content for message with offset ${message.offset}`);
-  }
-}
-
-await consumer.connect();
-
-await consumer.subscribe({ topic: env.TOPIC_NAME, fromBeginning: true }); // TODO Evaluate the use of fromBeginning
-
+const consumer = await initConsumer(env)
 
 consumer.run({
   // autoCommit: false, // TODO Remove, just for testing purposes

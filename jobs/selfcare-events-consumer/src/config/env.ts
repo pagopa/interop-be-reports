@@ -12,7 +12,7 @@ const envSchema = z.object({
   INTEROP_PRODUCT: z.string(),
 })
 
-type Env = z.infer<typeof envSchema>
+export type Env = z.infer<typeof envSchema>
 
 dotenv.config()
 export const env: Env = envSchema.parse(process.env)
