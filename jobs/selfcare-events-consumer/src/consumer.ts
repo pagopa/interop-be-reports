@@ -1,8 +1,8 @@
-import { Kafka } from "kafkajs";
+import { Consumer, Kafka } from "kafkajs";
 import { Env } from "./config/env.js";
 
 
-export async function initConsumer(env: Env) {
+export async function initConsumer(env: Env): Promise<Consumer> {
 
   const kafka = new Kafka({
     clientId: env.KAFKA_CLIENT_ID,
@@ -32,4 +32,12 @@ export async function initConsumer(env: Env) {
   await consumer.subscribe({ topic: env.TOPIC_NAME, fromBeginning: true }); // TODO Evaluate the use of fromBeginning
 
   return consumer;
+}
+
+
+export function exitWithError(consumer: Consumer): void {
+  consumer.disconnect().finally(() => {
+    console.log("Consumer interrupted after error");
+    process.exit(1);
+  });
 }

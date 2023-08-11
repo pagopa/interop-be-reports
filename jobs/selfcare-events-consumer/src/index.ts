@@ -1,5 +1,5 @@
 import { env } from "./config/env.js";
-import { initConsumer } from "./consumer.js";
+import { exitWithError, initConsumer } from "./consumer.js";
 import { processMessage } from "./processor.js";
 
 // TODO Logger
@@ -7,10 +7,16 @@ import { processMessage } from "./processor.js";
 console.log("Starting consumer...")
 
 const consumer = await initConsumer(env)
+const configuredProcessor = processMessage(env.INTEROP_PRODUCT)
 
 consumer.run({
-  // autoCommit: false, // TODO Remove, just for testing purposes
-  eachMessage: async ({ message }) => processMessage(message)
+  eachMessage: async ({ message }) => {
+  try {
+    return await configuredProcessor(message)
+  } catch(err) {
+    // TODO Terminate the consumer in case of error? or use a DLQ and proceeed?
+    exitWithError(consumer)
+  }}
 })
 
 // TODO Remove, just for testing purposes
