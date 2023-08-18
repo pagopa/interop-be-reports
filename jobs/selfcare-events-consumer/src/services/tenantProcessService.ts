@@ -1,17 +1,15 @@
 import axios from 'axios';
 import { InteropContext } from '../model/InteropContext.js';
-
-type SelfcareUpsertTenantResponse = {
-  id: string
-}
+import { SelfcareTenantSeed, SelfcareUpsertTenantResponse } from '../model/tenant-process.models.js';
 
 export class TenantProcessService {
 
   constructor(private tenantProcessUrl: string) { }
 
-  public async selfcareUpsertTenant(context: InteropContext): Promise<SelfcareUpsertTenantResponse> {
+  public async selfcareUpsertTenant(seed: SelfcareTenantSeed, context: InteropContext): Promise<SelfcareUpsertTenantResponse> {
     const { data, status } = await axios.post<SelfcareUpsertTenantResponse>(
       `${this.tenantProcessUrl}/selfcare/tenants`,
+      seed,
       {
         headers: {
           'X-Correlation-Id': context.correlationId,

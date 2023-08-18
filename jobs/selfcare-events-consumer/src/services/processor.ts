@@ -1,9 +1,10 @@
 import { KafkaMessage } from "kafkajs";
 import { EventPayload } from "../model/InstitutionEvent.js";
-import { InteropTokenGenerator } from "@interop-be-reports/commons";
+import { InteropTokenGenerator, ORIGIN_IPA } from "@interop-be-reports/commons";
 import { TenantProcessService } from "./tenantProcessService.js";
 import { InteropContext } from "../model/InteropContext.js";
 import { v4 as uuidv4 } from "uuid";
+import { SelfcareTenantSeed } from "../model/tenant-process.models.js";
 
 export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProcess: TenantProcessService, productName: string) => async (message: KafkaMessage, partition: number): Promise<void> => {
   if (!message.value)
@@ -27,7 +28,18 @@ export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProc
 
     const token = await tokenGenerator.generateInternalToken()
     const context: InteropContext = { bearerToken: token.serialized, correlationId: uuidv4() }
-    await tenantProcess.selfcareUpsertTenant(context)
+
+    const institution = parsed.data.institution
+
+    const seed: SelfcareTenantSeed = {
+      externalId: {
+        origin: institution.origin,
+        value: institution.origin == ORIGIN_IPA ? institution.subUnitCode || institution.originId : institution.taxCode
+      },
+      selfcareId: parsed.data.internalIstitutionID,
+      name: institution.description
+    }
+    await tenantProcess.selfcareUpsertTenant(seed, context)
 
     console.log(`Message in partition ${partition} with offset ${message.offset} correctly received`);
   } else {
