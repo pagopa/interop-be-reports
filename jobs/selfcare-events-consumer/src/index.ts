@@ -23,13 +23,14 @@ const tenantProcess = new TenantProcessService(env.TENANT_PROCESS_URL)
 const configuredProcessor = processMessage(tokenGenerator, tenantProcess, env.INTEROP_PRODUCT)
 
 consumer.run({
-  eachMessage: async ({ message }) => {
-  try {
-    return await configuredProcessor(message)
-  } catch(err) {
-    // TODO Terminate the consumer in case of error? or use a DLQ and proceed?
-    exitWithError(consumer)
-  }}
+  eachMessage: async ({ message, partition }) => {
+    try {
+      return await configuredProcessor(message, partition)
+    } catch (err) {
+      // TODO Terminate the consumer in case of error? or use a DLQ and proceed?
+      exitWithError(consumer)
+    }
+  }
 })
 
 // TODO Remove, just for testing purposes

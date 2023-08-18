@@ -5,7 +5,7 @@ import { TenantProcessService } from "./tenantProcessService.js";
 import { InteropContext } from "../model/InteropContext.js";
 import { v4 as uuidv4 } from "uuid";
 
-export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProcess: TenantProcessService, productName: string) => async (message: KafkaMessage): Promise<void> => {
+export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProcess: TenantProcessService, productName: string) => async (message: KafkaMessage, partition: number): Promise<void> => {
   if (!message.value)
     // TODO Should this throw an error or log warning and ignore?
     // throw Error(`Empty content for message with offset ${message.offset}`);
@@ -29,9 +29,9 @@ export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProc
     const context: InteropContext = { bearerToken: token.serialized, correlationId: uuidv4() }
     await tenantProcess.selfcareUpsertTenant(context)
 
-    console.log(`Message with offset ${message.offset} correctly received`);
+    console.log(`Message in partition ${partition} with offset ${message.offset} correctly received`);
   } else {
-    console.log(`Error consuming message with offset ${message.offset}. Reason: ${parsed.error}. Message: ${stringPayload}`)
+    console.log(`Error consuming message in partition ${partition} with offset ${message.offset}. Reason: ${parsed.error}. Message: ${stringPayload}`)
     throw parsed.error;
   }
 }
