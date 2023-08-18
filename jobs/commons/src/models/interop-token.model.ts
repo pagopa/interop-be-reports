@@ -12,6 +12,7 @@ export interface InteropJwtPayload {
   iat: number
   nbf: number
   exp: number
+  role: string
 }
 
 export interface InteropToken {

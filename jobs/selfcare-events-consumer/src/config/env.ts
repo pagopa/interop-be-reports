@@ -11,6 +11,8 @@ const envSchema = z.object({
 
   INTEROP_PRODUCT: z.string(),
 
+  TENANT_PROCESS_URL: z.string(),
+
   INTERNAL_JWT_KID: z.string(),
   INTERNAL_JWT_SUBJECT: z.string(),
   INTERNAL_JWT_ISSUER: z.string(),

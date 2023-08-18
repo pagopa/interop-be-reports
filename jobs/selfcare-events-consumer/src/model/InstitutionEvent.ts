@@ -15,6 +15,7 @@ const InstitutionEvent = z.object({
   subUnitCode: z.string().optional().nullable(), // AOO/UO ID
   subUnitType: SubUnitType.optional().nullable(),
 });
+export type InstitutionEvent = z.infer<typeof InstitutionEvent>
 
 export const EventPayload = z.object({
   id: z.string(),
@@ -28,3 +29,4 @@ export const EventPayload = z.object({
   institution: InstitutionEvent,
   notificationType: z.string().optional().nullable() // Undocumented TODO Check
 });
+export type EventPayload = z.infer<typeof EventPayload>

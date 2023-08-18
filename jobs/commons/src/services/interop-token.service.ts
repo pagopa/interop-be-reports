@@ -1,6 +1,6 @@
 import { KMSClient, SignCommand, SignCommandInput } from '@aws-sdk/client-kms'
 import { TokenGenerationConfig } from '../config/interop-token.config.js'
-import { InteropJwtHeader, InteropJwtPayload, InteropToken, b64ByteUrlEncode, b64UrlEncode } from '../index.js'
+import { InteropJwtHeader, InteropJwtPayload, InteropToken, JWT_INTERNAL_ROLE, b64ByteUrlEncode, b64UrlEncode } from '../index.js'
 import { v4 as uuidv4 } from 'uuid'
 
 const JWT_HEADER_ALG = "RS256"
@@ -16,7 +16,7 @@ export class InteropTokenGenerator {
 
   public async generateInternalToken(): Promise<InteropToken> {
 
-    const currentTimestamp = Date.now()
+    const currentTimestamp = Math.floor(Date.now() / 1000)
 
     const header: InteropJwtHeader = {
         alg: JWT_HEADER_ALG,
@@ -32,7 +32,8 @@ export class InteropTokenGenerator {
         sub: this.config.subject,
         iat: currentTimestamp,
         nbf: currentTimestamp,
-        exp: currentTimestamp + (this.config.secondsDuration * 1000)
+        exp: currentTimestamp + this.config.secondsDuration,
+        role: JWT_INTERNAL_ROLE
     }
 
     const serializedToken = `${b64UrlEncode(JSON.stringify(header))}.${b64UrlEncode(JSON.stringify(payload))}`
