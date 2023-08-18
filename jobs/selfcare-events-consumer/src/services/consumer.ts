@@ -1,5 +1,5 @@
 import { Consumer, Kafka } from "kafkajs";
-import { Env } from "./config/env.js";
+import { Env } from "../config/env.js";
 
 
 export async function initConsumer(env: Env): Promise<Consumer> {

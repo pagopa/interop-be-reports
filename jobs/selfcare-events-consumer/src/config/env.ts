@@ -10,6 +10,12 @@ const envSchema = z.object({
   TOPIC_NAME: z.string(),
 
   INTEROP_PRODUCT: z.string(),
+
+  INTERNAL_JWT_KID: z.string(),
+  INTERNAL_JWT_SUBJECT: z.string(),
+  INTERNAL_JWT_ISSUER: z.string(),
+  INTERNAL_JWT_AUDIENCE: z.string().transform((value) => value.split(',')),
+  INTERNAL_JWT_SECONDS_DURATION: z.string().transform((v, _) => parseInt(v)),
 })
 
 export type Env = z.infer<typeof envSchema>

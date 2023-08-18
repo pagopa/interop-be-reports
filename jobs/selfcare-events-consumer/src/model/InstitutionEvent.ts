@@ -8,7 +8,7 @@ type SubUnitType = z.infer<typeof SubUnitType>;
 
 const InstitutionEvent = z.object({
   description: z.string(),
-  digitalAddress: z.string(),
+  // digitalAddress: z.string(),
   origin: z.string(),
   originId: z.string(),
   taxCode: z.string(),

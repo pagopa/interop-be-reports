@@ -273,12 +273,18 @@ importers:
       '@interop-be-reports/commons':
         specifier: workspace:*
         version: link:../commons
+      axios:
+        specifier: ^1.4.0
+        version: 1.4.0
       dotenv:
         specifier: ^16.3.1
         version: 16.3.1
       kafkajs:
         specifier: ^2.2.4
         version: 2.2.4
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.0
       zod:
         specifier: ^3.21.4
         version: 3.21.4
@@ -289,6 +295,9 @@ importers:
       '@types/node':
         specifier: 20.4.9
         version: 20.4.9
+      '@types/uuid':
+        specifier: ^9.0.2
+        version: 9.0.2
       '@typescript-eslint/eslint-plugin':
         specifier: 6.3.0
         version: 6.3.0(@typescript-eslint/parser@6.3.0)(eslint@8.46.0)(typescript@5.1.6)
@@ -1743,7 +1752,6 @@ packages:
 
   /@types/uuid@9.0.2:
     resolution: {integrity: sha512-kNnC1GFBLuhImSnV7w4njQkUiJi0ZXUycu1rUaouPqiKlXkh77JKgdRnTAp1x5eBwcIwbtI+3otwzuIDEuDoxQ==}
-    dev: false
 
   /@types/webidl-conversions@7.0.0:
     resolution: {integrity: sha512-xTE1E+YF4aWPJJeUzaZI5DRntlkY3+BCVJi0axFptnjGmAoWxkyREIh/XMrfxVLejwQxMCfDXdICo0VLxThrog==}
