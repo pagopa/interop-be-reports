@@ -26,3 +26,4 @@ RUN pnpm install --frozen-lockfile
 # Build the project
 COPY --from=builder /app/out/full/ .
 RUN pnpm dlx turbo run build --filter=pn-consumers
+RUN ln -s ./jobs/pn-consumers/dist ./dist
