@@ -1,7 +1,7 @@
 import { InteropTokenGenerator } from "@interop-be-reports/commons"
 import { processMessage } from "../services/processor.js"
 import { TenantProcessService } from "../services/tenantProcessService.js"
-import { correctEventPayload, generateInternalTokenMock, interopProductName, kafkaMessage, selfcareUpsertTenantMock, tokenConfig } from "./helpers.js"
+import { correctEventPayload, correctInstitutionEventField, generateInternalTokenMock, interopProductName, interopToken, kafkaMessage, selfcareUpsertTenantMock, tokenConfig } from "./helpers.js"
 
 
 describe('processor', () => {
@@ -12,15 +12,15 @@ describe('processor', () => {
   const configuredProcessor = processMessage(tokenGeneratorMock, tenantProcessMock, interopProductName)
 
   const loggerMock = vitest.fn()
-  const generateInternalTokenSpy = vi.spyOn(tokenGeneratorMock, 'generateInternalToken')
-  const selfcareUpsertTenantSpy = vi.spyOn(tenantProcessMock, 'selfcareUpsertTenant')
+  const generateInternalTokenSpy = vi.spyOn(tokenGeneratorMock, 'generateInternalToken').mockImplementation(generateInternalTokenMock)
+  const selfcareUpsertTenantSpy = vi.spyOn(tenantProcessMock, 'selfcareUpsertTenant').mockImplementation(selfcareUpsertTenantMock)
 
   beforeAll(() => {
     vitest.spyOn(console, 'log').mockImplementation(loggerMock)
   })
 
   afterEach(() => {
-    vitest.restoreAllMocks()
+    vitest.clearAllMocks()
   })
 
   it('should skip empty message', async () => {
@@ -71,9 +71,6 @@ describe('processor', () => {
 
     const message = kafkaMessage
 
-    const generateInternalTokenSpy = vi.spyOn(tenantProcessMock, 'selfcareUpsertTenant').mockImplementationOnce(selfcareUpsertTenantMock)
-    const selfcareUpsertTenantSpy = vi.spyOn(tokenGeneratorMock, 'generateInternalToken').mockImplementationOnce(generateInternalTokenMock)
-
     await configuredProcessor(message, 0)
 
     expect(generateInternalTokenSpy).toBeCalledTimes(1)
@@ -81,4 +78,64 @@ describe('processor', () => {
 
   })
 
+  it('should upsert PA tenant - Main institution', async () => {
+
+    const message = { ...kafkaMessage, value: Buffer.from(JSON.stringify({ ...correctEventPayload, institution: { ...correctInstitutionEventField, origin: "IPA", originId: "ipa_123", subUnitType: null, subUnitCode: null } })) }
+
+    await configuredProcessor(message, 0)
+
+    expect(generateInternalTokenSpy).toBeCalledTimes(1)
+    expect(selfcareUpsertTenantSpy).toBeCalledTimes(1)
+    expect(selfcareUpsertTenantSpy).toHaveBeenCalledWith(
+      expect.objectContaining(
+        {
+          externalId: { origin: "IPA", value: "ipa_123" },
+          selfcareId: correctEventPayload.internalIstitutionID,
+          name: correctInstitutionEventField.description,
+        }),
+      expect.objectContaining({ bearerToken: interopToken.serialized })
+    )
+
+  })
+
+  it('should upsert PA tenant - AOO/UO', async () => {
+
+    const message = { ...kafkaMessage, value: Buffer.from(JSON.stringify({ ...correctEventPayload, institution: { ...correctInstitutionEventField, origin: "IPA", originId: "ipa_123", subUnitType: "AOO", subUnitCode: "AOO_456" } })) }
+
+    await configuredProcessor(message, 0)
+
+    expect(generateInternalTokenSpy).toBeCalledTimes(1)
+    expect(selfcareUpsertTenantSpy).toBeCalledTimes(1)
+    expect(selfcareUpsertTenantSpy).toHaveBeenCalledWith(
+      expect.objectContaining(
+        {
+          externalId: { origin: "IPA", value: "AOO_456" },
+          selfcareId: correctEventPayload.internalIstitutionID,
+          name: correctInstitutionEventField.description,
+        }),
+      expect.objectContaining({ bearerToken: interopToken.serialized })
+    )
+
+  })
+
+
+  it('should upsert non-PA tenant', async () => {
+
+    const message = { ...kafkaMessage, value: Buffer.from(JSON.stringify({ ...correctEventPayload, institution: { ...correctInstitutionEventField, origin: "OTHER", originId: "ipa_123", taxCode: "tax789", subUnitType: null, subUnitCode: null } })) }
+
+    await configuredProcessor(message, 0)
+
+    expect(generateInternalTokenSpy).toBeCalledTimes(1)
+    expect(selfcareUpsertTenantSpy).toBeCalledTimes(1)
+    expect(selfcareUpsertTenantSpy).toHaveBeenCalledWith(
+      expect.objectContaining(
+        {
+          externalId: { origin: "OTHER", value: "tax789" },
+          selfcareId: correctEventPayload.internalIstitutionID,
+          name: correctInstitutionEventField.description,
+        }),
+      expect.objectContaining({ bearerToken: interopToken.serialized })
+    )
+
+  })
 })
