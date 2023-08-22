@@ -26,6 +26,6 @@ export const EventPayload = z.object({
   updatedAt: z.string().datetime({ offset: true }),
   closedAt: z.string().datetime({ offset: true }).optional().nullable(),
   institution: InstitutionEvent,
-  notificationType: z.string().optional().nullable() // Undocumented TODO Check
+  notificationType: z.string().optional().nullable() // Undocumented
 });
 export type EventPayload = z.infer<typeof EventPayload>

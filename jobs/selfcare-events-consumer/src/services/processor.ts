@@ -15,7 +15,6 @@ export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProc
     info(correlationId, `Consuming message for partition ${partition} with offset ${message.offset}`)
 
     if (!message.value) {
-      // TODO Should this throw an error or log warning and ignore?
       warn(correlationId, `Empty message for partition ${partition} with offset ${message.offset}`)
       return
     }
@@ -51,10 +50,10 @@ export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProc
       }
       await tenantProcess.selfcareUpsertTenant(seed, context)
 
-      info(correlationId, `Message in partition ${partition} with offset ${message.offset} correctly consumed`);
+      info(correlationId, `Message in partition ${partition} with offset ${message.offset} correctly consumed. SelfcareId: ${parsed.data.internalIstitutionID}`);
     } else {
-      // Log to INFO to avoid double ERROR level message (and double alarm)
-      info(correlationId, `Error consuming message in partition ${partition} with offset ${message.offset}. Message: ${stringPayload}`)
+      // Log to WARN to avoid double ERROR level message (and double alarm)
+      warn(correlationId, `Error consuming message in partition ${partition} with offset ${message.offset}. Message: ${stringPayload}`)
       throw parsed.error;
     }
   } catch (err) {

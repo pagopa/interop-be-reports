@@ -4,8 +4,6 @@ import { processMessage } from "./services/processor.js";
 import { InteropTokenGenerator, TokenGenerationConfig } from '@interop-be-reports/commons'
 import { TenantProcessService } from "./services/tenantProcessService.js";
 
-// TODO Logger
-
 console.log("Starting consumer...")
 
 const tokenGeneratorConfig: TokenGenerationConfig = {
