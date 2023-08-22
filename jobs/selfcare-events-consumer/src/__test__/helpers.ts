@@ -7,24 +7,24 @@ export const interopProductName = "test-interop-product"
 
 export const interopToken: InteropToken = {
   header: {
-    alg: '',
-    use: '',
-    typ: '',
-    kid: '',
+    alg: 'algorithm',
+    use: 'use',
+    typ: 'type',
+    kid: 'key-id',
   },
   payload: {
-    jti: '',
-    iss: '',
-    aud: [''],
-    sub: '',
+    jti: 'token-id',
+    iss: 'issuer',
+    aud: ['audience1'],
+    sub: 'subject',
     iat: 0,
     nbf: 0,
     exp: 10,
-    role: '',
+    role: 'role1',
   },
   serialized: 'the-token',
 }
-export const selfcareUpsertTenantMock = (seed: SelfcareTenantSeed, context: InteropContext): Promise<SelfcareUpsertTenantResponse> => Promise.resolve({ id: "tenant-id" })
+export const selfcareUpsertTenantMock = (_seed: SelfcareTenantSeed, _context: InteropContext): Promise<SelfcareUpsertTenantResponse> => Promise.resolve({ id: "tenant-id" })
 export const generateInternalTokenMock = (): Promise<InteropToken> => Promise.resolve(interopToken)
 
 export const tokenConfig: TokenGenerationConfig = {
@@ -35,7 +35,29 @@ export const tokenConfig: TokenGenerationConfig = {
   secondsDuration: 100
 }
 
-const correctSelfcareInstitutionMessage = {
+export const correctInstitutionEventField = {
+  "institutionType": "PA",
+  "description": "Somewhere",
+  "digitalAddress": "somewhere@wonderland",
+  "address": "Piazza Cavicchioni, 8",
+  "taxCode": "12345678987",
+  "origin": "IPA",
+  "originId": "ipa_code",
+  "zipCode": "12345",
+  "paymentServiceProvider": null,
+  "istatCode": "123456",
+  "city": "somewhere",
+  "country": "wonderland",
+  "county": "WL",
+  "subUnitCode": null,
+  "subUnitType": null,
+  "rootParent": {
+    "id": null,
+    "description": null
+  }
+}
+
+export const correctEventPayload = {
   "id": "cfb4f57f-8d93-4e30-8c87-37a29c3c6dac",
   "internalIstitutionID": "b730fbb7-fffe-4090-a3ea-53ee7e07a4b9",
   "product": interopProductName,
@@ -43,27 +65,7 @@ const correctSelfcareInstitutionMessage = {
   "fileName": "",
   "contentType": "application/json",
   "onboardingTokenId": "8e73950f-b51d-46df-92a1-057907f2cb98",
-  "institution": {
-    "institutionType": "PA",
-    "description": "Somewhere",
-    "digitalAddress": "somewhere@wonderland",
-    "address": "Piazza Cavicchioni, 8",
-    "taxCode": "12345678987",
-    "origin": "IPA",
-    "originId": "ipa_code",
-    "zipCode": "12345",
-    "paymentServiceProvider": null,
-    "istatCode": "123456",
-    "city": "somewhere",
-    "country": "wonderland",
-    "county": "WL",
-    "subUnitCode": null,
-    "subUnitType": null,
-    "rootParent": {
-      "id": null,
-      "description": null
-    }
-  },
+  "institution": correctInstitutionEventField,
   "billing": {
     "vatNumber": "12345678987",
     "recipientCode": "11111",
@@ -76,7 +78,7 @@ const correctSelfcareInstitutionMessage = {
 
 export const kafkaMessage: MessageSetEntry = {
   key: Buffer.from('kafka-message-key'),
-  value: Buffer.from(JSON.stringify(correctSelfcareInstitutionMessage)),
+  value: Buffer.from(JSON.stringify(correctEventPayload)),
   timestamp: "0",
   attributes: 0,
   offset: "10",
@@ -84,9 +86,9 @@ export const kafkaMessage: MessageSetEntry = {
 }
 
 export const selfcareUpsertTenantSeed = {
-  externalId: { origin: correctSelfcareInstitutionMessage.institution.origin, value: correctSelfcareInstitutionMessage.institution.originId },
-  selfcareId: correctSelfcareInstitutionMessage.internalIstitutionID,
-  name: correctSelfcareInstitutionMessage.institution.description
+  externalId: { origin: correctEventPayload.institution.origin, value: correctEventPayload.institution.originId },
+  selfcareId: correctEventPayload.internalIstitutionID,
+  name: correctEventPayload.institution.description
 }
 
 export const serviceInvocationContext = {

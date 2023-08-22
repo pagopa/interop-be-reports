@@ -28,7 +28,7 @@ consumer.run({
       return await configuredProcessor(message, partition)
     } catch (err) {
       // TODO Terminate the consumer in case of error? or use a DLQ and proceed?
-      exitWithError(consumer)
+      exitWithError(consumer, err)
     }
   }
 })

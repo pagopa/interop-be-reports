@@ -35,9 +35,9 @@ export async function initConsumer(env: Env): Promise<Consumer> {
 }
 
 
-export function exitWithError(consumer: Consumer): void {
+export function exitWithError(consumer: Consumer, error: unknown): void {
   consumer.disconnect().finally(() => {
-    console.log("Consumer interrupted after error");
+    console.log(`Consumer interrupted after error: ${error}`);
     process.exit(1);
   });
 }
