@@ -9,6 +9,8 @@ const envSchema = z.object({
   KAFKA_GROUP_ID: z.string(),
   TOPIC_NAME: z.string(),
 
+  RESET_CONSUMER_OFFSETS: z.string().default('false').transform((value) => value.toUpperCase() === 'TRUE'),
+
   INTEROP_PRODUCT: z.string(),
 
   TENANT_PROCESS_URL: z.string(),

@@ -32,9 +32,6 @@ export const processMessage = (refreshableToken: RefreshableInteropToken, tenant
     const parsed = EventPayload.safeParse(jsonPayload);
 
     if (parsed.success) {
-      // TODO Generate token only once and refresh it when needed
-      //  Note: this function runs sequentially for each partition but in "parallel" among different partitions
-
       const token = await refreshableToken.get()
       const context: InteropContext = { bearerToken: token.serialized, correlationId: uuidv4() }
 
