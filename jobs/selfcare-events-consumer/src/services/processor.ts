@@ -5,15 +5,18 @@ import { TenantProcessService } from "./tenantProcessService.js";
 import { InteropContext } from "../model/interop-context.js";
 import { v4 as uuidv4 } from "uuid";
 import { SelfcareTenantSeed } from "../model/tenant-process.js";
+import { error, info, warn } from "../utils/logger.js";
 
 export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProcess: TenantProcessService, productName: string) => async (message: KafkaMessage, partition: number): Promise<void> => {
+  const correlationId = uuidv4()
+
   try {
 
-    console.log(`Consuming message for partition ${partition} with offset ${message.offset}`)
+    info(correlationId, `Consuming message for partition ${partition} with offset ${message.offset}`)
 
     if (!message.value) {
       // TODO Should this throw an error or log warning and ignore?
-      console.log(`WARN: Empty message for partition ${partition} with offset ${message.offset}`)
+      warn(correlationId, `Empty message for partition ${partition} with offset ${message.offset}`)
       return
     }
 
@@ -23,8 +26,7 @@ export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProc
     // Process only messages of our product
     // Note: Filtered before parsing to avoid errors on an unexpected messages that we are not interested in 
     if (jsonPayload.product !== productName) {
-      // TODO Log debug?
-      console.log(`Skipping message for partition ${partition} with offset ${message.offset} - Not required product: ${jsonPayload.product}`)
+      info(correlationId, `Skipping message for partition ${partition} with offset ${message.offset} - Not required product: ${jsonPayload.product}`)
       return
     }
 
@@ -49,15 +51,15 @@ export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProc
       }
       await tenantProcess.selfcareUpsertTenant(seed, context)
 
-      console.log(`Message in partition ${partition} with offset ${message.offset} correctly consumed`);
+      info(correlationId, `Message in partition ${partition} with offset ${message.offset} correctly consumed`);
     } else {
-      // TODO Log to INFO to avoid double ERROR level message (and double alarm)
-      console.log(`Error consuming message in partition ${partition} with offset ${message.offset}. Message: ${stringPayload}`)
+      // Log to INFO to avoid double ERROR level message (and double alarm)
+      info(correlationId, `Error consuming message in partition ${partition} with offset ${message.offset}. Message: ${stringPayload}`)
       throw parsed.error;
     }
   } catch (err) {
     const errorMessage = `Error consuming message in partition ${partition} with offset ${message.offset}. Reason: ${err}`
-    console.log(errorMessage)
+    error(correlationId, errorMessage)
     throw new Error(errorMessage, { cause: err })
   }
 }
