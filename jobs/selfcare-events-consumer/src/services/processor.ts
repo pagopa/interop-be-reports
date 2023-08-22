@@ -1,10 +1,10 @@
 import { KafkaMessage } from "kafkajs";
-import { EventPayload } from "../model/InstitutionEvent.js";
+import { EventPayload } from "../model/institution-event.js";
 import { InteropTokenGenerator, ORIGIN_IPA } from "@interop-be-reports/commons";
 import { TenantProcessService } from "./tenantProcessService.js";
-import { InteropContext } from "../model/InteropContext.js";
+import { InteropContext } from "../model/interop-context.js";
 import { v4 as uuidv4 } from "uuid";
-import { SelfcareTenantSeed } from "../model/tenant-process.models.js";
+import { SelfcareTenantSeed } from "../model/tenant-process.js";
 
 export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProcess: TenantProcessService, productName: string) => async (message: KafkaMessage, partition: number): Promise<void> => {
   try {

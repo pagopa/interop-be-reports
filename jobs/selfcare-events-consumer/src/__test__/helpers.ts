@@ -1,6 +1,6 @@
 import { InteropToken, TokenGenerationConfig } from "@interop-be-reports/commons"
-import { SelfcareTenantSeed, SelfcareUpsertTenantResponse } from "../model/tenant-process.models.js"
-import { InteropContext } from "../model/InteropContext.js"
+import { SelfcareTenantSeed, SelfcareUpsertTenantResponse } from "../model/tenant-process.js"
+import { InteropContext } from "../model/interop-context.js"
 import { MessageSetEntry } from "kafkajs"
 
 export const interopProductName = "test-interop-product"

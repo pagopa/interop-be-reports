@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { InteropContext } from '../model/InteropContext.js';
-import { SelfcareTenantSeed, SelfcareUpsertTenantResponse } from '../model/tenant-process.models.js';
+import { InteropContext } from '../model/interop-context.js';
+import { SelfcareTenantSeed, SelfcareUpsertTenantResponse } from '../model/tenant-process.js';
 
 export class TenantProcessService {
 
