@@ -1,13 +1,13 @@
 import { KafkaMessage } from "kafkajs";
 import { EventPayload } from "../model/institution-event.js";
-import { InteropTokenGenerator, ORIGIN_IPA } from "@interop-be-reports/commons";
+import { RefreshableInteropToken, ORIGIN_IPA } from "@interop-be-reports/commons";
 import { TenantProcessService } from "./tenantProcessService.js";
 import { InteropContext } from "../model/interop-context.js";
 import { v4 as uuidv4 } from "uuid";
 import { SelfcareTenantSeed } from "../model/tenant-process.js";
 import { error, info, warn } from "../utils/logger.js";
 
-export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProcess: TenantProcessService, productName: string) => async (message: KafkaMessage, partition: number): Promise<void> => {
+export const processMessage = (refreshableToken: RefreshableInteropToken, tenantProcess: TenantProcessService, productName: string) => async (message: KafkaMessage, partition: number): Promise<void> => {
   const correlationId = uuidv4()
 
   try {
@@ -35,7 +35,7 @@ export const processMessage = (tokenGenerator: InteropTokenGenerator, tenantProc
       // TODO Generate token only once and refresh it when needed
       //  Note: this function runs sequentially for each partition but in "parallel" among different partitions
 
-      const token = await tokenGenerator.generateInternalToken()
+      const token = await refreshableToken.get()
       const context: InteropContext = { bearerToken: token.serialized, correlationId: uuidv4() }
 
       const institution = parsed.data.institution

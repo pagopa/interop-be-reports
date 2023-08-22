@@ -1,7 +1,7 @@
 import { env } from "./config/env.js";
 import { exitWithError, initConsumer } from "./services/consumer.js";
 import { processMessage } from "./services/processor.js";
-import { InteropTokenGenerator, TokenGenerationConfig } from '@interop-be-reports/commons'
+import { InteropTokenGenerator, RefreshableInteropToken, TokenGenerationConfig } from '@interop-be-reports/commons'
 import { TenantProcessService } from "./services/tenantProcessService.js";
 
 console.log("Starting consumer...")
@@ -16,9 +16,12 @@ const tokenGeneratorConfig: TokenGenerationConfig = {
 
 const consumer = await initConsumer(env)
 const tokenGenerator = new InteropTokenGenerator(tokenGeneratorConfig)
+const refreshableToken = new RefreshableInteropToken(tokenGenerator)
 const tenantProcess = new TenantProcessService(env.TENANT_PROCESS_URL)
 
-const configuredProcessor = processMessage(tokenGenerator, tenantProcess, env.INTEROP_PRODUCT)
+await refreshableToken.init()
+
+const configuredProcessor = processMessage(refreshableToken, tenantProcess, env.INTEROP_PRODUCT)
 
 consumer.run({
   eachMessage: async ({ message, partition }) => {

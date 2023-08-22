@@ -1,18 +1,21 @@
-import { InteropTokenGenerator } from "@interop-be-reports/commons"
+import { InteropTokenGenerator, RefreshableInteropToken } from "@interop-be-reports/commons"
 import { processMessage } from "../services/processor.js"
 import { TenantProcessService } from "../services/tenantProcessService.js"
 import { correctEventPayload, correctInstitutionEventField, generateInternalTokenMock, interopProductName, interopToken, kafkaMessage, selfcareUpsertTenantMock, tokenConfig } from "./helpers.js"
 
 
-describe('processor', () => {
+describe('Message processor', () => {
 
   const tokenGeneratorMock = new InteropTokenGenerator(tokenConfig)
+  const refreshableTokenMock = new RefreshableInteropToken(tokenGeneratorMock)
   const tenantProcessMock = new TenantProcessService("url")
 
-  const configuredProcessor = processMessage(tokenGeneratorMock, tenantProcessMock, interopProductName)
+  const configuredProcessor = processMessage(refreshableTokenMock, tenantProcessMock, interopProductName)
 
   const loggerMock = vitest.fn()
-  const generateInternalTokenSpy = vi.spyOn(tokenGeneratorMock, 'generateInternalToken').mockImplementation(generateInternalTokenMock)
+
+  vi.spyOn(tokenGeneratorMock, 'generateInternalToken').mockImplementation(generateInternalTokenMock)
+  const refreshableInternalTokenSpy = vi.spyOn(refreshableTokenMock, 'get').mockImplementation(generateInternalTokenMock)
   const selfcareUpsertTenantSpy = vi.spyOn(tenantProcessMock, 'selfcareUpsertTenant').mockImplementation(selfcareUpsertTenantMock)
 
   beforeAll(() => {
@@ -29,7 +32,7 @@ describe('processor', () => {
 
     await configuredProcessor(message, 0)
 
-    expect(generateInternalTokenSpy).toBeCalledTimes(0)
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(0)
 
   })
@@ -40,7 +43,7 @@ describe('processor', () => {
 
     expect(() => configuredProcessor(message, 0)).rejects.toThrowError(/Error.*partition.*offset.*Reason/)
 
-    expect(generateInternalTokenSpy).toBeCalledTimes(0)
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(0)
 
   })
@@ -51,7 +54,7 @@ describe('processor', () => {
 
     await configuredProcessor(message, 0)
 
-    expect(generateInternalTokenSpy).toBeCalledTimes(0)
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(0)
 
   })
@@ -62,7 +65,7 @@ describe('processor', () => {
 
     expect(() => configuredProcessor(message, 0)).rejects.toThrowError(/Error.*partition.*offset.*Reason/)
 
-    expect(generateInternalTokenSpy).toBeCalledTimes(0)
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(0)
 
   })
@@ -73,7 +76,7 @@ describe('processor', () => {
 
     await configuredProcessor(message, 0)
 
-    expect(generateInternalTokenSpy).toBeCalledTimes(1)
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(1)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(1)
 
   })
@@ -84,7 +87,7 @@ describe('processor', () => {
 
     await configuredProcessor(message, 0)
 
-    expect(generateInternalTokenSpy).toBeCalledTimes(1)
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(1)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(1)
     expect(selfcareUpsertTenantSpy).toHaveBeenCalledWith(
       expect.objectContaining(
@@ -104,7 +107,7 @@ describe('processor', () => {
 
     await configuredProcessor(message, 0)
 
-    expect(generateInternalTokenSpy).toBeCalledTimes(1)
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(1)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(1)
     expect(selfcareUpsertTenantSpy).toHaveBeenCalledWith(
       expect.objectContaining(
@@ -125,7 +128,7 @@ describe('processor', () => {
 
     await configuredProcessor(message, 0)
 
-    expect(generateInternalTokenSpy).toBeCalledTimes(1)
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(1)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(1)
     expect(selfcareUpsertTenantSpy).toHaveBeenCalledWith(
       expect.objectContaining(
