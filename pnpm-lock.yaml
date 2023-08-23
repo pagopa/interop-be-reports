@@ -268,7 +268,7 @@ importers:
         specifier: 0.34.1
         version: 0.34.1
 
-  jobs/selfcare-events-consumer:
+  jobs/selfcare-contracts-events-consumer:
     dependencies:
       '@interop-be-reports/commons':
         specifier: workspace:*
