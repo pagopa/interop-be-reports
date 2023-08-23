@@ -39,7 +39,7 @@ export const correctInstitutionEventField = {
   "institutionType": "PA",
   "description": "Somewhere",
   "digitalAddress": "somewhere@wonderland",
-  "address": "Piazza Cavicchioni, 8",
+  "address": "123 Street",
   "taxCode": "12345678987",
   "origin": "IPA",
   "originId": "ipa_code",
