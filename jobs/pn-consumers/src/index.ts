@@ -40,7 +40,7 @@ async function main() {
     },
   })
 
-  mailer.sendMail({
+  await mailer.sendMail({
     from: env.SMTP_USER,
     to: env.MAIL_RECIPIENTS,
     subject: MAIL_SUBJECT,
