@@ -3,12 +3,12 @@ import { EventPayload } from "../model/institution-event.js";
 import { RefreshableInteropToken, ORIGIN_IPA } from "@interop-be-reports/commons";
 import { TenantProcessService } from "./tenantProcessService.js";
 import { InteropContext } from "../model/interop-context.js";
-import { v4 as uuidv4 } from "uuid";
 import { SelfcareTenantSeed } from "../model/tenant-process.js";
 import { error, info, warn } from "../utils/logger.js";
+import crypto from "crypto"
 
 export const processMessage = (refreshableToken: RefreshableInteropToken, tenantProcess: TenantProcessService, productName: string) => async (message: KafkaMessage, partition: number): Promise<void> => {
-  const correlationId = uuidv4()
+  const correlationId = crypto.randomUUID()
 
   try {
 
@@ -33,7 +33,7 @@ export const processMessage = (refreshableToken: RefreshableInteropToken, tenant
 
     if (parsed.success) {
       const token = await refreshableToken.get()
-      const context: InteropContext = { bearerToken: token.serialized, correlationId: uuidv4() }
+      const context: InteropContext = { bearerToken: token.serialized, correlationId }
 
       const institution = parsed.data.institution
 

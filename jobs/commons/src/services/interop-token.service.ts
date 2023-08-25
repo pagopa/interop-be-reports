@@ -1,7 +1,7 @@
 import { KMSClient, SignCommand, SignCommandInput } from '@aws-sdk/client-kms'
 import { TokenGenerationConfig } from '../config/interop-token.config.js'
 import { InteropJwtHeader, InteropJwtPayload, InteropToken, JWT_INTERNAL_ROLE, b64ByteUrlEncode, b64UrlEncode } from '../index.js'
-import { v4 as uuidv4 } from 'uuid'
+import crypto from "crypto"
 
 const JWT_HEADER_ALG = "RS256"
 const KMS_SIGNING_ALG = "RSASSA_PKCS1_V1_5_SHA_256"
@@ -26,7 +26,7 @@ export class InteropTokenGenerator {
     }
 
     const payload: InteropJwtPayload = {
-      jti: uuidv4(),
+      jti: crypto.randomUUID(),
       iss: this.config.issuer,
       aud: this.config.audience,
       sub: this.config.subject,

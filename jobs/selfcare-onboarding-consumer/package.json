@@ -14,7 +14,6 @@
   "devDependencies": {
     "@types/lodash": "4.14.196",
     "@types/node": "20.4.9",
-    "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "6.3.0",
     "@typescript-eslint/parser": "6.3.0",
     "eslint": "8.46.0",
@@ -27,7 +26,6 @@
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
     "kafkajs": "^2.2.4",
-    "uuid": "^9.0.0",
     "zod": "^3.21.4",
     "@interop-be-reports/commons": "workspace:*"
   }

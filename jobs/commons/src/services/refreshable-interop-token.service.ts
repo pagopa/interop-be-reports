@@ -37,7 +37,7 @@ export class RefreshableInteropToken {
       this.token = await this.tokenGenerator.generateInternalToken()
       return this.token
     } else {
-      return Promise.resolve(this.token)
+      return this.token
     }
   }
 
