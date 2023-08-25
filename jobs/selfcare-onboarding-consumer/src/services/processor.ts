@@ -47,7 +47,7 @@ export const processMessage = (refreshableToken: RefreshableInteropToken, tenant
       }
       await tenantProcess.selfcareUpsertTenant(seed, context)
 
-      info(correlationId, `Message in partition ${partition} with offset ${message.offset} correctly consumed. SelfcareId: ${parsed.data.internalIstitutionID}`);
+      info(correlationId, `Message in partition ${partition} with offset ${message.offset} correctly consumed. SelfcareId: ${parsed.data.internalIstitutionID} Origin: ${institution.origin} OriginId: ${institution.originId}`);
     } else {
       // Log to WARN to avoid double ERROR level message (and double alarm)
       warn(correlationId, `Error consuming message in partition ${partition} with offset ${message.offset}. Message: ${stringPayload}`)
