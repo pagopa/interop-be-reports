@@ -1,0 +1,25 @@
+import { z } from 'zod'
+import dotenv from 'dotenv'
+
+const envSchema = z.object({
+
+  SFTP_HOST: z.string(),
+  SFTP_PORT: z.string().transform((v, _) => parseInt(v)),
+  SFTP_USERNAME: z.string(),
+  SFTP_PRIVATE_KEY: z.string(),
+  SFTP_PATH: z.string(),
+
+  ANAC_TENANT_ID: z.string(),
+  // TODO Define these
+  ANAC_ATTR_1_CODE: z.string(),
+  //
+
+  RECORDS_PROCESS_BATCH_SIZE: z.string().transform((v, _) => parseInt(v)),
+
+  FORCE_REMOTE_FILE_NAME: z.string().optional(),
+})
+
+export type Env = z.infer<typeof envSchema>
+
+dotenv.config()
+export const env: Env = envSchema.parse(process.env)
