@@ -1,8 +1,5 @@
 import { z } from "zod";
 
-const InstitutionState = z.enum(["ACTIVE", "CLOSED"]);
-type InstitutionState = z.infer<typeof InstitutionState>;
-
 const SubUnitType = z.enum(["AOO", "UO"]);
 type SubUnitType = z.infer<typeof SubUnitType>;
 
@@ -20,12 +17,7 @@ export const EventPayload = z.object({
   id: z.string(),
   internalIstitutionID: z.string().trim().min(1), // Selfcare ID
   product: z.string().trim().min(1),
-  state: InstitutionState,
   onboardingTokenId: z.string(),
-  createdAt: z.string().datetime({ offset: true }),
-  updatedAt: z.string().datetime({ offset: true }),
-  closedAt: z.string().datetime({ offset: true }).optional().nullable(),
   institution: InstitutionEvent,
-  notificationType: z.string().optional().nullable() // Undocumented
 });
 export type EventPayload = z.infer<typeof EventPayload>
