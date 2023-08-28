@@ -18,9 +18,13 @@ type BatchParseResult = {
 
 
 const fileContent =
-  `cf_gestore,denominazione,domicilio_digitale,codice_IPA,anac_incaricato,anac_abilitato
-0123456789,Comune 1,com1@une.it,IPA_123,TRUE,FALSE
-0011223344,Procurement 1,proc1@urement.it,,TRUE,TRUE`
+//   `cf_gestore,denominazione,domicilio_digitale,codice_IPA,anac_incaricato,anac_abilitato
+// 0123456789,Comune 1,com1@une.it,IPA_123,TRUE,FALSE
+// 0011223344,Procurement 1,proc1@urement.it,,TRUE,TRUE`
+`cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
+0123456789,Nome ente presente in IPA,gsp1@pec.it,ipa_code_123,TRUE,FALSE,TRUE
+0011223344,E-Procurement 1,eprocurement1@pec.it,,TRUE,TRUE,FALSE
+0011223344,"E-Procurement 2 con , virgola nel nome",eprocurement1@pec.it,,TRUE,TRUE,FALSE`
 
 // xxxxx,Procurement x,,,TRUE,asd
 
@@ -47,7 +51,7 @@ async function process(): Promise<void> {
     }).filter((r): r is NonPaRow => r !== null)
     //
 
-    const paIpaCodes = paOrgs.map(org => org.codice_IPA)
+    const paIpaCodes = paOrgs.map(org => org.codice_ipa)
     const nonPaTaxCodes = nonPaOrgs.map(org => org.cf_gestore)
 
     const paTenants = await getPATenants(paIpaCodes)
