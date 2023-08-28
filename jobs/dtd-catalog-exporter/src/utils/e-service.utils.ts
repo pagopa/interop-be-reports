@@ -19,7 +19,7 @@ import {
 export function remapEServiceToPublicEService(
   eservice: EService,
   attributesMap: SafeMap<string, Attribute>,
-  producersMap: SafeMap<string, Tenant>
+  producersMap: SafeMap<string, Pick<Tenant, 'id' | 'name'>>
 ): PublicEService {
   const activeDescriptor = getEServiceActiveDescriptor(eservice)
 
