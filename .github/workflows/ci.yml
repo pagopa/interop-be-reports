@@ -52,6 +52,8 @@ jobs:
             package_path: ./jobs/one-trust-notices
           - image_name: pn-consumers
             package_path: ./jobs/pn-consumers
+          - image_name: selfcare-onboarding-consumer
+            package_path: ./jobs/selfcare-onboarding-consumer
 
     permissions:
       id-token: write
