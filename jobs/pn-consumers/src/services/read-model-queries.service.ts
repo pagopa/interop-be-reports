@@ -86,7 +86,7 @@ export class ReadModelQueriesClient {
           },
         }
       )
-      .map(({ data }) => tenantSchema.parse(data))
+      .map(({ data }) => tenantSchema.pick({ id: true, name: true }).parse(data))
       .toArray()
   }
 

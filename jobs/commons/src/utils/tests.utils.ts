@@ -100,4 +100,5 @@ export const getAttributeMock = createMockFactory<Attribute>({
 export const getProducerMock = createMockFactory<Tenant>({
   id: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
   name: 'Nome produttore 1',
+  attributes: [],
 })
