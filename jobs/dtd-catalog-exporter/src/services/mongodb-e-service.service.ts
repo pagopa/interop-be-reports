@@ -89,7 +89,7 @@ export class MongoDBEServiceClient {
         { 'data.id': { $in: tenantIds } },
         { projection: { _id: 0, 'data.id': 1, 'data.name': 1 } }
       )
-      .map(({ data }) => tenantSchema.parse(data))
+      .map(({ data }) => tenantSchema.pick({ id: true, name: true }).parse(data))
       .toArray()
   }
 
