@@ -29,4 +29,5 @@ RUN pnpm install --frozen-lockfile
 # Build the project
 COPY --from=builder /app/out/full/ .
 RUN pnpm dlx turbo run build --filter=one-trust-notices
-RUN ln -s ./jobs/one-trust-notices/dist ./dist
+
+CMD node ./jobs/one-trust-notices/dist

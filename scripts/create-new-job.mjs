@@ -191,7 +191,8 @@ RUN pnpm install --frozen-lockfile
 # Build the project
 COPY --from=builder /app/out/full/ .
 RUN pnpm dlx turbo run build --filter=${jobName}
-RUN ln -s ./jobs/${jobName}/dist ./dist
+
+CMD node ./jobs/${jobName}/dist
 `
   )
 }

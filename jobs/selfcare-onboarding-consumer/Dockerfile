@@ -8,7 +8,7 @@ RUN apk update
 WORKDIR /app
 RUN corepack enable
 COPY . .
-RUN pnpm --package=turbo dlx turbo prune --scope=selfcare-events-consumer --docker
+RUN pnpm --package=turbo dlx turbo prune --scope=selfcare-onboarding-consumer --docker
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
@@ -25,5 +25,6 @@ RUN pnpm install --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN pnpm dlx turbo run build --filter=selfcare-events-consumer
-RUN ln -s ./jobs/selfcare-events-consumer/dist ./dist
+RUN pnpm dlx turbo run build --filter=selfcare-onboarding-consumer
+
+CMD node ./jobs/selfcare-onboarding-consumer/dist
