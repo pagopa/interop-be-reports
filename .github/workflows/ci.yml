@@ -54,6 +54,8 @@ jobs:
             package_path: ./jobs/pn-consumers
           - image_name: selfcare-onboarding-consumer
             package_path: ./jobs/selfcare-onboarding-consumer
+          - image_name: metrics
+            package_path: ./jobs/metrics
 
     permissions:
       id-token: write
