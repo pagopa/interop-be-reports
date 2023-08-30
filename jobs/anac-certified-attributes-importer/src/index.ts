@@ -2,7 +2,8 @@ import { env } from "./config/env.js"
 // import sftp from 'ssh2-sftp-client'
 import { parse } from 'csv/sync';
 import { CsvRow, NonPaRow, PaRow } from './model/csv-row.js';
-import { PersistentTenat } from "./model/tenant.model.js";
+import { getNonPATenants, getPATenants } from "./service/read-model-queries.service.js";
+import { ReadModelClient, ReadModelConfig } from "@interop-be-reports/commons";
 
 type BatchParseResult = {
   processedRecordsCount: number
@@ -16,13 +17,26 @@ type BatchParseResult = {
 // retrieveAttributeByExternalId(anacTenant.features.certifier.certifierId, env.ANAC_ATTR_1_CODE)
 // ...
 
+const readModelConfig: ReadModelConfig = {
+  mongodbReplicaSet: env.MONGODB_REPLICA_SET,
+  mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
+  mongodbReadPreference: env.MONGODB_READ_PREFERENCE,
+  mongodbRetryWrites: env.MONGODB_RETRY_WRITES,
+  readModelDbUser: env.READ_MODEL_DB_USER,
+  readModelDbPassword: env.READ_MODEL_DB_PASSWORD,
+  readModelDbHost: env.READ_MODEL_DB_HOST,
+  readModelDbPort: env.READ_MODEL_DB_PORT,
+  readModelDbName: env.READ_MODEL_DB_NAME,
+}
+const readModelClient: ReadModelClient = await ReadModelClient.connect(readModelConfig)
+
 
 const fileContent =
-//   `cf_gestore,denominazione,domicilio_digitale,codice_IPA,anac_incaricato,anac_abilitato
-// 0123456789,Comune 1,com1@une.it,IPA_123,TRUE,FALSE
-// 0011223344,Procurement 1,proc1@urement.it,,TRUE,TRUE`
-`cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
-0123456789,Nome ente presente in IPA,gsp1@pec.it,ipa_code_123,TRUE,FALSE,TRUE
+  //   `cf_gestore,denominazione,domicilio_digitale,codice_IPA,anac_incaricato,anac_abilitato
+  // 0123456789,Comune 1,com1@une.it,IPA_123,TRUE,FALSE
+  // 0011223344,Procurement 1,proc1@urement.it,,TRUE,TRUE`
+  `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
+0123456789,Nome ente presente in IPA,gsp1@pec.it,DRMEST,TRUE,FALSE,TRUE
 0011223344,E-Procurement 1,eprocurement1@pec.it,,TRUE,TRUE,FALSE
 0011223344,"E-Procurement 2 con , virgola nel nome",eprocurement1@pec.it,,TRUE,TRUE,FALSE`
 
@@ -54,8 +68,11 @@ async function process(): Promise<void> {
     const paIpaCodes = paOrgs.map(org => org.codice_ipa)
     const nonPaTaxCodes = nonPaOrgs.map(org => org.cf_gestore)
 
-    const paTenants = await getPATenants(paIpaCodes)
-    const nonPaTenants = await getNonPATenants(nonPaTaxCodes)
+    const paTenants = await getPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, paIpaCodes)
+    const nonPaTenants = await getNonPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, nonPaTaxCodes)
+
+    console.log(JSON.stringify(paTenants))
+    console.log(JSON.stringify(nonPaTenants))
 
 
     // const groupedByIsPA = _.groupBy(batchResult.records, record => record.codice_IPA !== undefined)
@@ -68,8 +85,6 @@ async function process(): Promise<void> {
 
 }
 
-async function getPATenants(ipdaCodes: string[]): Promise<PersistentTenat[]> { return [] }
-async function getNonPATenants(taxCodes: string[]): Promise<PersistentTenat[]> { return [] }
 
 function getBatch(fromLine: number, batchSize: number): BatchParseResult {
   const rawRecords = parse(fileContent, { trim: true, columns: true, from: fromLine, to: fromLine + batchSize - 1 }) as Array<any>

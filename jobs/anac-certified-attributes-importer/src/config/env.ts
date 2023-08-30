@@ -9,6 +9,18 @@ const envSchema = z.object({
   SFTP_PRIVATE_KEY: z.string(),
   SFTP_PATH: z.string(),
 
+  MONGODB_REPLICA_SET: z.string().optional(),
+  MONGODB_DIRECT_CONNECTION: z.string().transform(value => value.toUpperCase() === 'TRUE').optional(),
+  MONGODB_READ_PREFERENCE: z.string().optional(),
+  MONGODB_RETRY_WRITES: z.string().transform(value => value.toUpperCase() === 'TRUE').optional(),
+  READ_MODEL_DB_USER: z.string(),
+  READ_MODEL_DB_PASSWORD: z.string(),
+  READ_MODEL_DB_HOST: z.string(),
+  READ_MODEL_DB_PORT: z.string(),
+  READ_MODEL_DB_NAME: z.string(),
+
+  TENANTS_COLLECTION_NAME: z.string(),
+
   ANAC_TENANT_ID: z.string(),
   // TODO Define these
   ANAC_ATTR_1_CODE: z.string(),
