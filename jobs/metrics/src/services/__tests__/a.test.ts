@@ -22,6 +22,7 @@ describe('Metrics', () => {
       },
     })
 
+    process.env.READ_MODEL_DB_NAME = DB_NAME
     process.env.ESERVICES_COLLECTION_NAME = 'eservices'
     process.env.ATTRIBUTES_COLLECTION_NAME = 'attributes'
     process.env.AGREEMENTS_COLLECTION_NAME = 'agreements'
