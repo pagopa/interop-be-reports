@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb'
 import { MongoMemoryServer } from 'mongodb-memory-server'
-import { ReadModelQueriesClient } from '../read-model-queries.service.js'
+import { MetricsManager } from '../metrics-manager.js'
 import {
   getAgreementMock,
   getAttributeMock,
@@ -9,11 +9,11 @@ import {
 } from '@interop-be-reports/commons'
 import { MacroCategory } from '../../configs/constants.js'
 
-describe('Metrics', () => {
+describe('MetricsManager', () => {
   const DB_NAME = 'read-model'
-  let con: MongoClient
+  let mongoClient: MongoClient
   let mongoServer: MongoMemoryServer
-  let client: ReadModelQueriesClient
+  let metricsManager: MetricsManager
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create({
@@ -29,21 +29,21 @@ describe('Metrics', () => {
     process.env.TENANTS_COLLECTION_NAME = 'tenants'
     process.env.PURPOSES_COLLECTION_NAME = 'purposes'
 
-    con = await new MongoClient(mongoServer.getUri(), {}).connect()
-    client = new ReadModelQueriesClient(con)
+    mongoClient = await new MongoClient(mongoServer.getUri(), {}).connect()
+    metricsManager = new MetricsManager(mongoClient)
   })
 
   afterEach(async () => {
-    await con.db(DB_NAME).dropDatabase()
+    await mongoClient.db(DB_NAME).dropDatabase()
   })
 
   afterAll(async () => {
-    await con?.close()
+    await mongoClient?.close()
     await mongoServer?.stop()
   })
 
   function seedCollection(collection: string, data: Array<{ data: unknown }>) {
-    return con.db(DB_NAME).collection(collection).insertMany(data)
+    return mongoClient.db(DB_NAME).collection(collection).insertMany(data)
   }
 
   type MacroCategoryCodeFor<TName extends MacroCategory['name']> = Extract<
@@ -61,7 +61,7 @@ describe('Metrics', () => {
       { data: getEServiceMock({ descriptors: [{ state: 'Draft' }] }) },
     ])
 
-    const result = await client.getPublishedEServicesMetric()
+    const result = await metricsManager.getPublishedEServicesMetric()
     expect(result).toStrictEqual(3)
   })
 
@@ -171,7 +171,7 @@ describe('Metrics', () => {
       },
     ])
 
-    const result = await client.getMacroCategoriesPublishedEServicesMetric()
+    const result = await metricsManager.getMacroCategoriesPublishedEServicesMetric()
     expect(
       result.find((a) => a.name === 'Altre Pubbliche Amministrazioni locali')
         ?.publishedEServicesCount
@@ -215,7 +215,7 @@ describe('Metrics', () => {
       },
     ])
 
-    const result = await client.getTop10MostSubscribedEServicesMetric()
+    const result = await metricsManager.getTop10MostSubscribedEServicesMetric()
 
     expect(result[0].activeAgreements).toStrictEqual(4)
     expect(result[0].name).toStrictEqual('eservice-4')

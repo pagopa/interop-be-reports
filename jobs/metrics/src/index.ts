@@ -1,11 +1,14 @@
 import { MongoClient, MongoClientOptions, ReadPreferenceMode } from 'mongodb'
 import { withExecutionTime } from '@interop-be-reports/commons'
-import { ReadModelQueriesClient } from './services/read-model-queries.service.js'
+import { MetricsManager } from './services/index.js'
 import * as fs from 'fs'
 import { env } from './configs/env.js'
 
+const log = console.log
+
 async function main() {
-  console.log('Starting program')
+  log('Starting program')
+
   const connectionConfig = {
     replicaSet: env.MONGODB_REPLICA_SET,
     directConnection: env.MONGODB_DIRECT_CONNECTION,
@@ -16,7 +19,7 @@ async function main() {
   const connectionString = `mongodb://${env.READ_MODEL_DB_USER}:${env.READ_MODEL_DB_PASSWORD}@${env.READ_MODEL_DB_HOST}:${env.READ_MODEL_DB_PORT}`
   const client = await new MongoClient(connectionString, connectionConfig).connect()
 
-  const readModelQueriesClient = new ReadModelQueriesClient(client)
+  const metricsManager = new MetricsManager(client)
 
   const [
     publishedEServicesMetric,
@@ -25,11 +28,11 @@ async function main() {
     top10MostSubscribedEServicesPerMacroCategoryMetric,
     top10ProviderWithMostSubscriberMetric,
   ] = await Promise.all([
-    readModelQueriesClient.getPublishedEServicesMetric(),
-    readModelQueriesClient.getMacroCategoriesPublishedEServicesMetric(),
-    readModelQueriesClient.getTop10MostSubscribedEServicesMetric(),
-    readModelQueriesClient.getTop10MostSubscribedEServicesPerMacroCategoryMetric(),
-    readModelQueriesClient.getTop10ProviderWithMostSubscriberMetric(),
+    metricsManager.getPublishedEServicesMetric(),
+    metricsManager.getMacroCategoriesPublishedEServicesMetric(),
+    metricsManager.getTop10MostSubscribedEServicesMetric(),
+    metricsManager.getTop10MostSubscribedEServicesPerMacroCategoryMetric(),
+    metricsManager.getTop10ProviderWithMostSubscriberMetric(),
   ])
 
   fs.writeFileSync(

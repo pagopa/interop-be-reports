@@ -3,7 +3,7 @@ import { env } from '../configs/env.js'
 import { Agreement, EService, EServiceDescriptor } from '@interop-be-reports/commons'
 import { MacroCategory, orgsMacroCategories } from '../configs/constants.js'
 
-export class ReadModelQueriesClient {
+export class MetricsManager {
   constructor(private client: MongoClient) {}
 
   /**
