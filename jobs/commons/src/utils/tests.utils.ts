@@ -1,5 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep.js'
 import merge from 'lodash/merge.js'
+import { EService, Attribute, Tenant, Agreement } from '../models/index.js'
 
 /**
  * Create and returns a mock factory function
@@ -94,10 +95,18 @@ export const getAttributeMock = createMockFactory<Attribute>({
   id: '929188a4-bbc8-4509-8999-b2d424de3870',
   name: 'Nome attributo 1',
   description: 'Descrizione attributo 1',
+  code: 'L6',
 })
 
 export const getTenantMock = createMockFactory<Tenant>({
   id: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
   name: 'Nome produttore 1',
   attributes: [],
+})
+
+export const getAgreementMock = createMockFactory<Agreement>({
+  id: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
+  eserviceId: '4747d063-0d9c-4a5d-b143-9f2fdc4d7f22',
+  state: 'Active',
+  descriptorId: 'a9c705d9-ecdb-47ff-bcd2-667495b111f2',
 })
