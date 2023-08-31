@@ -96,6 +96,7 @@ export const getAttributeMock = createMockFactory<Attribute>({
   name: 'Nome attributo 1',
   description: 'Descrizione attributo 1',
   code: 'L6',
+  kind: 'Certified',
 })
 
 export const getTenantMock = createMockFactory<Tenant>({
@@ -107,6 +108,8 @@ export const getTenantMock = createMockFactory<Tenant>({
 export const getAgreementMock = createMockFactory<Agreement>({
   id: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
   eserviceId: '4747d063-0d9c-4a5d-b143-9f2fdc4d7f22',
+  consumerId: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
+  producerId: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
   state: 'Active',
   descriptorId: 'a9c705d9-ecdb-47ff-bcd2-667495b111f2',
 })
