@@ -5,6 +5,7 @@ export const attributeSchema = z.object({
   name: z.string(),
   description: z.string(),
   code: z.string().optional(),
+  kind: z.enum(['Certified', 'Verified', 'Declared']),
 })
 
 export type Attribute = z.infer<typeof attributeSchema>
