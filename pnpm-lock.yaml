@@ -819,7 +819,7 @@ packages:
     dependencies:
       '@aws-sdk/client-cognito-identity': 3.398.0
       '@aws-sdk/types': 3.398.0
-      '@smithy/property-provider': 2.0.2
+      '@smithy/property-provider': 2.0.5
       '@smithy/types': 2.2.2
       tslib: 2.6.1
     transitivePeerDependencies:
@@ -843,7 +843,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@aws-sdk/types': 3.398.0
-      '@smithy/property-provider': 2.0.2
+      '@smithy/property-provider': 2.0.5
       '@smithy/types': 2.2.2
       tslib: 2.6.1
     dev: true
@@ -877,9 +877,9 @@ packages:
       '@aws-sdk/credential-provider-sso': 3.398.0
       '@aws-sdk/credential-provider-web-identity': 3.398.0
       '@aws-sdk/types': 3.398.0
-      '@smithy/credential-provider-imds': 2.0.2
-      '@smithy/property-provider': 2.0.2
-      '@smithy/shared-ini-file-loader': 2.0.2
+      '@smithy/credential-provider-imds': 2.0.5
+      '@smithy/property-provider': 2.0.5
+      '@smithy/shared-ini-file-loader': 2.0.5
       '@smithy/types': 2.2.2
       tslib: 2.6.1
     transitivePeerDependencies:
@@ -917,9 +917,9 @@ packages:
       '@aws-sdk/credential-provider-sso': 3.398.0
       '@aws-sdk/credential-provider-web-identity': 3.398.0
       '@aws-sdk/types': 3.398.0
-      '@smithy/credential-provider-imds': 2.0.2
-      '@smithy/property-provider': 2.0.2
-      '@smithy/shared-ini-file-loader': 2.0.2
+      '@smithy/credential-provider-imds': 2.0.5
+      '@smithy/property-provider': 2.0.5
+      '@smithy/shared-ini-file-loader': 2.0.5
       '@smithy/types': 2.2.2
       tslib: 2.6.1
     transitivePeerDependencies:
@@ -944,8 +944,8 @@ packages:
     requiresBuild: true
     dependencies:
       '@aws-sdk/types': 3.398.0
-      '@smithy/property-provider': 2.0.2
-      '@smithy/shared-ini-file-loader': 2.0.2
+      '@smithy/property-provider': 2.0.5
+      '@smithy/shared-ini-file-loader': 2.0.5
       '@smithy/types': 2.2.2
       tslib: 2.6.1
     dev: true
@@ -974,8 +974,8 @@ packages:
       '@aws-sdk/client-sso': 3.398.0
       '@aws-sdk/token-providers': 3.398.0
       '@aws-sdk/types': 3.398.0
-      '@smithy/property-provider': 2.0.2
-      '@smithy/shared-ini-file-loader': 2.0.2
+      '@smithy/property-provider': 2.0.5
+      '@smithy/shared-ini-file-loader': 2.0.5
       '@smithy/types': 2.2.2
       tslib: 2.6.1
     transitivePeerDependencies:
@@ -999,7 +999,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@aws-sdk/types': 3.398.0
-      '@smithy/property-provider': 2.0.2
+      '@smithy/property-provider': 2.0.5
       '@smithy/types': 2.2.2
       tslib: 2.6.1
     dev: true
@@ -1021,8 +1021,8 @@ packages:
       '@aws-sdk/credential-provider-sso': 3.398.0
       '@aws-sdk/credential-provider-web-identity': 3.398.0
       '@aws-sdk/types': 3.398.0
-      '@smithy/credential-provider-imds': 2.0.2
-      '@smithy/property-provider': 2.0.2
+      '@smithy/credential-provider-imds': 2.0.5
+      '@smithy/property-provider': 2.0.5
       '@smithy/types': 2.2.2
       tslib: 2.6.1
     transitivePeerDependencies:
@@ -1210,7 +1210,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@aws-sdk/types': 3.398.0
-      '@smithy/property-provider': 2.0.2
+      '@smithy/property-provider': 2.0.5
       '@smithy/protocol-http': 2.0.5
       '@smithy/signature-v4': 2.0.2
       '@smithy/types': 2.2.2
@@ -1305,9 +1305,9 @@ packages:
       '@smithy/middleware-stack': 2.0.0
       '@smithy/node-config-provider': 2.0.5
       '@smithy/node-http-handler': 2.0.5
-      '@smithy/property-provider': 2.0.2
+      '@smithy/property-provider': 2.0.5
       '@smithy/protocol-http': 2.0.5
-      '@smithy/shared-ini-file-loader': 2.0.2
+      '@smithy/shared-ini-file-loader': 2.0.5
       '@smithy/smithy-client': 2.0.5
       '@smithy/types': 2.2.2
       '@smithy/url-parser': 2.0.5
@@ -1817,6 +1817,7 @@ packages:
       '@smithy/types': 2.1.0
       '@smithy/url-parser': 2.0.2
       tslib: 2.6.1
+    dev: false
 
   /@smithy/credential-provider-imds@2.0.5:
     resolution: {integrity: sha512-KFcf/e0meFkQNyteJ65f1G19sgUEY1e5zL7hyAEUPz2SEfBmC9B37WyRq87G3MEEsvmAWwCRu7nFFYUKtR3svQ==}
@@ -2054,6 +2055,7 @@ packages:
       '@smithy/shared-ini-file-loader': 2.0.2
       '@smithy/types': 2.1.0
       tslib: 2.6.1
+    dev: false
 
   /@smithy/node-config-provider@2.0.5:
     resolution: {integrity: sha512-LRtjV9WkhONe2lVy+ipB/l1GX60ybzBmFyeRUoLUXWKdnZ3o81jsnbKzMK8hKq8eFSWPk+Lmyx6ZzCQabGeLxg==}
@@ -2093,6 +2095,7 @@ packages:
     dependencies:
       '@smithy/types': 2.1.0
       tslib: 2.6.1
+    dev: false
 
   /@smithy/property-provider@2.0.5:
     resolution: {integrity: sha512-cAFSUhX6aiHcmpWfrCLKvwBtgN1F6A0N8qY/8yeSi0LRLmhGqsY1/YTxFE185MCVzYbqBGXVr9TBv4RUcIV4rA==}
@@ -2142,6 +2145,7 @@ packages:
     dependencies:
       '@smithy/types': 2.1.0
       tslib: 2.6.1
+    dev: false
 
   /@smithy/querystring-parser@2.0.5:
     resolution: {integrity: sha512-C2stCULH0r54KBksv3AWcN8CLS3u9+WsEW8nBrvctrJ5rQTNa1waHkffpVaiKvcW2nP0aIMBPCobD/kYf/q9mA==}
@@ -2161,6 +2165,7 @@ packages:
     dependencies:
       '@smithy/types': 2.1.0
       tslib: 2.6.1
+    dev: false
 
   /@smithy/shared-ini-file-loader@2.0.5:
     resolution: {integrity: sha512-Mvtk6FwMtfbKRC4YuSsIqRYp9WTxsSUJVVo2djgyhcacKGMqicHDWSAmgy3sDrKv+G/G6xTZCPwm6pJARtdxVg==}
@@ -2222,6 +2227,7 @@ packages:
       '@smithy/querystring-parser': 2.0.2
       '@smithy/types': 2.1.0
       tslib: 2.6.1
+    dev: false
 
   /@smithy/url-parser@2.0.5:
     resolution: {integrity: sha512-OdMBvZhpckQSkugCXNJQCvqJ71wE7Ftxce92UOQLQ9pwF6hoS5PLL7wEfpnuEXtStzBqJYkzu1C1ZfjuFGOXAA==}
