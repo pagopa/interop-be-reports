@@ -53,9 +53,27 @@ export const PersistentExternalId = z.object({
 
 export type PersistentExternalId = z.infer<typeof PersistentExternalId>
 
+export const PersistentTenantFeatureCertifier = z.object({
+  type: z.literal('PersistentCertifier'),
+  certifierId: z.string()
+})
+
+export type PersistentTenantFeatureCertifier = z.infer<typeof PersistentTenantFeatureCertifier>
+
+export const PersistentTenantFeatureOther = z.object({
+  type: z.string(),
+})
+
+export type PersistentTenantFeatureOther = z.infer<typeof PersistentTenantFeatureOther>
+
+export const PersistentTenantFeature = z.union([PersistentTenantFeatureCertifier, PersistentTenantFeatureOther])
+
+export type PersistentTenantFeature = z.infer<typeof PersistentTenantFeature>
+
 export const PersistentTenant = z.object({
   id: z.string(),
   externalId: PersistentExternalId,
   attributes: z.array(PersistentTenantAttribute),
+  features: z.array(PersistentTenantFeatureCertifier)
 });
 export type PersistentTenant = z.infer<typeof PersistentTenant>

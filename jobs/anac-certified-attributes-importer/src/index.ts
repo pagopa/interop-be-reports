@@ -2,16 +2,29 @@ import { env } from "./config/env.js"
 // import sftp from 'ssh2-sftp-client'
 import { parse } from 'csv/sync';
 import { CsvRow, NonPaRow, PaRow } from './model/csv-row.js';
-import { getNonPATenants, getPATenants } from "./service/read-model-queries.service.js";
-import { ReadModelClient, ReadModelConfig } from "@interop-be-reports/commons";
+import { getAttributeByExternalId, getNonPATenants, getPATenants, getTenantById } from "./service/read-model-queries.service.js";
+import { InteropTokenGenerator, ReadModelClient, ReadModelConfig, RefreshableInteropToken, TokenGenerationConfig } from "@interop-be-reports/commons";
 import { PersistentTenant } from "./model/tenant.model.js";
 import { warn } from "./utils/logger.js";
 import crypto from "crypto"
+import { InteropContext } from "./model/interop-context.js";
+import { TenantProcessService } from "./service/tenant-process.service.js";
 
 type BatchParseResult = {
   processedRecordsCount: number
   records: CsvRow[]
 }
+
+type PersistentExternalId = {
+  origin: string
+  value: string
+}
+
+type AttributeIdentifiers = {
+  id: string
+  externalId: PersistentExternalId
+}
+
 // const filePath = env.SFTP_PATH + env.FORCE_REMOTE_FILE_NAME
 // const fileContent = await downloadCSV(filePath)
 
@@ -19,6 +32,19 @@ type BatchParseResult = {
 // const anacTenant = await getTenantById(env.ANAC_TENANT_ID)
 // retrieveAttributeByExternalId(anacTenant.features.certifier.certifierId, env.ANAC_ATTR_1_CODE)
 // ...
+
+
+const tokenGeneratorConfig: TokenGenerationConfig = {
+  kid: env.INTERNAL_JWT_KID,
+  subject: env.INTERNAL_JWT_SUBJECT,
+  issuer: env.INTERNAL_JWT_ISSUER,
+  audience: env.INTERNAL_JWT_AUDIENCE,
+  secondsDuration: env.INTERNAL_JWT_SECONDS_DURATION,
+}
+
+const tokenGenerator = new InteropTokenGenerator(tokenGeneratorConfig)
+const refreshableToken = new RefreshableInteropToken(tokenGenerator)
+const tenantProcess = new TenantProcessService(env.TENANT_PROCESS_URL)
 
 const readModelConfig: ReadModelConfig = {
   mongodbReplicaSet: env.MONGODB_REPLICA_SET,
@@ -54,6 +80,8 @@ async function process(): Promise<void> {
   const jobCorrelationId = crypto.randomUUID()
   const batchSize = env.RECORDS_PROCESS_BATCH_SIZE
 
+  const attributes: AttributeIdentifiers[] = await getAttributesIdentifiers(readModelClient, env.TENANTS_COLLECTION_NAME, env.ATTRIBUTES_COLLECTION_NAME, env.ANAC_TENANT_ID, env.ANAC_ATTRIBUTES_CODES)
+
   var scanComplete = false
   var fromLine = 1
   do {
@@ -71,8 +99,8 @@ async function process(): Promise<void> {
     }).filter((r): r is NonPaRow => r !== null)
     //
 
-    processTenants(paOrgs, org => org.codice_ipa, codes => getPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, codes), jobCorrelationId)
-    processTenants(nonPaOrgs, org => org.cf_gestore, codes => getNonPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, codes), jobCorrelationId)
+    processTenants(paOrgs, org => org.codice_ipa, codes => getPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, codes), attributes, jobCorrelationId)
+    processTenants(nonPaOrgs, org => org.cf_gestore, codes => getNonPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, codes), attributes, jobCorrelationId)
 
     fromLine = fromLine + batchSize
     scanComplete = batchResult.processedRecordsCount === 0
@@ -80,17 +108,67 @@ async function process(): Promise<void> {
 
 }
 
-async function processTenants<T>(orgs: T[], extractCode: (org: T) => string, retrieveTenants: (codes: string[]) => Promise<PersistentTenant[]>,  correlationId: string) {
+async function getAttributesIdentifiers(readModelClient: ReadModelClient, tenantsCollectionName: string, attributesCollectionName: string, anacTenantId: string, anacAttributesCodes: string[]): Promise<AttributeIdentifiers[]> {
 
-  const codes = orgs.map(extractCode)
+  const anacTenant: PersistentTenant = await getTenantById(readModelClient, tenantsCollectionName, anacTenantId)
+  const certifier = anacTenant.features.find(f => f.type === 'PersistentCertifier')
+
+  if (!certifier) {
+    throw Error(`Tenant with id ${env.ANAC_TENANT_ID} is not a certifier`)
+  }
+
+  return await Promise.all(anacAttributesCodes
+    .map(async code => getAttributeByExternalId(readModelClient, attributesCollectionName, certifier.certifierId, code))
+    .map(attributePromise =>
+      attributePromise.then(
+        attribute => ({
+          id: attribute.id,
+          externalId: {
+            origin: attribute.origin,
+            value: attribute.code
+          }
+        })
+      )
+    )
+  )
+
+}
+
+async function processTenants<T>(orgs: T[], extractTenantCode: (org: T) => string, retrieveTenants: (codes: string[]) => Promise<PersistentTenant[]>, attributes: AttributeIdentifiers[], correlationId: string) {
+
+  const codes = orgs.map(extractTenantCode)
 
   const tenants = await retrieveTenants(codes)
 
   const missingTenants = getMissingTenants(codes, tenants)
 
   if (missingTenants.length !== 0)
-    warn(correlationId, `PA organizations in CSV not found in Tenants for codes: ${missingTenants}`)
+    warn(correlationId, `Organizations in CSV not found in Tenants for codes: ${missingTenants}`)
 
+  cartesian(attributes, tenants)
+    .forEach(async ([attribute, tenant]) => assignAttribute(tenant, attribute))
+
+}
+
+async function assignAttribute(tenant: PersistentTenant, attribute: AttributeIdentifiers): Promise<void> {
+  if (!tenantContainsAttribute(tenant, attribute.id)) {
+    const token = await refreshableToken.get()
+    const context: InteropContext = {
+      correlationId: crypto.randomUUID(),
+      bearerToken: token.serialized
+    }
+    await tenantProcess.internalAssignCertifiedAttribute(tenant.externalId.origin, tenant.externalId.value, attribute.externalId.origin, attribute.externalId.value, context)
+  }
+}
+
+
+function cartesian<A, B>(a: A[], b: B[]): [A, B][] {
+  const toTuple = (a: A, b: B): [A, B] => [a, b]
+  return a.flatMap(a => b.map(b => toTuple(a, b)))
+}
+
+function tenantContainsAttribute(tenant: PersistentTenant, attributeId: string): boolean {
+  return tenant.attributes.find(attribute => attribute.id === attributeId) !== undefined
 }
 
 function getMissingTenants(expectedExternalId: string[], tenants: PersistentTenant[]): string[] {

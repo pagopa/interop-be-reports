@@ -20,11 +20,18 @@ const envSchema = z.object({
   READ_MODEL_DB_NAME: z.string(),
 
   TENANTS_COLLECTION_NAME: z.string(),
+  ATTRIBUTES_COLLECTION_NAME: z.string(),
+
+  TENANT_PROCESS_URL: z.string(),
+
+  INTERNAL_JWT_KID: z.string(),
+  INTERNAL_JWT_SUBJECT: z.string(),
+  INTERNAL_JWT_ISSUER: z.string(),
+  INTERNAL_JWT_AUDIENCE: z.string().transform((value) => value.split(',')),
+  INTERNAL_JWT_SECONDS_DURATION: z.string().transform((v, _) => parseInt(v)),
 
   ANAC_TENANT_ID: z.string(),
-  // TODO Define these
-  ANAC_ATTR_1_CODE: z.string(),
-  //
+  ANAC_ATTRIBUTES_CODES: z.string().transform(value => value.split(',')),
 
   RECORDS_PROCESS_BATCH_SIZE: z.string().transform((v, _) => parseInt(v)),
 
