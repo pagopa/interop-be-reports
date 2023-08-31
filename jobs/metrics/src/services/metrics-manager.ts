@@ -2,7 +2,6 @@ import { MongoClient } from 'mongodb'
 import { env } from '../configs/env.js'
 import { Agreement, EService, EServiceDescriptor } from '@interop-be-reports/commons'
 import { MacroCategory, orgsMacroCategories } from '../configs/constants.js'
-
 export class MetricsManager {
   constructor(private client: MongoClient) {}
 
@@ -115,12 +114,12 @@ export class MetricsManager {
             agreements: {
               $push: '$data',
             },
-            count: {
+            agreementsCount: {
               $sum: 1,
             },
           },
         },
-        { $sort: { count: -1 } },
+        { $sort: { agreementsCount: -1 } },
         { $limit: 10 },
         {
           $lookup: {
@@ -150,14 +149,40 @@ export class MetricsManager {
           $project: {
             _id: 0,
             name: { $arrayElemAt: ['$producer.data.name', 0] },
-            ipaCodes: {
+            attributes: 1,
+            agreementConsumers: {
               $map: {
-                input: '$consumers',
+                input: '$agreements',
+                as: 'agreement',
+                in: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: '$consumers',
+                        as: 'consumer',
+                        cond: {
+                          $eq: ['$$consumer.data.id', '$$agreement.consumerId'],
+                        },
+                      },
+                    },
+                    0,
+                  ],
+                },
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            name: 1,
+            agreementsConsumerAttributes: {
+              $map: {
+                input: '$agreementConsumers',
                 as: 'consumer',
                 in: {
                   $map: {
                     input: '$$consumer.data.attributes',
-                    as: 'attr',
+                    as: 'consumerAttribute',
                     in: {
                       $arrayElemAt: [
                         {
@@ -166,7 +191,7 @@ export class MetricsManager {
                             as: 'attribute',
                             cond: {
                               $and: [
-                                { $eq: ['$$attribute.data.id', '$$attr.id'] },
+                                { $eq: ['$$attribute.data.id', '$$consumerAttribute.id'] },
                                 { $eq: ['$$attribute.data.kind', 'Certified'] },
                               ],
                             },
@@ -187,9 +212,9 @@ export class MetricsManager {
             name: 1,
             ipaCodes: {
               $map: {
-                input: '$ipaCodes',
-                as: 'i',
-                in: '$$i.data.code',
+                input: '$agreementsConsumerAttributes',
+                as: 'consumerAttribute',
+                in: '$$consumerAttribute.data.code',
               },
             },
           },
@@ -221,7 +246,7 @@ export class MetricsManager {
         {
           $project: {
             name: 1,
-            top: {
+            topSubscribers: {
               $map: {
                 input: '$top',
                 as: 't',
