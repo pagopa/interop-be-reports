@@ -18,6 +18,7 @@ describe('remapping e-service to public e-service tests', () => {
       id,
       name: `attribute-${i}`,
       description: `attribute-${i}-description`,
+      kind: 'Certified' as const,
     }))
 
     const attributesMap = getSafeMapFromIdentifiableRecords(attributes)
