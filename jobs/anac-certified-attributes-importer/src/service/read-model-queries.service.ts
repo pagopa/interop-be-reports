@@ -4,6 +4,7 @@ import { PersistentTenant } from "../model/tenant.model.js";
 const projectUnrevokedCertifiedAttributes = {
   _id: 0,
   'data.id': 1,
+  'data.externalId': 1,
   'data.attributes': {
     '$filter': {
       input: '$data.attributes',
@@ -40,15 +41,17 @@ export async function getPATenants(readModelClient: ReadModelClient, collectionN
 export async function getNonPATenants(readModelClient: ReadModelClient, collectionName: string, taxCodes: string[]): Promise<PersistentTenant[]> {
   return await readModelClient.db()
     .collection<{ data: PersistentTenant }>(collectionName)
-    .find(
+    .aggregate([
       {
-        'data.externalId.origin': { $ne: "IPA" },
-        'data.externalId.value': { $in: taxCodes },
+        $match: {
+          'data.externalId.origin': { $ne: "IPA" },
+          'data.externalId.value': { $in: taxCodes },
+        }
       },
       {
-        projection: projectUnrevokedCertifiedAttributes
+        $project: projectUnrevokedCertifiedAttributes
       }
-    )
+    ])
     .map(({ data }) => PersistentTenant.parse(data))
     .toArray()
 }

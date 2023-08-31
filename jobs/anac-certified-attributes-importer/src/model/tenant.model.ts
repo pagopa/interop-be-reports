@@ -1,4 +1,3 @@
-// TODO This could be moved in commons
 import { z } from "zod";
 
 export const PersistentTenantRevoker = z.object({
@@ -47,8 +46,16 @@ export const PersistentTenantAttribute = PersistentCertifiedAttribute.or(Persist
 
 export type PersistentTenantAttribute = z.infer<typeof PersistentTenantAttribute>
 
+export const PersistentExternalId = z.object({
+  origin: z.string(),
+  value: z.string()
+})
+
+export type PersistentExternalId = z.infer<typeof PersistentExternalId>
+
 export const PersistentTenant = z.object({
   id: z.string(),
+  externalId: PersistentExternalId,
   attributes: z.array(PersistentTenantAttribute),
 });
 export type PersistentTenant = z.infer<typeof PersistentTenant>

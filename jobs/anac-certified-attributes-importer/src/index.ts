@@ -4,6 +4,9 @@ import { parse } from 'csv/sync';
 import { CsvRow, NonPaRow, PaRow } from './model/csv-row.js';
 import { getNonPATenants, getPATenants } from "./service/read-model-queries.service.js";
 import { ReadModelClient, ReadModelConfig } from "@interop-be-reports/commons";
+import { PersistentTenant } from "./model/tenant.model.js";
+import { warn } from "./utils/logger.js";
+import crypto from "crypto"
 
 type BatchParseResult = {
   processedRecordsCount: number
@@ -44,14 +47,17 @@ const fileContent =
 
 await process()
 
+await readModelClient.close()
+
 
 async function process(): Promise<void> {
+  const jobCorrelationId = crypto.randomUUID()
   const batchSize = env.RECORDS_PROCESS_BATCH_SIZE
 
   var scanComplete = false
   var fromLine = 1
   do {
-    const batchResult = getBatch(fromLine, batchSize)
+    const batchResult: BatchParseResult = getBatch(fromLine, batchSize)
 
     // TODO Not sure these type checks are ok
     const paOrgs: PaRow[] = batchResult.records.map((org: CsvRow) => {
@@ -65,19 +71,8 @@ async function process(): Promise<void> {
     }).filter((r): r is NonPaRow => r !== null)
     //
 
-    const paIpaCodes = paOrgs.map(org => org.codice_ipa)
-    const nonPaTaxCodes = nonPaOrgs.map(org => org.cf_gestore)
-
-    const paTenants = await getPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, paIpaCodes)
-    const nonPaTenants = await getNonPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, nonPaTaxCodes)
-
-    console.log(JSON.stringify(paTenants))
-    console.log(JSON.stringify(nonPaTenants))
-
-
-    // const groupedByIsPA = _.groupBy(batchResult.records, record => record.codice_IPA !== undefined)
-    // const ipaCodes = groupedByIsPA['true'].map(org => org.)
-    // console.log(groupedByIsPA)
+    processTenants(paOrgs, org => org.codice_ipa, codes => getPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, codes), jobCorrelationId)
+    processTenants(nonPaOrgs, org => org.cf_gestore, codes => getNonPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, codes), jobCorrelationId)
 
     fromLine = fromLine + batchSize
     scanComplete = batchResult.processedRecordsCount === 0
@@ -85,6 +80,24 @@ async function process(): Promise<void> {
 
 }
 
+async function processTenants<T>(orgs: T[], extractCode: (org: T) => string, retrieveTenants: (codes: string[]) => Promise<PersistentTenant[]>,  correlationId: string) {
+
+  const codes = orgs.map(extractCode)
+
+  const tenants = await retrieveTenants(codes)
+
+  const missingTenants = getMissingTenants(codes, tenants)
+
+  if (missingTenants.length !== 0)
+    warn(correlationId, `PA organizations in CSV not found in Tenants for codes: ${missingTenants}`)
+
+}
+
+function getMissingTenants(expectedExternalId: string[], tenants: PersistentTenant[]): string[] {
+  const existingSet = new Set(tenants.map(t => t.externalId.value))
+
+  return expectedExternalId.filter(v => !existingSet.has(v))
+}
 
 function getBatch(fromLine: number, batchSize: number): BatchParseResult {
   const rawRecords = parse(fileContent, { trim: true, columns: true, from: fromLine, to: fromLine + batchSize - 1 }) as Array<any>
