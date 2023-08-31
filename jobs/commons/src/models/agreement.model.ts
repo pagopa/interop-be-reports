@@ -4,6 +4,8 @@ export const agreementSchema = z.object({
   id: z.string(),
   eserviceId: z.string(),
   descriptorId: z.string(),
+  consumerId: z.string(),
+  producerId: z.string(),
   state: z.enum(['Active', 'Draft', 'Pending', 'Suspended', 'Archived']),
 })
 
