@@ -46,6 +46,10 @@ describe('MetricsManager', () => {
     return mongoClient.db(DB_NAME).collection(collection).insertMany(data)
   }
 
+  function repeatObjInArray<T extends Record<'data', unknown>>(item: T, length: number): T[] {
+    return Array.from({ length }, () => ({ ...item }))
+  }
+
   type MacroCategoryCodeFor<TName extends MacroCategory['name']> = Extract<
     MacroCategory,
     { name: TName }
@@ -192,18 +196,10 @@ describe('MetricsManager', () => {
     ])
 
     await seedCollection('agreements', [
-      ...Array.from({ length: 3 }, (_) => ({
-        data: getAgreementMock({ eserviceId: 'eservice-1' }),
-      })),
-      ...Array.from({ length: 2 }, (_) => ({
-        data: getAgreementMock({ eserviceId: 'eservice-2' }),
-      })),
-      ...Array.from({ length: 1 }, (_) => ({
-        data: getAgreementMock({ eserviceId: 'eservice-3' }),
-      })),
-      ...Array.from({ length: 4 }, (_) => ({
-        data: getAgreementMock({ eserviceId: 'eservice-4' }),
-      })),
+      ...repeatObjInArray({ data: getAgreementMock({ eserviceId: 'eservice-1' }) }, 3),
+      ...repeatObjInArray({ data: getAgreementMock({ eserviceId: 'eservice-2' }) }, 2),
+      ...repeatObjInArray({ data: getAgreementMock({ eserviceId: 'eservice-3' }) }, 1),
+      ...repeatObjInArray({ data: getAgreementMock({ eserviceId: 'eservice-4' }) }, 4),
     ])
 
     await seedCollection('tenants', [
@@ -232,5 +228,262 @@ describe('MetricsManager', () => {
     expect(result[3].activeAgreements).toStrictEqual(1)
     expect(result[3].name).toStrictEqual('eservice-3')
     expect(result[3].producerName).toStrictEqual('Producer 1')
+  })
+
+  it('getTop10MostSubscribedEServicesPerMacroCategoryMetric', async () => {
+    await seedCollection('eservices', [
+      { data: getEServiceMock({ name: 'eservice-1', id: 'eservice-1', producerId: 'producer' }) },
+      { data: getEServiceMock({ name: 'eservice-2', id: 'eservice-2', producerId: 'producer' }) },
+      { data: getEServiceMock({ name: 'eservice-3', id: 'eservice-3', producerId: 'producer' }) },
+    ])
+
+    await seedCollection('agreements', [
+      { data: getAgreementMock({ eserviceId: 'eservice-1', consumerId: 'comune-1' }) },
+      { data: getAgreementMock({ eserviceId: 'eservice-2', consumerId: 'comune-2' }) },
+      { data: getAgreementMock({ eserviceId: 'eservice-2', consumerId: 'comune-3' }) },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-2',
+          consumerId: 'comune-3',
+          state: 'Draft',
+        }),
+      },
+      { data: getAgreementMock({ eserviceId: 'eservice-3', consumerId: 'azienda-ospedaliera-1' }) },
+      { data: getAgreementMock({ eserviceId: 'eservice-3', consumerId: 'azienda-ospedaliera-2' }) },
+      { data: getAgreementMock({ eserviceId: 'eservice-3', consumerId: 'azienda-ospedaliera-3' }) },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-3',
+          consumerId: 'azienda-ospedaliera-3',
+          state: 'Pending',
+        }),
+      },
+    ])
+
+    await seedCollection('tenants', [
+      {
+        data: getTenantMock({
+          id: 'producer',
+          name: 'Producer',
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: 'comune-1',
+          attributes: [{ id: 'attribute-comune', type: 'PersistentCertifiedAttribute' }],
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: 'comune-2',
+          attributes: [{ id: 'attribute-comune', type: 'PersistentCertifiedAttribute' }],
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: 'comune-3',
+          attributes: [{ id: 'attribute-comune', type: 'PersistentCertifiedAttribute' }],
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: 'comune-4',
+          attributes: [{ id: 'attribute-comune', type: 'PersistentCertifiedAttribute' }],
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: 'azienda-ospedaliera-1',
+          attributes: [
+            { id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' },
+          ],
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: 'azienda-ospedaliera-2',
+          attributes: [
+            { id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' },
+          ],
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: 'azienda-ospedaliera-3',
+          attributes: [
+            { id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' },
+          ],
+        }),
+      },
+    ])
+
+    await seedCollection('attributes', [
+      {
+        data: getAttributeMock({
+          id: 'attribute-comune',
+          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
+        }),
+      },
+      {
+        data: getAttributeMock({
+          id: 'attribute-azienda-ospedaliera',
+          code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere'>,
+        }),
+      },
+    ])
+
+    const result = await metricsManager.getTop10MostSubscribedEServicesPerMacroCategoryMetric()
+    const comuniTop10 = result.find((a) => a.name === 'Comuni')?.top10MostSubscribedEServices
+
+    expect(comuniTop10?.[0].name).toStrictEqual('eservice-2')
+    expect(comuniTop10?.[0].producerName).toStrictEqual('Producer')
+    expect(comuniTop10?.[0].agreementCount).toStrictEqual(2)
+
+    expect(comuniTop10?.[1].name).toStrictEqual('eservice-1')
+    expect(comuniTop10?.[1].producerName).toStrictEqual('Producer')
+    expect(comuniTop10?.[1].agreementCount).toStrictEqual(1)
+
+    expect(comuniTop10?.[2].name).toStrictEqual('eservice-3')
+    expect(comuniTop10?.[2].producerName).toStrictEqual('Producer')
+    expect(comuniTop10?.[2].agreementCount).toStrictEqual(0)
+
+    const aziendeOspedaliereTop10 = result.find((a) => a.name === 'Aziende Ospedaliere')
+      ?.top10MostSubscribedEServices
+
+    expect(aziendeOspedaliereTop10?.[0].name).toStrictEqual('eservice-3')
+    expect(aziendeOspedaliereTop10?.[0].producerName).toStrictEqual('Producer')
+    expect(aziendeOspedaliereTop10?.[0].agreementCount).toStrictEqual(3)
+
+    expect(aziendeOspedaliereTop10?.[1].name).toStrictEqual('eservice-1')
+    expect(aziendeOspedaliereTop10?.[1].producerName).toStrictEqual('Producer')
+    expect(aziendeOspedaliereTop10?.[1].agreementCount).toStrictEqual(0)
+
+    expect(aziendeOspedaliereTop10?.[2].name).toStrictEqual('eservice-2')
+    expect(aziendeOspedaliereTop10?.[2].producerName).toStrictEqual('Producer')
+    expect(aziendeOspedaliereTop10?.[2].agreementCount).toStrictEqual(0)
+  })
+
+  it('getTop10ProviderWithMostSubscriberMetric', async () => {
+    await seedCollection('eservices', [
+      { data: getEServiceMock({ name: 'eservice-1', id: 'eservice-1', producerId: 'producer-1' }) },
+      { data: getEServiceMock({ name: 'eservice-2', id: 'eservice-2', producerId: 'producer-1' }) },
+      { data: getEServiceMock({ name: 'eservice-3', id: 'eservice-3', producerId: 'producer-2' }) },
+    ])
+
+    await seedCollection('agreements', [
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-1',
+          producerId: 'producer-1',
+          consumerId: 'comune',
+        }),
+      },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-2',
+          producerId: 'producer-1',
+          consumerId: 'comune',
+        }),
+      },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-3',
+          producerId: 'producer-2',
+          consumerId: 'comune',
+        }),
+      },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-1',
+          producerId: 'producer-1',
+          consumerId: 'azienda-ospedaliera',
+        }),
+      },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-2',
+          producerId: 'producer-1',
+          consumerId: 'azienda-ospedaliera',
+        }),
+      },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-3',
+          producerId: 'producer-2',
+          consumerId: 'azienda-ospedaliera',
+          state: 'Pending',
+        }),
+      },
+    ])
+
+    await seedCollection('tenants', [
+      {
+        data: getTenantMock({
+          id: 'producer-1',
+          name: 'Producer 1',
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: 'producer-2',
+          name: 'Producer 2',
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: 'comune',
+          attributes: [{ id: 'attribute-comune', type: 'PersistentCertifiedAttribute' }],
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: 'azienda-ospedaliera',
+          attributes: [
+            { id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' },
+          ],
+        }),
+      },
+    ])
+
+    await seedCollection('attributes', [
+      {
+        data: getAttributeMock({
+          id: 'attribute-comune',
+          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
+          kind: 'Certified',
+        }),
+      },
+      {
+        data: getAttributeMock({
+          id: 'attribute-azienda-ospedaliera',
+          code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere'>,
+          kind: 'Certified',
+        }),
+      },
+    ])
+
+    const result = await metricsManager.getTop10ProviderWithMostSubscriberMetric()
+
+    const producer1 = result[0]
+    expect(producer1.name).toStrictEqual('Producer 1')
+    const producer1Comuni = producer1.topSubscribers.find(
+      (a: { name: string }) => a.name === 'Comuni'
+    )
+    const producer1AziendeOspedaliere = producer1.topSubscribers.find(
+      (a: { name: string }) => a.name === 'Aziende Ospedaliere'
+    )
+    expect(producer1Comuni?.count).toStrictEqual(2)
+    expect(producer1AziendeOspedaliere?.count).toStrictEqual(2)
+
+    const producer2 = result[1]
+    expect(producer2.name).toStrictEqual('Producer 2')
+    const producer2Comuni = producer2.topSubscribers.find(
+      (a: { name: string }) => a.name === 'Comuni' //TODO: Fix typing
+    )
+    const producer2AziendeOspedaliere = producer2.topSubscribers.find(
+      (a: { name: string }) => a.name === 'Aziende Ospedaliere' //TODO: Fix typing
+    )
+    expect(producer2Comuni?.count).toStrictEqual(1)
+    expect(producer2AziendeOspedaliere?.count).toStrictEqual(0)
   })
 })
