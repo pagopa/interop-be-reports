@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { InteropContext } from '../model/interop-context.js';
 import { SelfcareTenantSeed, SelfcareUpsertTenantResponse } from '../model/tenant-process.js';
-import { error as logError } from '../utils/logger.js';
+import { error } from '../utils/logger.js';
 
 export class TenantProcessService {
 
@@ -18,9 +18,9 @@ export class TenantProcessService {
           'Content-Type': 'application/json',
         },
       },
-    ).catch(error => {
-      logError(context.correlationId, `Error on selfcareUpsertTenant. Reason: ${error.message}`)
-      throw Error(`Unexpected response from selfcareUpsertTenant. Reason: ${error.message}`)
+    ).catch(err => {
+      error(context.correlationId, `Error on selfcareUpsertTenant. Reason: ${err.message}`)
+      throw Error(`Unexpected response from selfcareUpsertTenant. Reason: ${err.message}`)
     });
 
     return data;
