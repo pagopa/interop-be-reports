@@ -9,12 +9,12 @@ import {
   Top10MostSubscribedEServicesPerMacroCategoryMetric,
   Top10ProviderWithMostSubscriberMetric,
 } from '../models/metrics.model.js'
+
 export class MetricsManager {
   constructor(private client: MongoClient) {}
 
   /**
-   * Queries the number of published e-services.
-   * Published e-services are those that have at least one descriptor with state Published or Suspended.
+   * @see https://pagopa.atlassian.net/browse/PIN-3744
    **/
   async getPublishedEServicesMetric() {
     const publishedEServicesCount = await this.client
@@ -30,8 +30,7 @@ export class MetricsManager {
   }
 
   /**
-   * Queries the number of published e-services per macro-category.
-   * Macro-categories are defined in the constants file.
+   * @see https://pagopa.atlassian.net/browse/PIN-3745
    */
   async getMacroCategoriesPublishedEServicesMetric() {
     const result = await Promise.all(
@@ -42,6 +41,9 @@ export class MetricsManager {
     return MacroCategoriesPublishedEServicesMetric.parse(result)
   }
 
+  /**
+   * @see https://pagopa.atlassian.net/browse/PIN-3746
+   */
   async getTop10MostSubscribedEServicesMetric() {
     const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
@@ -100,6 +102,9 @@ export class MetricsManager {
     return Top10MostSubscribedEServicesMetric.parse(result)
   }
 
+  /**
+   * @see https://pagopa.atlassian.net/browse/PIN-3746
+   */
   async getTop10MostSubscribedEServicesPerMacroCategoryMetric() {
     const result = await Promise.all(
       MACRO_CATEGORIES.map((macroCategory) =>
@@ -110,6 +115,9 @@ export class MetricsManager {
     return Top10MostSubscribedEServicesPerMacroCategoryMetric.parse(result)
   }
 
+  /**
+   * @see https://pagopa.atlassian.net/browse/PIN-3747
+   */
   async getTop10ProviderWithMostSubscriberMetric() {
     const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
@@ -474,23 +482,18 @@ export class MetricsManager {
         },
       ])
       .toArray()
-      .then((res) => ({
-        id: macroCategory.id,
-        name: macroCategory.name,
-        top10MostSubscribedEServices: res,
-      }))
 
-    return result
+    return {
+      id: macroCategory.id,
+      name: macroCategory.name,
+      top10MostSubscribedEServices: result,
+    }
   }
 
-  /**
-   * Queries the number of published e-services per macro-category.
-   * Macro-categories are defined in the constants file.
-   */
   private async getMacroCategoryPublishedEServiceCount(
     macroCategory: (typeof MACRO_CATEGORIES)[number]
   ) {
-    return await this.client
+    const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
       .aggregate([
@@ -562,10 +565,11 @@ export class MetricsManager {
         },
       ])
       .toArray()
-      .then((res) => ({
-        id: macroCategory.id,
-        name: macroCategory.name,
-        publishedEServicesCount: res[0]?.result ?? 0,
-      }))
+
+    return {
+      id: macroCategory.id,
+      name: macroCategory.name,
+      publishedEServicesCount: result[0]?.result ?? 0,
+    }
   }
 }
