@@ -300,7 +300,7 @@ export class MetricsManager {
   private async getMacroCategoryTop10MostSubscribedEServices(
     macroCategory: (typeof MACRO_CATEGORIES)[number]
   ) {
-    const result = this.client
+    const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
       .aggregate([
