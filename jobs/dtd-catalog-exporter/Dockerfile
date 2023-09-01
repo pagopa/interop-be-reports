@@ -29,4 +29,5 @@ RUN pnpm install --frozen-lockfile
 # Build the project
 COPY --from=builder /app/out/full/ .
 RUN pnpm dlx turbo run build --filter=dtd-catalog-exporter
-RUN ln -s ./jobs/dtd-catalog-exporter/dist ./dist
+
+CMD node ./jobs/dtd-catalog-exporter/dist
