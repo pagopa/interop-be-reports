@@ -68,7 +68,7 @@ describe('MetricsManager', () => {
     ])
 
     const result = await metricsManager.getPublishedEServicesMetric()
-    expect(result).toStrictEqual(3)
+    expect(result.publishedEServicesCount).toStrictEqual(3)
   })
 
   it('getMacroCategoriesPublishedEServicesMetric', async () => {

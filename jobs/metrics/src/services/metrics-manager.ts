@@ -92,7 +92,7 @@ export class MetricsManager {
             },
           },
         },
-        { $sort: { activeAgreements: -1 } },
+        { $sort: { agreementsCount: -1 } },
         { $limit: 10 },
       ])
       .toArray()
