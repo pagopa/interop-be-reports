@@ -5,7 +5,7 @@ import { ReadModelQueries, SftpClient, TenantProcessService } from "../service/i
 import { RefreshableInteropToken, zipBy, logError, logWarn } from "@interop-be-reports/commons";
 import crypto from "crypto"
 
-export async function process(sftpClient: SftpClient, readModel: ReadModelQueries, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken): Promise<void> {
+export async function importAttributes(sftpClient: SftpClient, readModel: ReadModelQueries, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken): Promise<void> {
   const jobCorrelationId = crypto.randomUUID()
   const batchSize = env.RECORDS_PROCESS_BATCH_SIZE
 
@@ -65,8 +65,11 @@ async function getAttributesIdentifiers(readModel: ReadModelQueries, anacTenantI
 
 const processTenants =
   (tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken, attributes: AnacAttributes, jobCorrelationId: string) =>
-    async <T extends CsvRow>(orgs: T[], extractTenantCode: (org: T) => string, retrieveTenants: (codes: string[]) => Promise<PersistentTenant[]>) => {
+    async <T extends CsvRow>(orgs: T[], extractTenantCode: (org: T) => string, retrieveTenants: (codes: string[]) => Promise<PersistentTenant[]>) : Promise <void> => {
 
+      if(orgs.length === 0)
+        return
+      
       const codes = orgs.map(extractTenantCode)
 
       const tenants = await retrieveTenants(codes)

@@ -1,14 +1,6 @@
 import { InteropTokenGenerator, ReadModelClient, ReadModelConfig, RefreshableInteropToken, TokenGenerationConfig } from '@interop-be-reports/commons'
-import { ReadModelQueries, SftpClient, TenantProcessService, process } from './service/index.js'
+import { ReadModelQueries, SftpClient, TenantProcessService, importAttributes } from './service/index.js'
 import { SftpConfig, env } from './config/index.js'
-
-
-// const fileContent =
-//   `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
-// 0123456789,Nome ente presente in IPA,gsp1@pec.it,DRMEST,TRUE,FALSE,TRUE
-// 0011223344,E-Procurement 1,eprocurement1@pec.it,,TRUE,TRUE,FALSE
-// 0011223344,"E-Procurement 2 con , virgola nel nome",eprocurement1@pec.it,,TRUE,TRUE,FALSE`
-
 
 const readModelConfig: ReadModelConfig = {
   mongodbReplicaSet: env.MONGODB_REPLICA_SET,
@@ -46,6 +38,6 @@ const tokenGenerator = new InteropTokenGenerator(tokenGeneratorConfig)
 const refreshableToken = new RefreshableInteropToken(tokenGenerator)
 const tenantProcess = new TenantProcessService(env.TENANT_PROCESS_URL)
 
-await process(sftpClient, readModelQueries, tenantProcess, refreshableToken)
+await importAttributes(sftpClient, readModelQueries, tenantProcess, refreshableToken)
 
 await readModelClient.close()
