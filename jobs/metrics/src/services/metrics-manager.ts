@@ -1,7 +1,14 @@
 import { MongoClient } from 'mongodb'
 import { env } from '../configs/env.js'
 import { Agreement, EService, EServiceDescriptor } from '@interop-be-reports/commons'
-import { MacroCategory, orgsMacroCategories } from '../configs/constants.js'
+import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
+import {
+  MacroCategoriesPublishedEServicesMetric,
+  PublishedEServicesMetric,
+  Top10MostSubscribedEServicesMetric,
+  Top10MostSubscribedEServicesPerMacroCategoryMetric,
+  Top10ProviderWithMostSubscriberMetric,
+} from '../models/metrics.model.js'
 export class MetricsManager {
   constructor(private client: MongoClient) {}
 
@@ -10,7 +17,7 @@ export class MetricsManager {
    * Published e-services are those that have at least one descriptor with state Published or Suspended.
    **/
   async getPublishedEServicesMetric() {
-    return await this.client
+    const publishedEServicesCount = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
       .countDocuments({
@@ -18,6 +25,8 @@ export class MetricsManager {
           $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
         },
       })
+
+    return PublishedEServicesMetric.parse({ publishedEServicesCount })
   }
 
   /**
@@ -25,15 +34,16 @@ export class MetricsManager {
    * Macro-categories are defined in the constants file.
    */
   async getMacroCategoriesPublishedEServicesMetric() {
-    return Promise.all(
-      orgsMacroCategories.map((macroCategory) =>
+    const result = await Promise.all(
+      MACRO_CATEGORIES.map((macroCategory) =>
         this.getMacroCategoryPublishedEServiceCount(macroCategory)
       )
     )
+    return MacroCategoriesPublishedEServicesMetric.parse(result)
   }
 
   async getTop10MostSubscribedEServicesMetric() {
-    return await this.client
+    const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
       .aggregate([
@@ -67,7 +77,7 @@ export class MetricsManager {
             producerName: {
               $arrayElemAt: ['$producer.data.name', 0],
             },
-            activeAgreements: {
+            agreementsCount: {
               $size: {
                 $filter: {
                   input: '$agreements',
@@ -86,18 +96,22 @@ export class MetricsManager {
         { $limit: 10 },
       ])
       .toArray()
+
+    return Top10MostSubscribedEServicesMetric.parse(result)
   }
 
   async getTop10MostSubscribedEServicesPerMacroCategoryMetric() {
-    return Promise.all(
-      orgsMacroCategories.map((macroCategory) =>
+    const result = await Promise.all(
+      MACRO_CATEGORIES.map((macroCategory) =>
         this.getMacroCategoryTop10MostSubscribedEServices(macroCategory)
       )
     )
+
+    return Top10MostSubscribedEServicesPerMacroCategoryMetric.parse(result)
   }
 
   async getTop10ProviderWithMostSubscriberMetric() {
-    return await this.client
+    const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection(env.AGREEMENTS_COLLECTION_NAME)
       .aggregate([
@@ -222,7 +236,7 @@ export class MetricsManager {
         {
           $project: {
             name: 1,
-            top: orgsMacroCategories.map((macroCategory) => ({
+            top: MACRO_CATEGORIES.map((macroCategory) => ({
               id: macroCategory.id,
               name: macroCategory.name,
               count: {
@@ -234,7 +248,7 @@ export class MetricsManager {
                       input: '$$i',
                       as: 'attr',
                       cond: {
-                        $in: ['$$attr', macroCategory.codes],
+                        $in: ['$$attr', macroCategory.ipaCodes],
                       },
                     },
                   },
@@ -253,7 +267,7 @@ export class MetricsManager {
                 in: {
                   id: '$$t.id',
                   name: '$$t.name',
-                  count: {
+                  agreementsCount: {
                     $size: {
                       $filter: {
                         input: '$$t.count',
@@ -271,10 +285,14 @@ export class MetricsManager {
         },
       ])
       .toArray()
+
+    return Top10ProviderWithMostSubscriberMetric.parse(result)
   }
 
-  private async getMacroCategoryTop10MostSubscribedEServices(macroCategory: MacroCategory) {
-    return await this.client
+  private async getMacroCategoryTop10MostSubscribedEServices(
+    macroCategory: (typeof MACRO_CATEGORIES)[number]
+  ) {
+    const result = this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
       .aggregate([
@@ -421,7 +439,7 @@ export class MetricsManager {
                     input: '$$i',
                     as: 'attr',
                     cond: {
-                      $in: ['$$attr.data.code', macroCategory.codes],
+                      $in: ['$$attr.data.code', macroCategory.ipaCodes],
                     },
                   },
                 },
@@ -433,7 +451,7 @@ export class MetricsManager {
           $project: {
             name: 1,
             producerName: 1,
-            agreementCount: {
+            agreementsCount: {
               $size: {
                 $filter: {
                   input: '$ipaCodes',
@@ -448,7 +466,7 @@ export class MetricsManager {
         },
         {
           $sort: {
-            agreementCount: -1,
+            agreementsCount: -1,
           },
         },
         {
@@ -461,13 +479,17 @@ export class MetricsManager {
         name: macroCategory.name,
         top10MostSubscribedEServices: res,
       }))
+
+    return result
   }
 
   /**
    * Queries the number of published e-services per macro-category.
    * Macro-categories are defined in the constants file.
    */
-  private async getMacroCategoryPublishedEServiceCount(macroCategory: MacroCategory) {
+  private async getMacroCategoryPublishedEServiceCount(
+    macroCategory: (typeof MACRO_CATEGORIES)[number]
+  ) {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
@@ -521,7 +543,7 @@ export class MetricsManager {
               $sum: {
                 $cond: [
                   {
-                    $or: macroCategory.codes.map((code) => ({
+                    $or: macroCategory.ipaCodes.map((code) => ({
                       $in: [code, '$codes'],
                     })),
                   },

@@ -7,7 +7,7 @@ import {
   getEServiceMock,
   getTenantMock,
 } from '@interop-be-reports/commons'
-import { MacroCategory } from '../../configs/constants.js'
+import { MACRO_CATEGORIES } from '../../configs/macro-categories.js'
 
 describe('MetricsManager', () => {
   const DB_NAME = 'read-model'
@@ -50,10 +50,12 @@ describe('MetricsManager', () => {
     return Array.from({ length }, () => ({ ...item }))
   }
 
+  type MacroCategory = (typeof MACRO_CATEGORIES)[number]
+
   type MacroCategoryCodeFor<TName extends MacroCategory['name']> = Extract<
     MacroCategory,
     { name: TName }
-  >['codes'][number]
+  >['ipaCodes'][number]
 
   it('getPublishedEServicesMetric', async () => {
     await seedCollection('eservices', [
@@ -213,19 +215,19 @@ describe('MetricsManager', () => {
 
     const result = await metricsManager.getTop10MostSubscribedEServicesMetric()
 
-    expect(result[0].activeAgreements).toStrictEqual(4)
+    expect(result[0].agreementsCount).toStrictEqual(4)
     expect(result[0].name).toStrictEqual('eservice-4')
     expect(result[0].producerName).toStrictEqual('Producer 1')
 
-    expect(result[1].activeAgreements).toStrictEqual(3)
+    expect(result[1].agreementsCount).toStrictEqual(3)
     expect(result[1].name).toStrictEqual('eservice-1')
     expect(result[1].producerName).toStrictEqual('Producer 1')
 
-    expect(result[2].activeAgreements).toStrictEqual(2)
+    expect(result[2].agreementsCount).toStrictEqual(2)
     expect(result[2].name).toStrictEqual('eservice-2')
     expect(result[2].producerName).toStrictEqual('Producer 1')
 
-    expect(result[3].activeAgreements).toStrictEqual(1)
+    expect(result[3].agreementsCount).toStrictEqual(1)
     expect(result[3].name).toStrictEqual('eservice-3')
     expect(result[3].producerName).toStrictEqual('Producer 1')
   })
@@ -337,30 +339,30 @@ describe('MetricsManager', () => {
 
     expect(comuniTop10?.[0].name).toStrictEqual('eservice-2')
     expect(comuniTop10?.[0].producerName).toStrictEqual('Producer')
-    expect(comuniTop10?.[0].agreementCount).toStrictEqual(2)
+    expect(comuniTop10?.[0].agreementsCount).toStrictEqual(2)
 
     expect(comuniTop10?.[1].name).toStrictEqual('eservice-1')
     expect(comuniTop10?.[1].producerName).toStrictEqual('Producer')
-    expect(comuniTop10?.[1].agreementCount).toStrictEqual(1)
+    expect(comuniTop10?.[1].agreementsCount).toStrictEqual(1)
 
     expect(comuniTop10?.[2].name).toStrictEqual('eservice-3')
     expect(comuniTop10?.[2].producerName).toStrictEqual('Producer')
-    expect(comuniTop10?.[2].agreementCount).toStrictEqual(0)
+    expect(comuniTop10?.[2].agreementsCount).toStrictEqual(0)
 
     const aziendeOspedaliereTop10 = result.find((a) => a.name === 'Aziende Ospedaliere')
       ?.top10MostSubscribedEServices
 
     expect(aziendeOspedaliereTop10?.[0].name).toStrictEqual('eservice-3')
     expect(aziendeOspedaliereTop10?.[0].producerName).toStrictEqual('Producer')
-    expect(aziendeOspedaliereTop10?.[0].agreementCount).toStrictEqual(3)
+    expect(aziendeOspedaliereTop10?.[0].agreementsCount).toStrictEqual(3)
 
     expect(aziendeOspedaliereTop10?.[1].name).toStrictEqual('eservice-1')
     expect(aziendeOspedaliereTop10?.[1].producerName).toStrictEqual('Producer')
-    expect(aziendeOspedaliereTop10?.[1].agreementCount).toStrictEqual(0)
+    expect(aziendeOspedaliereTop10?.[1].agreementsCount).toStrictEqual(0)
 
     expect(aziendeOspedaliereTop10?.[2].name).toStrictEqual('eservice-2')
     expect(aziendeOspedaliereTop10?.[2].producerName).toStrictEqual('Producer')
-    expect(aziendeOspedaliereTop10?.[2].agreementCount).toStrictEqual(0)
+    expect(aziendeOspedaliereTop10?.[2].agreementsCount).toStrictEqual(0)
   })
 
   it('getTop10ProviderWithMostSubscriberMetric', async () => {
@@ -472,8 +474,8 @@ describe('MetricsManager', () => {
     const producer1AziendeOspedaliere = producer1.topSubscribers.find(
       (a: { name: string }) => a.name === 'Aziende Ospedaliere'
     )
-    expect(producer1Comuni?.count).toStrictEqual(2)
-    expect(producer1AziendeOspedaliere?.count).toStrictEqual(2)
+    expect(producer1Comuni?.agreementsCount).toStrictEqual(2)
+    expect(producer1AziendeOspedaliere?.agreementsCount).toStrictEqual(2)
 
     const producer2 = result[1]
     expect(producer2.name).toStrictEqual('Producer 2')
@@ -483,7 +485,7 @@ describe('MetricsManager', () => {
     const producer2AziendeOspedaliere = producer2.topSubscribers.find(
       (a: { name: string }) => a.name === 'Aziende Ospedaliere' //TODO: Fix typing
     )
-    expect(producer2Comuni?.count).toStrictEqual(1)
-    expect(producer2AziendeOspedaliere?.count).toStrictEqual(0)
+    expect(producer2Comuni?.agreementsCount).toStrictEqual(1)
+    expect(producer2AziendeOspedaliere?.agreementsCount).toStrictEqual(0)
   })
 })
