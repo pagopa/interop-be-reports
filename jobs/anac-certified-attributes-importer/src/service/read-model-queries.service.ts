@@ -16,93 +16,99 @@ const projectUnrevokedCertifiedAttributes = {
   }
 }
 
-/**
- * Retrieve all PA tenants that matches the given IPA codes, with their unrevoked certified attribute
- */
-export async function getPATenants(readModelClient: ReadModelClient, collectionName: string, ipaCodes: string[]): Promise<PersistentTenant[]> {
-  return await readModelClient.db()
-    .collection<{ data: PersistentTenant }>(collectionName)
-    .aggregate([
-      {
-        $match: {
-          'data.externalId.origin': "IPA",
-          'data.externalId.value': { $in: ipaCodes },
+export class ReadModelQueries {
+
+  constructor(private readModelClient: ReadModelClient, private tenantsCollectionName: string, private attributesCollectionName: string) { }
+
+  /**
+   * Retrieve all PA tenants that matches the given IPA codes, with their unrevoked certified attribute
+   */
+  async getPATenants(ipaCodes: string[]): Promise<PersistentTenant[]> {
+    return await this.readModelClient.db()
+      .collection<{ data: PersistentTenant }>(this.tenantsCollectionName)
+      .aggregate([
+        {
+          $match: {
+            'data.externalId.origin': "IPA",
+            'data.externalId.value': { $in: ipaCodes },
+          }
+        },
+        {
+          $project: projectUnrevokedCertifiedAttributes
         }
-      },
-      {
-        $project: projectUnrevokedCertifiedAttributes
-      }
-    ])
-    .map(({ data }) => PersistentTenant.parse(data))
-    .toArray()
-}
+      ])
+      .map(({ data }) => PersistentTenant.parse(data))
+      .toArray()
+  }
 
-/**
- * Retrieve all non-PA tenants that matches the given tax codes, with their unrevoked certified attribute
- */
-export async function getNonPATenants(readModelClient: ReadModelClient, collectionName: string, taxCodes: string[]): Promise<PersistentTenant[]> {
-  return await readModelClient.db()
-    .collection<{ data: PersistentTenant }>(collectionName)
-    .aggregate([
-      {
-        $match: {
-          'data.externalId.origin': { $ne: "IPA" },
-          'data.externalId.value': { $in: taxCodes },
+  /**
+   * Retrieve all non-PA tenants that matches the given tax codes, with their unrevoked certified attribute
+   */
+  async getNonPATenants(taxCodes: string[]): Promise<PersistentTenant[]> {
+    return await this.readModelClient.db()
+      .collection<{ data: PersistentTenant }>(this.tenantsCollectionName)
+      .aggregate([
+        {
+          $match: {
+            'data.externalId.origin': { $ne: "IPA" },
+            'data.externalId.value': { $in: taxCodes },
+          }
+        },
+        {
+          $project: projectUnrevokedCertifiedAttributes
         }
-      },
-      {
-        $project: projectUnrevokedCertifiedAttributes
-      }
-    ])
-    .map(({ data }) => PersistentTenant.parse(data))
-    .toArray()
-}
+      ])
+      .map(({ data }) => PersistentTenant.parse(data))
+      .toArray()
+  }
 
 
-export async function getTenantById(readModelClient: ReadModelClient, collectionName: string, tenantId: string): Promise<PersistentTenant> {
-  const result = await readModelClient.db()
-    .collection<{ data: PersistentTenant }>(collectionName)
-    .aggregate([
-      {
-        $match: {
-          'data.id': tenantId,
+  async getTenantById(tenantId: string): Promise<PersistentTenant> {
+    const result = await this.readModelClient.db()
+      .collection<{ data: PersistentTenant }>(this.tenantsCollectionName)
+      .aggregate([
+        {
+          $match: {
+            'data.id': tenantId,
+          }
+        },
+        {
+          $project: projectUnrevokedCertifiedAttributes
         }
-      },
-      {
-        $project: projectUnrevokedCertifiedAttributes
-      }
-    ])
-    .map(({ data }) => PersistentTenant.parse(data))
-    .toArray()
+      ])
+      .map(({ data }) => PersistentTenant.parse(data))
+      .toArray()
 
-  if (result.length === 0)
-    throw Error(`Tenant with id ${tenantId} not found`)
-  else
-    return result[0]
-}
+    if (result.length === 0)
+      throw Error(`Tenant with id ${tenantId} not found`)
+    else
+      return result[0]
+  }
 
-export async function getAttributeByExternalId(readModelClient: ReadModelClient, collectionName: string, origin: string, code: string): Promise<PersistentAttribute> {
-  const result = await readModelClient.db()
-    .collection<{ data: PersistentAttribute }>(collectionName)
-    .find(
-      {
-        'data.origin': origin,
-        'data.code': code,
-      },
-      {
-        projection: {
-          '_id': 0,
-          'data.id': 1,
-          'data.origin': 1,
-          'data.code': 1,
+  async getAttributeByExternalId(origin: string, code: string): Promise<PersistentAttribute> {
+    const result = await this.readModelClient.db()
+      .collection<{ data: PersistentAttribute }>(this.attributesCollectionName)
+      .find(
+        {
+          'data.origin': origin,
+          'data.code': code,
+        },
+        {
+          projection: {
+            '_id': 0,
+            'data.id': 1,
+            'data.origin': 1,
+            'data.code': 1,
+          }
         }
-      }
-    )
-    .map(({ data }) => PersistentAttribute.parse(data))
-    .toArray()
+      )
+      .map(({ data }) => PersistentAttribute.parse(data))
+      .toArray()
 
-  if (result.length === 0)
-    throw Error(`Attribute with origin ${origin} and code ${code} not found`)
-  else
-    return result[0]
+    if (result.length === 0)
+      throw Error(`Attribute with origin ${origin} and code ${code} not found`)
+    else
+      return result[0]
+  }
+
 }

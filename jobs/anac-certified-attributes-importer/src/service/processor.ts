@@ -1,17 +1,17 @@
 import { ANAC_ABILITATO_CODE, ANAC_INCARICATO_CODE, ANAC_IN_CONVALIDA_CODE, env } from "../config/index.js"
 import { parse } from 'csv/sync';
 import { CsvRow, NonPaRow, PaRow, PersistentTenant, InteropContext, AnacAttributes, BatchParseResult, AttributeIdentifiers } from '../model/index.js';
-import { getAttributeByExternalId, getNonPATenants, getPATenants, getTenantById, SftpClient, TenantProcessService } from "../service/index.js";
-import { ReadModelClient, RefreshableInteropToken, zipBy, logError, logWarn } from "@interop-be-reports/commons";
+import { ReadModelQueries, SftpClient, TenantProcessService } from "../service/index.js";
+import { RefreshableInteropToken, zipBy, logError, logWarn } from "@interop-be-reports/commons";
 import crypto from "crypto"
 
-export async function process(sftpClient: SftpClient, readModelClient: ReadModelClient, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken): Promise<void> {
+export async function process(sftpClient: SftpClient, readModel: ReadModelQueries, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken): Promise<void> {
   const jobCorrelationId = crypto.randomUUID()
   const batchSize = env.RECORDS_PROCESS_BATCH_SIZE
 
   const fileContent = await sftpClient.downloadCSV()
 
-  const attributes: AnacAttributes = await getAttributesIdentifiers(readModelClient, env.TENANTS_COLLECTION_NAME, env.ATTRIBUTES_COLLECTION_NAME, env.ANAC_TENANT_ID)
+  const attributes: AnacAttributes = await getAttributesIdentifiers(readModel, env.ANAC_TENANT_ID)
 
   const preparedProcessTenants = processTenants(tenantProcess, refreshableToken, attributes, jobCorrelationId)
 
@@ -33,8 +33,8 @@ export async function process(sftpClient: SftpClient, readModelClient: ReadModel
     }).filter((r): r is NonPaRow => r !== null)
     //
 
-    preparedProcessTenants(paOrgs, org => org.codice_ipa, codes => getPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, codes))
-    preparedProcessTenants(nonPaOrgs, org => org.cf_gestore, codes => getNonPATenants(readModelClient, env.TENANTS_COLLECTION_NAME, codes))
+    preparedProcessTenants(paOrgs, org => org.codice_ipa, codes => readModel.getPATenants(codes))
+    preparedProcessTenants(nonPaOrgs, org => org.cf_gestore, codes => readModel.getNonPATenants(codes))
 
     fromLine = fromLine + batchSize
     scanComplete = batchResult.processedRecordsCount === 0
@@ -42,18 +42,18 @@ export async function process(sftpClient: SftpClient, readModelClient: ReadModel
 
 }
 
-async function getAttributesIdentifiers(readModelClient: ReadModelClient, tenantsCollectionName: string, attributesCollectionName: string, anacTenantId: string): Promise<AnacAttributes> {
+async function getAttributesIdentifiers(readModel: ReadModelQueries, anacTenantId: string): Promise<AnacAttributes> {
 
-  const anacTenant: PersistentTenant = await getTenantById(readModelClient, tenantsCollectionName, anacTenantId)
+  const anacTenant: PersistentTenant = await readModel.getTenantById(anacTenantId)
   const certifier = anacTenant.features.find(f => f.type === 'PersistentCertifier')
 
   if (!certifier) {
     throw Error(`Tenant with id ${anacTenantId} is not a certifier`)
   }
 
-  const anacAbilitato = await getAttributeByExternalId(readModelClient, attributesCollectionName, certifier.certifierId, ANAC_ABILITATO_CODE)
-  const anacIncaricato = await getAttributeByExternalId(readModelClient, attributesCollectionName, certifier.certifierId, ANAC_INCARICATO_CODE)
-  const anacInConvalida = await getAttributeByExternalId(readModelClient, attributesCollectionName, certifier.certifierId, ANAC_IN_CONVALIDA_CODE)
+  const anacAbilitato = await readModel.getAttributeByExternalId(certifier.certifierId, ANAC_ABILITATO_CODE)
+  const anacIncaricato = await readModel.getAttributeByExternalId(certifier.certifierId, ANAC_INCARICATO_CODE)
+  const anacInConvalida = await readModel.getAttributeByExternalId(certifier.certifierId, ANAC_IN_CONVALIDA_CODE)
 
   return {
     anacAbilitato: { id: anacAbilitato.id, externalId: { origin: anacAbilitato.origin, value: anacAbilitato.code } },
