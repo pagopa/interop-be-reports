@@ -1,9 +1,9 @@
 import { InteropTokenGenerator, ReadModelClient, RefreshableInteropToken, generateInternalTokenMock } from "@interop-be-reports/commons"
 import { ReadModelQueries, SftpClient, TenantProcessService, importAttributes } from "../index.js"
-import { downloadCSVMock, getAttributeByExternalIdMock, getNonPATenantsMock, getPATenantsMock, getTenantByIdMock, internalAssignCertifiedAttributeMock, internalRevokeCertifiedAttributeMock, sftpConfigTest } from "./helpers.test.js"
+import { downloadCSVMock, getAttributeByExternalIdMock, getNonPATenantsMock, getPATenantsMock, getTenantByIdMock, internalAssignCertifiedAttributeMock, internalRevokeCertifiedAttributeMock, sftpConfigTest } from "./helpers.js"
 
 
-describe('Message processor', () => {
+describe('ANAC Certified Attributes Importer', () => {
 
   const tokenGeneratorMock = {} as InteropTokenGenerator
   const refreshableTokenMock = new RefreshableInteropToken(tokenGeneratorMock)
@@ -12,9 +12,9 @@ describe('Message processor', () => {
   const readModelClient = {} as ReadModelClient
   const readModelQueriesMock = new ReadModelQueries(readModelClient, 'tenants', 'attributes')
 
-  const run = () => importAttributes(sftpClientMock, readModelQueriesMock, tenantProcessMock, refreshableTokenMock)
+  const run = () => importAttributes(sftpClientMock, readModelQueriesMock, tenantProcessMock, refreshableTokenMock, 1, 'anac-tenant-id')
 
-  const loggerMock = vitest.fn()
+  // const loggerMock = vitest.fn()
 
   const refreshableInternalTokenSpy = vi.spyOn(refreshableTokenMock, 'get').mockImplementation(generateInternalTokenMock)
 
@@ -30,19 +30,36 @@ describe('Message processor', () => {
 
 
   beforeAll(() => {
-    vitest.spyOn(console, 'log').mockImplementation(loggerMock)
-    vitest.spyOn(console, 'error').mockImplementation(loggerMock)
+    // vitest.spyOn(console, 'log').mockImplementation(loggerMock)
+    // vitest.spyOn(console, 'error').mockImplementation(loggerMock)
+    vitest.clearAllMocks()
   })
 
   afterEach(() => {
     vitest.clearAllMocks()
   })
 
-  it('should succeed, assigning and unassigning attributes', async () => { 
+  it('should succeed', async () => {
+    await run()
+
+    expect(downloadCSVSpy).toBeCalledTimes(1)
+    expect(getTenantByIdSpy).toBeCalledTimes(1)
+    expect(getAttributeByExternalIdSpy).toBeCalledTimes(3)
+
+    expect(getPATenantsSpy).toBeCalledTimes(1)
+    expect(getNonPATenantsSpy).toBeCalledTimes(2)
+
+    expect(refreshableInternalTokenSpy).toBeCalled()
+    expect(internalAssignCertifiedAttributeSpy).toBeCalled()
+    expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
 
   })
 
-  it('should succeed, assigning and unassigning attributes only of existing tenants', async () => { })
+  it('should succeed, assigning missing attributes', async () => { })
+
+  it('should succeed, unassigning existing attributes', async () => { })
+
+  it('should succeed, only for tenants that exist on read model ', async () => { })
 
   it('should succeed with more than one batch', async () => { })
 

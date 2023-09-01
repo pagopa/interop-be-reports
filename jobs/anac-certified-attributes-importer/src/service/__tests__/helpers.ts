@@ -29,7 +29,7 @@ export const persistentTenant: PersistentTenant = {
   id: '091fbea1-0c8e-411b-988f-5098b6a33ba7',
   externalId: { origin: 'tenantOrigin', value: 'tenantValue' },
   attributes: [],
-  features: [],
+  features: [{ type: 'PersistentCertifier', certifierId: 'ANAC' }],
 }
 
 export const persistentAttribute: PersistentAttribute = {

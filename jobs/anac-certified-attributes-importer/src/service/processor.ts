@@ -1,17 +1,17 @@
-import { ANAC_ABILITATO_CODE, ANAC_INCARICATO_CODE, ANAC_IN_CONVALIDA_CODE, env } from "../config/index.js"
+import { ANAC_ABILITATO_CODE, ANAC_INCARICATO_CODE, ANAC_IN_CONVALIDA_CODE } from "../config/index.js"
 import { parse } from 'csv/sync';
 import { CsvRow, NonPaRow, PaRow, PersistentTenant, InteropContext, AnacAttributes, BatchParseResult, AttributeIdentifiers } from '../model/index.js';
 import { ReadModelQueries, SftpClient, TenantProcessService } from "../service/index.js";
 import { RefreshableInteropToken, zipBy, logError, logWarn } from "@interop-be-reports/commons";
 import crypto from "crypto"
 
-export async function importAttributes(sftpClient: SftpClient, readModel: ReadModelQueries, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken): Promise<void> {
+export async function importAttributes(sftpClient: SftpClient, readModel: ReadModelQueries, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken, recordsBatchSize: number, anacTenantId: string): Promise<void> {
   const jobCorrelationId = crypto.randomUUID()
-  const batchSize = env.RECORDS_PROCESS_BATCH_SIZE
+  const batchSize = recordsBatchSize
 
   const fileContent = await sftpClient.downloadCSV()
 
-  const attributes: AnacAttributes = await getAttributesIdentifiers(readModel, env.ANAC_TENANT_ID)
+  const attributes: AnacAttributes = await getAttributesIdentifiers(readModel, anacTenantId)
 
   const preparedProcessTenants = processTenants(tenantProcess, refreshableToken, attributes, jobCorrelationId)
 
@@ -65,11 +65,11 @@ async function getAttributesIdentifiers(readModel: ReadModelQueries, anacTenantI
 
 const processTenants =
   (tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken, attributes: AnacAttributes, jobCorrelationId: string) =>
-    async <T extends CsvRow>(orgs: T[], extractTenantCode: (org: T) => string, retrieveTenants: (codes: string[]) => Promise<PersistentTenant[]>) : Promise <void> => {
+    async <T extends CsvRow>(orgs: T[], extractTenantCode: (org: T) => string, retrieveTenants: (codes: string[]) => Promise<PersistentTenant[]>): Promise<void> => {
 
-      if(orgs.length === 0)
+      if (orgs.length === 0)
         return
-      
+
       const codes = orgs.map(extractTenantCode)
 
       const tenants = await retrieveTenants(codes)

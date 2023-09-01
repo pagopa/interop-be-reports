@@ -38,6 +38,6 @@ const tokenGenerator = new InteropTokenGenerator(tokenGeneratorConfig)
 const refreshableToken = new RefreshableInteropToken(tokenGenerator)
 const tenantProcess = new TenantProcessService(env.TENANT_PROCESS_URL)
 
-await importAttributes(sftpClient, readModelQueries, tenantProcess, refreshableToken)
+await importAttributes(sftpClient, readModelQueries, tenantProcess, refreshableToken, env.RECORDS_PROCESS_BATCH_SIZE, env.ANAC_TENANT_ID)
 
 await readModelClient.close()
