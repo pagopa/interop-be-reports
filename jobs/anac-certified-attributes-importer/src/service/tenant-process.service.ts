@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { InteropContext } from '../model/interop-context.model.js';
-import { error } from '../utils/logger.js';
+import { InteropContext } from '../model/index.js';
+import { logError } from '@interop-be-reports/commons';
 
 export class TenantProcessService {
 
@@ -17,7 +17,7 @@ export class TenantProcessService {
         },
       },
     ).catch(err => {
-      error(context.correlationId, `Error on internalAssignCertifiedAttribute. Reason: ${err.message}`)
+      logError(context.correlationId, `Error on internalAssignCertifiedAttribute. Reason: ${err.message}`)
       throw Error(`Unexpected response from internalAssignCertifiedAttribute. Reason: ${err.message}`)
     });
     return data;
@@ -35,7 +35,7 @@ export class TenantProcessService {
         },
       },
     ).catch(err => {
-      error(context.correlationId, `Error on internalRevokeCertifiedAttribute. Reason: ${err.message}`)
+      logError(context.correlationId, `Error on internalRevokeCertifiedAttribute. Reason: ${err.message}`)
       throw Error(`Unexpected response from internalRevokeCertifiedAttribute. Reason: ${err.message}`)
     });
     return data;

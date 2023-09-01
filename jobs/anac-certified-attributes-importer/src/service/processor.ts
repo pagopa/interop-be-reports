@@ -2,8 +2,7 @@ import { ANAC_ABILITATO_CODE, ANAC_INCARICATO_CODE, ANAC_IN_CONVALIDA_CODE, env 
 import { parse } from 'csv/sync';
 import { CsvRow, NonPaRow, PaRow, PersistentTenant, InteropContext, AnacAttributes, BatchParseResult, AttributeIdentifiers } from '../model/index.js';
 import { getAttributeByExternalId, getNonPATenants, getPATenants, getTenantById, SftpClient, TenantProcessService } from "../service/index.js";
-import { ReadModelClient, RefreshableInteropToken, zipBy } from "@interop-be-reports/commons";
-import { error, warn } from "../utils/logger.js";
+import { ReadModelClient, RefreshableInteropToken, zipBy, logError, logWarn } from "@interop-be-reports/commons";
 import crypto from "crypto"
 
 export async function process(sftpClient: SftpClient, readModelClient: ReadModelClient, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken): Promise<void> {
@@ -75,7 +74,7 @@ const processTenants =
       const missingTenants = getMissingTenants(codes, tenants)
 
       if (missingTenants.length !== 0)
-        warn(jobCorrelationId, `Organizations in CSV not found in Tenants for codes: ${missingTenants}`)
+        logWarn(jobCorrelationId, `Organizations in CSV not found in Tenants for codes: ${missingTenants}`)
 
       zipBy(orgs, tenants, extractTenantCode, tenant => tenant.externalId.value)
         .forEach(async ([org, tenant]) => {
@@ -138,7 +137,7 @@ function getBatch(fileContent: string, fromLine: number, batchSize: number, jobC
     if (result.success)
       return result.data
     else {
-      error(jobCorrelationId, `Error parsing row ${fromLine + index}`, result.error)
+      logError(jobCorrelationId, `Error parsing row ${fromLine + index}`, result.error)
       return null
     }
 
