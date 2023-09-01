@@ -33,8 +33,8 @@ export async function importAttributes(sftpClient: SftpClient, readModel: ReadMo
     }).filter((r): r is NonPaRow => r !== null)
     //
 
-    preparedProcessTenants(paOrgs, org => org.codice_ipa, codes => readModel.getPATenants(codes))
-    preparedProcessTenants(nonPaOrgs, org => org.cf_gestore, codes => readModel.getNonPATenants(codes))
+    await preparedProcessTenants(paOrgs, org => org.codice_ipa, codes => readModel.getPATenants(codes))
+    await preparedProcessTenants(nonPaOrgs, org => org.cf_gestore, codes => readModel.getNonPATenants(codes))
 
     fromLine = fromLine + batchSize
     scanComplete = batchResult.processedRecordsCount === 0
