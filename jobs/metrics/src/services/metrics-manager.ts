@@ -4,14 +4,12 @@ import { Agreement, EService, EServiceDescriptor } from '@interop-be-reports/com
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import {
   MacroCategoriesPublishedEServicesMetric,
-  Metrics,
   PublishedEServicesMetric,
   Top10MostSubscribedEServicesMetric,
   Top10MostSubscribedEServicesPerMacroCategoryMetric,
   Top10ProviderWithMostSubscriberMetric,
 } from '../models/metrics.model.js'
 import { getVariationPercentage } from '../utils/helpers.utils.js'
-import * as fs from 'fs'
 
 export class MetricsManager {
   constructor(private client: MongoClient) {}
@@ -29,17 +27,7 @@ export class MetricsManager {
         },
       })
 
-    // TEMP - The old metric needs to be taken from a bucket, it is stored in the output.json file for now
-    const outputFile: Metrics | undefined = fs.existsSync('output.json')
-      ? JSON.parse(fs.readFileSync('output.json', 'utf8'))
-      : undefined
-
-    const variation = outputFile
-      ? getVariationPercentage(
-          outputFile.publishedEServicesMetric.publishedEServicesCount,
-          publishedEServicesCount
-        )
-      : 0
+    const variation = getVariationPercentage(0, publishedEServicesCount) // TODO get previous value from the bucket
 
     return PublishedEServicesMetric.parse({ publishedEServicesCount, variation })
   }
