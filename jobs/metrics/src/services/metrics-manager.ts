@@ -9,6 +9,7 @@ import {
   Top10MostSubscribedEServicesPerMacroCategoryMetric,
   Top10ProviderWithMostSubscriberMetric,
 } from '../models/metrics.model.js'
+import { getVariationPercentage } from '../utils/helpers.utils.js'
 
 export class MetricsManager {
   constructor(private client: MongoClient) {}
@@ -26,7 +27,9 @@ export class MetricsManager {
         },
       })
 
-    return PublishedEServicesMetric.parse({ publishedEServicesCount })
+    const variation = getVariationPercentage(99, publishedEServicesCount) // TODO get real value
+
+    return PublishedEServicesMetric.parse({ publishedEServicesCount, variation })
   }
 
   /**

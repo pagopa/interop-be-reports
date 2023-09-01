@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const PublishedEServicesMetric = z.object({
   publishedEServicesCount: z.number(),
+  variation: z.number(),
 })
 
 export const MacroCategoriesPublishedEServicesMetric = z.array(
