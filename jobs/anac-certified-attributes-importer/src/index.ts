@@ -10,6 +10,11 @@ import crypto from "crypto"
 import { InteropContext } from "./model/interop-context.js";
 import { TenantProcessService } from "./service/tenant-process.service.js";
 
+// TODO Get name of csv header to force constraint?
+const ANAC_ABILITATO_CODE = "anac_abilitato"
+const ANAC_INCARICATO_CODE = "anac_incaricato"
+const ANAC_IN_CONVALIDA_CODE = "anac_in_convalida"
+
 type BatchParseResult = {
   processedRecordsCount: number
   records: CsvRow[]
@@ -23,6 +28,12 @@ type PersistentExternalId = {
 type AttributeIdentifiers = {
   id: string
   externalId: PersistentExternalId
+}
+
+type AnacAttributes = {
+  anacAbilitato: AttributeIdentifiers,
+  anacInConvalida: AttributeIdentifiers,
+  anacIncaricato: AttributeIdentifiers
 }
 
 // const filePath = env.SFTP_PATH + env.FORCE_REMOTE_FILE_NAME
@@ -80,7 +91,7 @@ async function process(): Promise<void> {
   const jobCorrelationId = crypto.randomUUID()
   const batchSize = env.RECORDS_PROCESS_BATCH_SIZE
 
-  const attributes: AttributeIdentifiers[] = await getAttributesIdentifiers(readModelClient, env.TENANTS_COLLECTION_NAME, env.ATTRIBUTES_COLLECTION_NAME, env.ANAC_TENANT_ID, env.ANAC_ATTRIBUTES_CODES)
+  const attributes: AnacAttributes = await getAttributesIdentifiers(readModelClient, env.TENANTS_COLLECTION_NAME, env.ATTRIBUTES_COLLECTION_NAME, env.ANAC_TENANT_ID)
 
   var scanComplete = false
   var fromLine = 1
@@ -108,33 +119,28 @@ async function process(): Promise<void> {
 
 }
 
-async function getAttributesIdentifiers(readModelClient: ReadModelClient, tenantsCollectionName: string, attributesCollectionName: string, anacTenantId: string, anacAttributesCodes: string[]): Promise<AttributeIdentifiers[]> {
+async function getAttributesIdentifiers(readModelClient: ReadModelClient, tenantsCollectionName: string, attributesCollectionName: string, anacTenantId: string): Promise<AnacAttributes> {
 
   const anacTenant: PersistentTenant = await getTenantById(readModelClient, tenantsCollectionName, anacTenantId)
   const certifier = anacTenant.features.find(f => f.type === 'PersistentCertifier')
 
   if (!certifier) {
-    throw Error(`Tenant with id ${env.ANAC_TENANT_ID} is not a certifier`)
+    throw Error(`Tenant with id ${anacTenantId} is not a certifier`)
   }
 
-  return await Promise.all(anacAttributesCodes
-    .map(async code => getAttributeByExternalId(readModelClient, attributesCollectionName, certifier.certifierId, code))
-    .map(attributePromise =>
-      attributePromise.then(
-        attribute => ({
-          id: attribute.id,
-          externalId: {
-            origin: attribute.origin,
-            value: attribute.code
-          }
-        })
-      )
-    )
-  )
+  const anacAbilitato = await getAttributeByExternalId(readModelClient, attributesCollectionName, certifier.certifierId, ANAC_ABILITATO_CODE)
+  const anacIncaricato = await getAttributeByExternalId(readModelClient, attributesCollectionName, certifier.certifierId, ANAC_INCARICATO_CODE)
+  const anacInConvalida = await getAttributeByExternalId(readModelClient, attributesCollectionName, certifier.certifierId, ANAC_IN_CONVALIDA_CODE)
+
+  return {
+    anacAbilitato: { id: anacAbilitato.id, externalId: { origin: anacAbilitato.origin, value: anacAbilitato.code } },
+    anacIncaricato: { id: anacIncaricato.id, externalId: { origin: anacIncaricato.origin, value: anacIncaricato.code } },
+    anacInConvalida: { id: anacInConvalida.id, externalId: { origin: anacInConvalida.origin, value: anacInConvalida.code } }
+  }
 
 }
 
-async function processTenants<T>(orgs: T[], extractTenantCode: (org: T) => string, retrieveTenants: (codes: string[]) => Promise<PersistentTenant[]>, attributes: AttributeIdentifiers[], correlationId: string) {
+async function processTenants<T extends CsvRow>(orgs: T[], extractTenantCode: (org: T) => string, retrieveTenants: (codes: string[]) => Promise<PersistentTenant[]>, attributes: AnacAttributes, correlationId: string) {
 
   const codes = orgs.map(extractTenantCode)
 
@@ -145,9 +151,48 @@ async function processTenants<T>(orgs: T[], extractTenantCode: (org: T) => strin
   if (missingTenants.length !== 0)
     warn(correlationId, `Organizations in CSV not found in Tenants for codes: ${missingTenants}`)
 
-  cartesian(attributes, tenants)
-    .forEach(async ([attribute, tenant]) => assignAttribute(tenant, attribute))
+  zipBy(orgs, tenants, extractTenantCode, tenant => tenant.externalId.value)
+    .forEach(async ([org, tenant]) => {
+      if (org.anac_abilitato)
+        await assignAttribute(tenant, attributes.anacAbilitato)
+      else
+        await unassignAttribute(tenant, attributes.anacAbilitato)
 
+      if (org.anac_in_convalida)
+        await assignAttribute(tenant, attributes.anacInConvalida)
+      else
+        await unassignAttribute(tenant, attributes.anacInConvalida)
+
+      if (org.anac_incaricato)
+        await assignAttribute(tenant, attributes.anacIncaricato)
+      else
+        await unassignAttribute(tenant, attributes.anacIncaricato)
+
+    })
+
+  // TODO Take actual attributes flag to assing/unassign
+  // cartesian(attributes, tenants)
+  //   .forEach(async ([attribute, tenant]) => assignAttribute(tenant, attribute))
+
+}
+
+/**
+ * Zip two arrays based on a matching key
+ * Non-matching values are discarded
+ * @param a 
+ * @param b 
+ * @param getValueA Function that extracts the key for array a
+ * @param getValueB Function that extracts the key for array b
+ * @returns 
+ */
+function zipBy<A, B, K>(a: A[], b: B[], getValueA: (a: A) => K, getValueB: (b: B) => K): [A, B][] {
+  const mapB = new Map<K, B>()
+
+  b.forEach(bv => mapB.set(getValueB(bv), bv))
+
+  return a
+    .map(av => [av, mapB.get(getValueA(av))])
+    .filter(([_, bv]) => bv !== undefined) as [A, B][] // TODO Is there a better way to match types?
 }
 
 async function assignAttribute(tenant: PersistentTenant, attribute: AttributeIdentifiers): Promise<void> {
@@ -161,11 +206,22 @@ async function assignAttribute(tenant: PersistentTenant, attribute: AttributeIde
   }
 }
 
-
-function cartesian<A, B>(a: A[], b: B[]): [A, B][] {
-  const toTuple = (a: A, b: B): [A, B] => [a, b]
-  return a.flatMap(a => b.map(b => toTuple(a, b)))
+async function unassignAttribute(tenant: PersistentTenant, attribute: AttributeIdentifiers): Promise<void> {
+  if (tenantContainsAttribute(tenant, attribute.id)) {
+    const token = await refreshableToken.get()
+    const context: InteropContext = {
+      correlationId: crypto.randomUUID(),
+      bearerToken: token.serialized
+    }
+    await tenantProcess.internalRevokeCertifiedAttribute(tenant.externalId.origin, tenant.externalId.value, attribute.externalId.origin, attribute.externalId.value, context)
+  }
 }
+
+
+// function cartesian<A, B>(a: A[], b: B[]): [A, B][] {
+//   const toTuple = (a: A, b: B): [A, B] => [a, b]
+//   return a.flatMap(a => b.map(b => toTuple(a, b)))
+// }
 
 function tenantContainsAttribute(tenant: PersistentTenant, attributeId: string): boolean {
   return tenant.attributes.find(attribute => attribute.id === attributeId) !== undefined

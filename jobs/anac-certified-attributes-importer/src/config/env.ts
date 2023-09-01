@@ -31,7 +31,6 @@ const envSchema = z.object({
   INTERNAL_JWT_SECONDS_DURATION: z.string().transform((v, _) => parseInt(v)),
 
   ANAC_TENANT_ID: z.string(),
-  ANAC_ATTRIBUTES_CODES: z.string().transform(value => value.split(',')),
 
   RECORDS_PROCESS_BATCH_SIZE: z.string().transform((v, _) => parseInt(v)),
 

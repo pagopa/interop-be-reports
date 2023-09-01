@@ -17,8 +17,26 @@ export class TenantProcessService {
         },
       },
     ).catch(err => {
-      error(context.correlationId, `Error on selfcareUpsertTenant. Reason: ${err.message}`)
+      error(context.correlationId, `Error on internalAssignCertifiedAttribute. Reason: ${err.message}`)
       throw Error(`Unexpected response from internalAssignCertifiedAttribute. Reason: ${err.message}`)
+    });
+    return data;
+  }
+
+
+  public async internalRevokeCertifiedAttribute(tenantOrigin: string, tenantExternalId: string, attributeOrigin: string, attributeExternalId: string, context: InteropContext): Promise<void> {
+    const { data } = await axios.delete<void>(
+      `${this.tenantProcessUrl}/internal/origin/${tenantOrigin}/externalId/${tenantExternalId}/attributes/origin/${attributeOrigin}/externalId/${attributeExternalId}`,
+      {
+        headers: {
+          'X-Correlation-Id': context.correlationId,
+          'Authorization': `Bearer ${context.bearerToken}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    ).catch(err => {
+      error(context.correlationId, `Error on internalRevokeCertifiedAttribute. Reason: ${err.message}`)
+      throw Error(`Unexpected response from internalRevokeCertifiedAttribute. Reason: ${err.message}`)
     });
     return data;
   }
