@@ -1,4 +1,4 @@
-import { SafeMap, b64ByteUrlEncode, b64UrlEncode, toCSV, withExecutionTime } from '../helpers.utils.js'
+import { SafeMap, b64ByteUrlEncode, b64UrlEncode, toCSV, withExecutionTime, zipBy } from '../helpers.utils.js'
 
 describe('toCSV', () => {
   it('should return a CSV string from an array of objects', () => {
@@ -60,4 +60,47 @@ describe('b64ByteUrlEncode', () => {
 
     expect(b64ByteUrlEncode(toEncode)).toEqual(expected)
   })
+})
+
+describe('zipBy', () => {
+  it('should zip arrays of the same size', () => {
+
+    const a = [{ x: "x1", y: "y1" }, { x: "x2", y: "y2" }, { x: "x3", y: "y3" }]
+    const b = [{ k: "x1", z: "z1" }, { k: "x2", z: "z2" }, { k: "x3", z: "z3" }]
+
+    const expected = [
+      [{ x: "x1", y: "y1" }, { k: "x1", z: "z1" }],
+      [{ x: "x2", y: "y2" }, { k: "x2", z: "z2" }],
+      [{ x: "x3", y: "y3" }, { k: "x3", z: "z3" }]
+    ]
+
+    expect(zipBy(a, b, av => av.x, bv => bv.k)).toEqual(expected)
+  })
+
+  it('should zip arrays exclude elements in the first array that are not in the second', () => {
+
+    const a = [{ x: "x1", y: "y1" }, { x: "x2", y: "y2" }, { x: "x3", y: "y3" }]
+    const b = [{ k: "x1", z: "z1" }, { k: "x2", z: "z2" }]
+
+    const expected = [
+      [{ x: "x1", y: "y1" }, { k: "x1", z: "z1" }],
+      [{ x: "x2", y: "y2" }, { k: "x2", z: "z2" }],
+    ]
+
+    expect(zipBy(a, b, av => av.x, bv => bv.k)).toEqual(expected)
+  })
+
+  it('should zip arrays exclude elements in the second array that are not in the first', () => {
+
+    const a = [{ x: "x1", y: "y1" }, { x: "x2", y: "y2" }]
+    const b = [{ k: "x1", z: "z1" }, { k: "x2", z: "z2" }, { k: "x3", z: "z3" }]
+
+    const expected = [
+      [{ x: "x1", y: "y1" }, { k: "x1", z: "z1" }],
+      [{ x: "x2", y: "y2" }, { k: "x2", z: "z2" }],
+    ]
+
+    expect(zipBy(a, b, av => av.x, bv => bv.k)).toEqual(expected)
+  })
+
 })

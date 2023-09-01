@@ -6,4 +6,4 @@ export const info = (correlationId: string, message: string) : void => console.l
 
 export const warn = (correlationId: string, message: string) : void => console.log(`${timestamp()} WARN [CID=${correlationId}] ${message}`)
 
-export const error = (correlationId: string, message: string) : void => console.log(`${timestamp()} ERROR [CID=${correlationId}] ${message}`)
+export const error = (correlationId: string, message: string, reason: any | undefined) : void => console.error(`${timestamp()} ERROR [CID=${correlationId}] ${message}`, reason)
