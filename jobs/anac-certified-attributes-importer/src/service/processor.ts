@@ -1,37 +1,10 @@
-import { env } from "../config/index.js"
+import { ANAC_ABILITATO_CODE, ANAC_INCARICATO_CODE, ANAC_IN_CONVALIDA_CODE, env } from "../config/index.js"
 import { parse } from 'csv/sync';
-import { CsvRow, NonPaRow, PaRow, PersistentTenant, InteropContext } from '../model/index.js';
+import { CsvRow, NonPaRow, PaRow, PersistentTenant, InteropContext, AnacAttributes, BatchParseResult, AttributeIdentifiers } from '../model/index.js';
 import { getAttributeByExternalId, getNonPATenants, getPATenants, getTenantById, SftpClient, TenantProcessService } from "../service/index.js";
 import { ReadModelClient, RefreshableInteropToken, zipBy } from "@interop-be-reports/commons";
 import { error, warn } from "../utils/logger.js";
 import crypto from "crypto"
-
-// TODO Get name of csv header to force constraint?
-const ANAC_ABILITATO_CODE = "anac_abilitato"
-const ANAC_INCARICATO_CODE = "anac_incaricato"
-const ANAC_IN_CONVALIDA_CODE = "anac_in_convalida"
-
-type BatchParseResult = {
-  processedRecordsCount: number
-  records: CsvRow[]
-}
-
-type PersistentExternalId = {
-  origin: string
-  value: string
-}
-
-type AttributeIdentifiers = {
-  id: string
-  externalId: PersistentExternalId
-}
-
-type AnacAttributes = {
-  anacAbilitato: AttributeIdentifiers,
-  anacInConvalida: AttributeIdentifiers,
-  anacIncaricato: AttributeIdentifiers
-}
-
 
 export async function process(sftpClient: SftpClient, readModelClient: ReadModelClient, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken): Promise<void> {
   const jobCorrelationId = crypto.randomUUID()
