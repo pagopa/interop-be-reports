@@ -15,8 +15,8 @@ export async function importAttributes(sftpClient: SftpClient, readModel: ReadMo
 
   const preparedProcessTenants = processTenants(tenantProcess, refreshableToken, attributes, jobCorrelationId)
 
-  var scanComplete = false
-  var fromLine = 1
+  let scanComplete = false
+  let fromLine = 1
 
   do {
     const batchResult: BatchParseResult = getBatch(fileContent, fromLine, batchSize, jobCorrelationId)
@@ -134,7 +134,7 @@ function getMissingTenants(expectedExternalId: string[], tenants: PersistentTena
 }
 
 function getBatch(fileContent: string, fromLine: number, batchSize: number, jobCorrelationId: string): BatchParseResult {
-  const rawRecords = parse(fileContent, { trim: true, columns: true, from: fromLine, to: fromLine + batchSize - 1 }) as Array<any>
+  const rawRecords = parse(fileContent, { trim: true, columns: true, from: fromLine, to: fromLine + batchSize - 1 }) as Array<object>
 
   const records: CsvRow[] = rawRecords.map((value, index) => {
     const result = CsvRow.safeParse(value)

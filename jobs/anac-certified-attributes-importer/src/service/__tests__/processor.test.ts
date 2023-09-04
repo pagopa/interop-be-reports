@@ -1,6 +1,6 @@
 import { InteropTokenGenerator, ReadModelClient, RefreshableInteropToken, generateInternalTokenMock } from "@interop-be-reports/commons"
 import { ReadModelQueries, SftpClient, TenantProcessService, importAttributes } from "../index.js"
-import { ATTRIBUTE_ANAC_ABILITATO_ID, ATTRIBUTE_ANAC_INCARICATO_ID, downloadCSVMock, downloadCSVMockGenerator, getAttributeByExternalIdMock, getNonPATenantsMock, getPATenantsMock, getTenantByIdMock, getTenantByIdMockGenerator, getTenantsMockGenerator, internalAssignCertifiedAttributeMock, internalRevokeCertifiedAttributeMock, persistentAttribute, persistentTenant, persistentTenantAttribute, sftpConfigTest } from "./helpers.js"
+import { ATTRIBUTE_ANAC_ABILITATO_ID, ATTRIBUTE_ANAC_INCARICATO_ID, downloadCSVMock, downloadCSVMockGenerator, getAttributeByExternalIdMock, getNonPATenantsMock, getPATenantsMock, getTenantByIdMock, getTenantByIdMockGenerator, getTenantsMockGenerator, internalAssignCertifiedAttributeMock, internalRevokeCertifiedAttributeMock, persistentTenant, persistentTenantAttribute, sftpConfigTest } from "./helpers.js"
 import { PersistentTenant } from "../../model/tenant.model.js"
 
 
