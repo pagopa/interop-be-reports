@@ -1,6 +1,6 @@
 import { InteropTokenGenerator, ReadModelClient, RefreshableInteropToken, generateInternalTokenMock } from "@interop-be-reports/commons"
 import { ReadModelQueries, SftpClient, TenantProcessService, importAttributes } from "../index.js"
-import { ATTRIBUTE_ANAC_ABILITATO_ID, ATTRIBUTE_ANAC_IN_CONVALIDA_ID, downloadCSVMock, getAttributeByExternalIdMock, getNonPATenantsMock, getPATenantsMock, getTenantByIdMock, internalAssignCertifiedAttributeMock, internalRevokeCertifiedAttributeMock, persistentAttribute, persistentTenant, persistentTenantAttribute, sftpConfigTest } from "./helpers.js"
+import { ATTRIBUTE_ANAC_ABILITATO_ID, ATTRIBUTE_ANAC_INCARICATO_ID, downloadCSVMock, downloadCSVMockGenerator, getAttributeByExternalIdMock, getNonPATenantsMock, getPATenantsMock, getTenantByIdMock, getTenantsMockGenerator, internalAssignCertifiedAttributeMock, internalRevokeCertifiedAttributeMock, persistentAttribute, persistentTenant, persistentTenantAttribute, sftpConfigTest } from "./helpers.js"
 import { PersistentTenant } from "../../model/tenant.model.js"
 
 
@@ -13,7 +13,7 @@ describe('ANAC Certified Attributes Importer', () => {
   const readModelClient = {} as ReadModelClient
   const readModelQueriesMock = new ReadModelQueries(readModelClient, 'tenants', 'attributes')
 
-  const run = () => importAttributes(sftpClientMock, readModelQueriesMock, tenantProcessMock, refreshableTokenMock, 1, 'anac-tenant-id')
+  const run = () => importAttributes(sftpClientMock, readModelQueriesMock, tenantProcessMock, refreshableTokenMock, 10, 'anac-tenant-id')
 
   // const loggerMock = vitest.fn()
 
@@ -50,7 +50,7 @@ describe('ANAC Certified Attributes Importer', () => {
     expect(getAttributeByExternalIdSpy).toBeCalledTimes(3)
 
     expect(getPATenantsSpy).toBeCalledTimes(1)
-    expect(getNonPATenantsSpy).toBeCalledTimes(2)
+    expect(getNonPATenantsSpy).toBeCalledTimes(1)
 
     expect(refreshableInternalTokenSpy).toBeCalled()
     expect(internalAssignCertifiedAttributeSpy).toBeCalled()
@@ -61,18 +61,18 @@ describe('ANAC Certified Attributes Importer', () => {
   it('should succeed, assigning only missing attributes', async () => {
     const csvFileContent =
       `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
-0123456789,Nome ente presente in IPA,gsp1@pec.it,DRMEST,TRUE,TRUE,TRUE`
-
-    const localDownloadCSVMock = (): Promise<string> => Promise.resolve(csvFileContent)
-    const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE`
 
     const readModelTenants: PersistentTenant[] = [{
       ...persistentTenant,
-      externalId: { origin: 'IPA', value: 'DRMEST' },
+      externalId: { origin: 'IPA', value: 'ipa_code_123' },
       attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_ABILITATO_ID }]
     }]
 
-    const getPATenantsMock = (_ipaCodes: string[]): Promise<PersistentTenant[]> => Promise.resolve(readModelTenants)
+    const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
+    const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+
+    const getPATenantsMock = getTenantsMockGenerator(_ => readModelTenants)
     const getPATenantsSpy = vi.spyOn(readModelQueriesMock, 'getPATenants').mockImplementation(getPATenantsMock)
 
     await run()
@@ -90,9 +90,72 @@ describe('ANAC Certified Attributes Importer', () => {
 
   })
 
-  it('should succeed, unassigning only existing attributes', async () => { })
+  it('should succeed, unassigning only existing attributes', async () => {
+    const csvFileContent =
+      `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
+0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,FALSE,FALSE,FALSE`
 
-  it('should succeed, only for tenants that exist on read model ', async () => { })
+    const readModelTenants: PersistentTenant[] = [{
+      ...persistentTenant,
+      externalId: { origin: 'IPA', value: 'ipa_code_123' },
+      attributes: [
+        { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_ABILITATO_ID },
+        { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_INCARICATO_ID }
+      ]
+    }]
+
+    const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
+    const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+
+    const getPATenantsMock = getTenantsMockGenerator(_ => readModelTenants)
+    const getPATenantsSpy = vi.spyOn(readModelQueriesMock, 'getPATenants').mockImplementation(getPATenantsMock)
+
+    await run()
+
+    expect(downloadCSVSpy).toBeCalledTimes(1)
+    expect(getTenantByIdSpy).toBeCalledTimes(1)
+    expect(getAttributeByExternalIdSpy).toBeCalledTimes(3)
+
+    expect(getPATenantsSpy).toBeCalledTimes(1)
+    expect(getNonPATenantsSpy).toBeCalledTimes(0)
+
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
+    expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
+    expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(2)
+
+  })
+
+  it('should succeed, only for tenants that exist on read model ', async () => {
+    const csvFileContent =
+      `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
+0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE
+9876543210,Org name not in Tenants,gsp2@pec.it,ipa_code_456,TRUE,TRUE,TRUE`
+
+    const readModelTenants: PersistentTenant[] = [{
+      ...persistentTenant,
+      externalId: { origin: 'IPA', value: 'ipa_code_123' },
+      attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_ABILITATO_ID }]
+    }]
+
+    const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
+    const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+
+    const getPATenantsMock = getTenantsMockGenerator(_ => readModelTenants)
+    const getPATenantsSpy = vi.spyOn(readModelQueriesMock, 'getPATenants').mockImplementation(getPATenantsMock)
+
+    await run()
+
+    expect(downloadCSVSpy).toBeCalledTimes(1)
+    expect(getTenantByIdSpy).toBeCalledTimes(1)
+    expect(getAttributeByExternalIdSpy).toBeCalledTimes(3)
+
+    expect(getPATenantsSpy).toBeCalledTimes(1)
+    expect(getNonPATenantsSpy).toBeCalledTimes(0)
+
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
+    expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
+    expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
+  })
 
   it('should succeed with more than one batch', async () => { })
 

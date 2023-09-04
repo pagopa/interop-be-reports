@@ -21,7 +21,7 @@ export async function importAttributes(sftpClient: SftpClient, readModel: ReadMo
   do {
     const batchResult: BatchParseResult = getBatch(fileContent, fromLine, batchSize, jobCorrelationId)
 
-    // TODO Not sure these type checks are ok
+    // TODO Not sure this is the best way to satisfy type checks
     const paOrgs: PaRow[] = batchResult.records.map((org: CsvRow) => {
       if ("codice_ipa" in org && org.codice_ipa) return org as PaRow
       else return null
@@ -79,25 +79,26 @@ const processTenants =
       if (missingTenants.length !== 0)
         logWarn(jobCorrelationId, `Organizations in CSV not found in Tenants for codes: ${missingTenants}`)
 
-      zipBy(orgs, tenants, extractTenantCode, tenant => tenant.externalId.value)
-        .forEach(async ([org, tenant]) => {
-          if (org.anac_abilitato)
-            await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacAbilitato)
-          else
-            await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacAbilitato)
+      await Promise.all(
+        zipBy(orgs, tenants, extractTenantCode, tenant => tenant.externalId.value)
+          .map(async ([org, tenant]) => {
+            if (org.anac_abilitato)
+              await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacAbilitato)
+            else
+              await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacAbilitato)
 
-          if (org.anac_in_convalida)
-            await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacInConvalida)
-          else
-            await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacInConvalida)
+            if (org.anac_in_convalida)
+              await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacInConvalida)
+            else
+              await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacInConvalida)
 
-          if (org.anac_incaricato)
-            await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacIncaricato)
-          else
-            await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacIncaricato)
+            if (org.anac_incaricato)
+              await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacIncaricato)
+            else
+              await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacIncaricato)
 
-        })
-
+          })
+      )
     }
 
 async function assignAttribute(tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken, tenant: PersistentTenant, attribute: AttributeIdentifiers): Promise<void> {
