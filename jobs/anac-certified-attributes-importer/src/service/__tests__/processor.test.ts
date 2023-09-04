@@ -194,7 +194,7 @@ describe('ANAC Certified Attributes Importer', () => {
     const localDownloadCSVMock = (): Promise<string> => Promise.reject(new Error('CSV Retrieve error'))
     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
 
-    expect(() => run()).rejects.toThrowError('CSV Retrieve error')
+    await expect(() => run()).rejects.toThrowError('CSV Retrieve error')
 
     expect(downloadCSVSpy).toBeCalledTimes(1)
     expect(getTenantByIdSpy).toBeCalledTimes(0)

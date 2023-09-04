@@ -42,7 +42,7 @@ describe('Message processor', () => {
 
     const message = { ...kafkaMessage, value: Buffer.from('{ not-a : "correct-json"') }
 
-    expect(() => configuredProcessor(message, 0)).rejects.toThrowError(/Error.*partition.*offset.*Reason/)
+    await expect(() => configuredProcessor(message, 0)).rejects.toThrowError(/Error.*partition.*offset.*Reason/)
 
     expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(0)
@@ -64,7 +64,7 @@ describe('Message processor', () => {
 
     const message = { ...kafkaMessage, value: Buffer.from(`{ "product" : "${interopProductName}", "this-schema" : "was-unexpected" }`) }
 
-    expect(() => configuredProcessor(message, 0)).rejects.toThrowError(/Error.*partition.*offset.*Reason/)
+    await expect(() => configuredProcessor(message, 0)).rejects.toThrowError(/Error.*partition.*offset.*Reason/)
 
     expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(0)
