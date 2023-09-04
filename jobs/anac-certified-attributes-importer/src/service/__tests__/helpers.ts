@@ -22,6 +22,7 @@ export const ATTRIBUTE_ANAC_IN_CONVALIDA_ID = '97dec753-8a6e-4a25-aa02-95ac8602b
 
 export const downloadCSVMockGenerator = (csvContent: string) => (): Promise<string> => Promise.resolve(csvContent)
 export const getTenantsMockGenerator = (f: (codes: string[]) => PersistentTenant[]) => (codes: string[]): Promise<PersistentTenant[]> => Promise.resolve(f(codes))
+export const getTenantByIdMockGenerator = (f: (tenantId: string) => PersistentTenant) => (tenantId: string): Promise<PersistentTenant> => Promise.resolve(f(tenantId))
 
 export const downloadCSVMock = downloadCSVMockGenerator(csvFileContent)
 
@@ -30,7 +31,7 @@ export const internalRevokeCertifiedAttributeMock = (_tenantOrigin: string, _ten
 
 export const getPATenantsMock = getTenantsMockGenerator(ipaCodes => ipaCodes.map(c => ({ ...persistentTenant, externalId: { origin: 'tenantOrigin', value: c } })))
 export const getNonPATenantsMock = getTenantsMockGenerator(taxCodes => taxCodes.map(c => ({ ...persistentTenant, externalId: { origin: 'tenantOrigin', value: c } })))
-export const getTenantByIdMock = (tenantId: string): Promise<PersistentTenant> => Promise.resolve({ ...persistentTenant, id: tenantId, features: [{ type: 'PersistentCertifier', certifierId: 'ANAC' }] })
+export const getTenantByIdMock = getTenantByIdMockGenerator(tenantId => ({ ...persistentTenant, id: tenantId, features: [{ type: 'PersistentCertifier', certifierId: 'ANAC' }] }))
 export const getAttributeByExternalIdMock = (origin: string, code: string): Promise<PersistentAttribute> => {
   switch (code) {
     case ANAC_ABILITATO_CODE:
