@@ -228,8 +228,6 @@ describe('ANAC Certified Attributes Importer', () => {
     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
   })
 
-  it('should fail if one attribute does not exist', async () => { })
-
   it('should skip CSV file rows with unexpected schema', async () => {
     const csvFileContent =
       `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
