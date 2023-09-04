@@ -40,4 +40,10 @@ const envSchema = z.object({
 export type Env = z.infer<typeof envSchema>
 
 dotenv.config()
+
+// Skip env runtime check if we are in test environment
+if (process.env.NODE_ENV !== 'test') {
+  envSchema.parse(process.env)
+}
+
 export const env: Env = envSchema.parse(process.env)
