@@ -1,4 +1,3 @@
-
 FROM node:18-alpine AS base
 
 FROM base AS builder
@@ -30,4 +29,5 @@ RUN pnpm install --frozen-lockfile
 # Build the project
 COPY --from=builder /app/out/full/ .
 RUN pnpm dlx turbo run build --filter=anac-certified-attributes-importer
-RUN ln -s ./jobs/anac-certified-attributes-importer/dist ./dist
+
+CMD node ./jobs/anac-certified-attributes-importer/dist
