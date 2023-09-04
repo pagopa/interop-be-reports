@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod'
 
 export const PersistentTenantRevoker = z.object({
   id: z.string().uuid(),
@@ -42,20 +42,21 @@ export const PersistentVerifiedAttribute = z.object({
 })
 export type PersistentVerifiedAttribute = z.infer<typeof PersistentVerifiedAttribute>
 
-export const PersistentTenantAttribute = PersistentCertifiedAttribute.or(PersistentVerifiedAttribute).or(PersistentDeclaredAttribute)
+export const PersistentTenantAttribute =
+  PersistentCertifiedAttribute.or(PersistentVerifiedAttribute).or(PersistentDeclaredAttribute)
 
 export type PersistentTenantAttribute = z.infer<typeof PersistentTenantAttribute>
 
 export const PersistentExternalId = z.object({
   origin: z.string(),
-  value: z.string()
+  value: z.string(),
 })
 
 export type PersistentExternalId = z.infer<typeof PersistentExternalId>
 
 export const PersistentTenantFeatureCertifier = z.object({
   type: z.literal('PersistentCertifier'),
-  certifierId: z.string()
+  certifierId: z.string(),
 })
 
 export type PersistentTenantFeatureCertifier = z.infer<typeof PersistentTenantFeatureCertifier>
@@ -74,6 +75,6 @@ export const PersistentTenant = z.object({
   id: z.string(),
   externalId: PersistentExternalId,
   attributes: z.array(PersistentTenantAttribute),
-  features: z.array(PersistentTenantFeatureCertifier)
-});
+  features: z.array(PersistentTenantFeatureCertifier),
+})
 export type PersistentTenant = z.infer<typeof PersistentTenant>

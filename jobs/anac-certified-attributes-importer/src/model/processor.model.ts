@@ -1,4 +1,4 @@
-import { CsvRow, PersistentExternalId } from "./index.js"
+import { CsvRow, PersistentExternalId } from './index.js'
 
 export type BatchParseResult = {
   processedRecordsCount: number
@@ -11,7 +11,7 @@ export type AttributeIdentifiers = {
 }
 
 export type AnacAttributes = {
-  anacAbilitato: AttributeIdentifiers,
-  anacInConvalida: AttributeIdentifiers,
+  anacAbilitato: AttributeIdentifiers
+  anacInConvalida: AttributeIdentifiers
   anacIncaricato: AttributeIdentifiers
 }

@@ -1,4 +1,10 @@
-import { InteropTokenGenerator, ReadModelClient, ReadModelConfig, RefreshableInteropToken, TokenGenerationConfig } from '@interop-be-reports/commons'
+import {
+  InteropTokenGenerator,
+  ReadModelClient,
+  ReadModelConfig,
+  RefreshableInteropToken,
+  TokenGenerationConfig,
+} from '@interop-be-reports/commons'
 import { ReadModelQueries, SftpClient, TenantProcessService, importAttributes } from './service/index.js'
 import { SftpConfig, env } from './config/index.js'
 
@@ -32,12 +38,23 @@ const tokenGeneratorConfig: TokenGenerationConfig = {
 
 const sftpClient: SftpClient = new SftpClient(sftpConfig)
 const readModelClient: ReadModelClient = await ReadModelClient.connect(readModelConfig)
-const readModelQueries: ReadModelQueries = new ReadModelQueries(readModelClient, env.TENANTS_COLLECTION_NAME, env.ATTRIBUTES_COLLECTION_NAME)
+const readModelQueries: ReadModelQueries = new ReadModelQueries(
+  readModelClient,
+  env.TENANTS_COLLECTION_NAME,
+  env.ATTRIBUTES_COLLECTION_NAME
+)
 
 const tokenGenerator = new InteropTokenGenerator(tokenGeneratorConfig)
 const refreshableToken = new RefreshableInteropToken(tokenGenerator)
 const tenantProcess = new TenantProcessService(env.TENANT_PROCESS_URL)
 
-await importAttributes(sftpClient, readModelQueries, tenantProcess, refreshableToken, env.RECORDS_PROCESS_BATCH_SIZE, env.ANAC_TENANT_ID)
+await importAttributes(
+  sftpClient,
+  readModelQueries,
+  tenantProcess,
+  refreshableToken,
+  env.RECORDS_PROCESS_BATCH_SIZE,
+  env.ANAC_TENANT_ID
+)
 
 await readModelClient.close()
