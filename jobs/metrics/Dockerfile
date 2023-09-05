@@ -30,4 +30,5 @@ RUN pnpm install --frozen-lockfile
 # Build the project
 COPY --from=builder /app/out/full/ .
 RUN pnpm dlx turbo run build --filter=metrics
-RUN ln -s ./jobs/metrics/dist ./dist
+
+CMD node ./jobs/metrics/dist
