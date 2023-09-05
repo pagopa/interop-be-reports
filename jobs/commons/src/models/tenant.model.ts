@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const tenantAttributeSchema = z.object({
+export const TenantAttribute = z.object({
   id: z.string(),
   type: z.union([
     z.literal('PersistentCertifiedAttribute'),
@@ -9,14 +9,14 @@ export const tenantAttributeSchema = z.object({
   ]),
 })
 
-export const tenantSchema = z.object({
+export const Tenant = z.object({
   id: z.string(),
   name: z.string(),
-  attributes: z.array(tenantAttributeSchema),
+  attributes: z.array(TenantAttribute),
 })
 
-export type TenantAttribute = z.infer<typeof tenantAttributeSchema>
-export type Tenant = z.infer<typeof tenantSchema>
+export type TenantAttribute = z.infer<typeof TenantAttribute>
+export type Tenant = z.infer<typeof Tenant>
 
-export const tenantsSchema = z.array(tenantSchema)
-export type Tenants = z.infer<typeof tenantsSchema>
+export const Tenants = z.array(Tenant)
+export type Tenants = z.infer<typeof Tenants>

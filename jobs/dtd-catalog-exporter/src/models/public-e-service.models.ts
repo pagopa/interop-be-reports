@@ -1,56 +1,50 @@
 import { z } from 'zod'
 
-const publicEServiceAttributeSchema = z.object({
+const PublicEServiceAttribute = z.object({
   name: z.string(),
   description: z.string(),
 })
 
-const publicEServiceAttributeSingleSchema = z.object({
-  single: publicEServiceAttributeSchema,
+const PublicEServiceAttributeSingle = z.object({
+  single: PublicEServiceAttribute,
 })
 
-const publicEServiceAttributesGroupSchema = z.object({
-  group: z.array(publicEServiceAttributeSchema),
+const PublicEServiceAttributesGroup = z.object({
+  group: z.array(PublicEServiceAttribute),
 })
 
-const publicEServiceAttributesSchema = z.object({
-  certified: z.array(
-    z.union([publicEServiceAttributeSingleSchema, publicEServiceAttributesGroupSchema])
-  ),
-  verified: z.array(
-    z.union([publicEServiceAttributeSingleSchema, publicEServiceAttributesGroupSchema])
-  ),
-  declared: z.array(
-    z.union([publicEServiceAttributeSingleSchema, publicEServiceAttributesGroupSchema])
-  ),
+const PublicEServiceAttributes = z.object({
+  certified: z.array(z.union([PublicEServiceAttributeSingle, PublicEServiceAttributesGroup])),
+  verified: z.array(z.union([PublicEServiceAttributeSingle, PublicEServiceAttributesGroup])),
+  declared: z.array(z.union([PublicEServiceAttributeSingle, PublicEServiceAttributesGroup])),
 })
 
-const publicEServiceDocSchema = z.object({
+const PublicEServiceDoc = z.object({
   filename: z.string(),
   prettyName: z.string(),
 })
 
-const publicEServiceDescriptorSchema = z.object({
+const PublicEServiceDescriptor = z.object({
   id: z.string(),
   state: z.enum(['PUBLISHED', 'SUSPENDED']),
   version: z.string(),
 })
 
-export const publicEServiceSchema = z.object({
-  activeDescriptor: publicEServiceDescriptorSchema,
+export const PublicEService = z.object({
+  activeDescriptor: PublicEServiceDescriptor,
   technology: z.enum(['REST', 'SOAP']),
   producerName: z.string(),
   id: z.string(),
   name: z.string(),
   description: z.string(),
-  attributes: publicEServiceAttributesSchema,
+  attributes: PublicEServiceAttributes,
 })
 
-export type PublicEService = z.infer<typeof publicEServiceSchema>
-export type PublicEServiceDoc = z.infer<typeof publicEServiceDocSchema>
-export type PublicEServiceDescriptor = z.infer<typeof publicEServiceDescriptorSchema>
-export type PublicEServiceAttribute = z.infer<typeof publicEServiceAttributeSchema>
-export type PublicEServiceAttributes = z.infer<typeof publicEServiceAttributesSchema>
+export type PublicEService = z.infer<typeof PublicEService>
+export type PublicEServiceDoc = z.infer<typeof PublicEServiceDoc>
+export type PublicEServiceDescriptor = z.infer<typeof PublicEServiceDescriptor>
+export type PublicEServiceAttribute = z.infer<typeof PublicEServiceAttribute>
+export type PublicEServiceAttributes = z.infer<typeof PublicEServiceAttributes>
 
-export const publicEServicesSchema = z.array(publicEServiceSchema)
-export type PublicEServices = z.infer<typeof publicEServicesSchema>
+export const PublicEServices = z.array(PublicEService)
+export type PublicEServices = z.infer<typeof PublicEServices>

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import dotenv from 'dotenv'
 
-const envSchema = z.object({
+const Env = z.object({
   LANGS: z.string().transform((value) => value.split(',')),
 
   CONTENT_STORAGE_BUCKET: z.string(),
@@ -15,7 +15,7 @@ const envSchema = z.object({
   PRIVACY_NOTICES_DYNAMO_TABLE_NAME: z.string(),
 })
 
-type Env = z.infer<typeof envSchema>
+type Env = z.infer<typeof Env>
 
 dotenv.config()
-export const env: Env = envSchema.parse(process.env)
+export const env: Env = Env.parse(process.env)

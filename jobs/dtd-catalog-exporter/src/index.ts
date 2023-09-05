@@ -5,7 +5,7 @@ import {
   remapEServiceToPublicEService,
   getSafeMapFromIdentifiableRecords,
 } from './utils/index.js'
-import { publicEServicesSchema } from './models/index.js'
+import { PublicEServices } from './models/index.js'
 import { withExecutionTime, AwsS3BucketClient } from '@interop-be-reports/commons'
 import { env } from './configs/env.js'
 
@@ -38,7 +38,7 @@ async function main() {
   })
 
   log('\nRemapping completed! Validating result...')
-  publicEServicesSchema.parse(publicEServices)
+  PublicEServices.parse(publicEServices)
 
   log('\nUploading result to S3 bucket...')
   await dtdCatalogBucketClient.uploadData(

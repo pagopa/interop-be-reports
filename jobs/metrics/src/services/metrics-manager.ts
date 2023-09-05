@@ -17,7 +17,7 @@ export class MetricsManager {
   /**
    * @see https://pagopa.atlassian.net/browse/PIN-3744
    **/
-  async getPublishedEServicesMetric() {
+  async getPublishedEServicesMetric(): Promise<PublishedEServicesMetric> {
     const publishedEServicesCount = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
@@ -35,7 +35,7 @@ export class MetricsManager {
   /**
    * @see https://pagopa.atlassian.net/browse/PIN-3745
    */
-  async getMacroCategoriesPublishedEServicesMetric() {
+  async getMacroCategoriesPublishedEServicesMetric(): Promise<MacroCategoriesPublishedEServicesMetric> {
     const result = await Promise.all(
       MACRO_CATEGORIES.map((macroCategory) =>
         this.getMacroCategoryPublishedEServiceCount(macroCategory)
@@ -47,7 +47,7 @@ export class MetricsManager {
   /**
    * @see https://pagopa.atlassian.net/browse/PIN-3746
    */
-  async getTop10MostSubscribedEServicesMetric() {
+  async getTop10MostSubscribedEServicesMetric(): Promise<Top10MostSubscribedEServicesMetric> {
     const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
@@ -108,7 +108,7 @@ export class MetricsManager {
   /**
    * @see https://pagopa.atlassian.net/browse/PIN-3746
    */
-  async getTop10MostSubscribedEServicesPerMacroCategoryMetric() {
+  async getTop10MostSubscribedEServicesPerMacroCategoryMetric(): Promise<Top10MostSubscribedEServicesPerMacroCategoryMetric> {
     const result = await Promise.all(
       MACRO_CATEGORIES.map((macroCategory) =>
         this.getMacroCategoryTop10MostSubscribedEServices(macroCategory)
@@ -121,7 +121,7 @@ export class MetricsManager {
   /**
    * @see https://pagopa.atlassian.net/browse/PIN-3747
    */
-  async getTop10ProviderWithMostSubscriberMetric() {
+  async getTop10ProviderWithMostSubscriberMetric(): Promise<Top10ProviderWithMostSubscriberMetric> {
     const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection(env.AGREEMENTS_COLLECTION_NAME)
@@ -302,7 +302,7 @@ export class MetricsManager {
 
   private async getMacroCategoryTop10MostSubscribedEServices(
     macroCategory: (typeof MACRO_CATEGORIES)[number]
-  ) {
+  ): Promise<Top10MostSubscribedEServicesPerMacroCategoryMetric[number]> {
     const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
@@ -489,13 +489,13 @@ export class MetricsManager {
     return {
       id: macroCategory.id,
       name: macroCategory.name,
-      top10MostSubscribedEServices: result,
+      top10MostSubscribedEServices: Top10MostSubscribedEServicesMetric.parse(result),
     }
   }
 
   private async getMacroCategoryPublishedEServiceCount(
     macroCategory: (typeof MACRO_CATEGORIES)[number]
-  ) {
+  ): Promise<MacroCategoriesPublishedEServicesMetric[number]> {
     const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)

@@ -1,10 +1,6 @@
 import axios, { AxiosInstance, toFormData } from 'axios'
 import { env, ONE_STRUST_API_ENDPOINT } from '../config/index.js'
-import {
-  GetNoticeContentResponseData,
-  getNoticeContentResponseDataSchema,
-  oneTrustNoticeVersion,
-} from '../models/index.js'
+import { GetNoticeContentResponseData, OneTrustNoticeVersion } from '../models/index.js'
 
 export class OneTrustClient {
   private otAxiosInstance: AxiosInstance
@@ -63,7 +59,7 @@ export class OneTrustClient {
     const date = new Date().toISOString().slice(0, -5)
     const url = `${ONE_STRUST_API_ENDPOINT}/privacynotice/v2/privacynotices/${noticeId}?date=${date}`
     const response = await this.otAxiosInstance.get(url)
-    return oneTrustNoticeVersion.parse(response.data)
+    return OneTrustNoticeVersion.parse(response.data)
   }
 
   /**
@@ -83,6 +79,6 @@ export class OneTrustClient {
        */
       headers: { 'Accept-Encoding': 'identity' },
     })
-    return getNoticeContentResponseDataSchema.parse(response.data)
+    return GetNoticeContentResponseData.parse(response.data)
   }
 }

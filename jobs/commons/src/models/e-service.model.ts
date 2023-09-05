@@ -1,44 +1,44 @@
 import { z } from 'zod'
 
-const descriptorAttributeSchema = z.object({
+const DescriptorAttribute = z.object({
   explicitAttributeVerification: z.boolean(),
   id: z.string(),
 })
 
-const descriptorAttributeSingleSchema = z.object({
-  id: descriptorAttributeSchema,
+const DescriptorAttributeSingle = z.object({
+  id: DescriptorAttribute,
 })
 
-const descriptorAttributesGroupSchema = z.object({
-  ids: z.array(descriptorAttributeSchema),
+const DescriptorAttributesGroup = z.object({
+  ids: z.array(DescriptorAttribute),
 })
 
-const descriptorAttributesSchema = z.object({
-  certified: z.array(z.union([descriptorAttributeSingleSchema, descriptorAttributesGroupSchema])),
-  verified: z.array(z.union([descriptorAttributeSingleSchema, descriptorAttributesGroupSchema])),
-  declared: z.array(z.union([descriptorAttributeSingleSchema, descriptorAttributesGroupSchema])),
+const DescriptorAttributes = z.object({
+  certified: z.array(z.union([DescriptorAttributeSingle, DescriptorAttributesGroup])),
+  verified: z.array(z.union([DescriptorAttributeSingle, DescriptorAttributesGroup])),
+  declared: z.array(z.union([DescriptorAttributeSingle, DescriptorAttributesGroup])),
 })
 
-export const eserviceDescriptorSchema = z.object({
+export const EServiceDescriptor = z.object({
   id: z.string(),
   state: z.enum(['Published', 'Draft', 'Deprecated', 'Suspended']),
   version: z.string(),
-  attributes: descriptorAttributesSchema,
+  attributes: DescriptorAttributes,
 })
 
-export const eserviceSchema = z.object({
+export const EService = z.object({
   description: z.string(),
-  descriptors: z.array(eserviceDescriptorSchema),
+  descriptors: z.array(EServiceDescriptor),
   id: z.string(),
   name: z.string(),
   producerId: z.string(),
   technology: z.enum(['Rest', 'Soap']),
 })
 
-export type EService = z.infer<typeof eserviceSchema>
-export type EServiceDescriptor = z.infer<typeof eserviceDescriptorSchema>
-export type DescriptorAttribute = z.infer<typeof descriptorAttributeSchema>
-export type DescriptorAttributes = z.infer<typeof descriptorAttributesSchema>
+export type EService = z.infer<typeof EService>
+export type EServiceDescriptor = z.infer<typeof EServiceDescriptor>
+export type DescriptorAttribute = z.infer<typeof DescriptorAttribute>
+export type DescriptorAttributes = z.infer<typeof DescriptorAttributes>
 
-export const eservicesSchema = z.array(eserviceSchema)
-export type EServices = z.infer<typeof eservicesSchema>
+export const EServices = z.array(EService)
+export type EServices = z.infer<typeof EServices>

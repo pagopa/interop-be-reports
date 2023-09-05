@@ -1,12 +1,6 @@
 import { MongoClient, MongoClientOptions, ReadPreferenceMode } from 'mongodb'
 import { env } from '../configs/env.js'
-import {
-  Tenant,
-  tenantSchema,
-  purposeSchema,
-  Purpose,
-  PurposeState,
-} from '@interop-be-reports/commons'
+import { Tenant, Purpose, PurposeState } from '@interop-be-reports/commons'
 
 export class ReadModelQueriesClient {
   private client: MongoClient
@@ -56,7 +50,7 @@ export class ReadModelQueriesClient {
           },
         }
       )
-      .map(({ data }) => purposeSchema.parse(data))
+      .map(({ data }) => Purpose.parse(data))
       .toArray()
   }
 
@@ -86,7 +80,7 @@ export class ReadModelQueriesClient {
           },
         }
       )
-      .map(({ data }) => tenantSchema.pick({ id: true, name: true }).parse(data))
+      .map(({ data }) => Tenant.pick({ id: true, name: true }).parse(data))
       .toArray()
   }
 

@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import { z } from 'zod'
 
-export const envSchema = z.object({
+export const Env = z.object({
   TENANTS_COLLECTION_NAME: z.string(),
   PURPOSES_COLLECTION_NAME: z.string(),
   ESERVICES_COLLECTION_NAME: z.string(),
@@ -26,12 +26,12 @@ export const envSchema = z.object({
     .optional(),
 })
 
-export type Env = z.infer<typeof envSchema>
+export type Env = z.infer<typeof Env>
 
 dotenv.config()
 
 if (process.env.NODE_ENV !== 'test') {
-  envSchema.parse(process.env)
+  Env.parse(process.env)
 }
 
 export const env = process.env as unknown as Env

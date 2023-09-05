@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const attributeSchema = z.object({
+export const Attribute = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string(),
@@ -8,7 +8,7 @@ export const attributeSchema = z.object({
   kind: z.enum(['Certified', 'Verified', 'Declared']),
 })
 
-export type Attribute = z.infer<typeof attributeSchema>
+export type Attribute = z.infer<typeof Attribute>
 
-export const attributesSchema = z.array(attributeSchema)
-export type Attributes = z.infer<typeof attributesSchema>
+export const Attributes = z.array(Attribute)
+export type Attributes = z.infer<typeof Attributes>

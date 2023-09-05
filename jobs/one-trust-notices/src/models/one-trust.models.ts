@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const oneTrustNoticeVersion = z.object({
+export const OneTrustNoticeVersion = z.object({
   id: z.string().uuid(),
   createdDate: z.string(),
   lastPublishedDate: z.string(),
@@ -14,9 +14,9 @@ export const oneTrustNoticeVersion = z.object({
   }),
 })
 
-export type OneTrustNoticeVersion = z.infer<typeof oneTrustNoticeVersion>
+export type OneTrustNoticeVersion = z.infer<typeof OneTrustNoticeVersion>
 
-export const oneTrustPublicNoticeSchema = z.object({
+export const OneTrustPublicNotice = z.object({
   content: z.string(),
   timestamp: z.string(),
   contentCss: z.array(z.string()),
@@ -27,12 +27,12 @@ export const oneTrustPublicNoticeSchema = z.object({
   targetElementAttribute: z.string(),
 })
 
-export type OneTrustPublicNotice = z.infer<typeof oneTrustPublicNoticeSchema>
+export type OneTrustPublicNotice = z.infer<typeof OneTrustPublicNotice>
 
-export const getNoticeContentResponseDataSchema = z.object({
+export const GetNoticeContentResponseData = z.object({
   schemaType: z.string(),
   schemaVersion: z.number(),
-  notices: z.record(z.string(), oneTrustPublicNoticeSchema),
+  notices: z.record(z.string(), OneTrustPublicNotice),
 })
 
-export type GetNoticeContentResponseData = z.infer<typeof getNoticeContentResponseDataSchema>
+export type GetNoticeContentResponseData = z.infer<typeof GetNoticeContentResponseData>
