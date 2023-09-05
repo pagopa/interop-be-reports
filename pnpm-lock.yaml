@@ -148,18 +148,9 @@ importers:
       '@interop-be-reports/commons':
         specifier: workspace:*
         version: link:../commons
-      axios:
-        specifier: ^1.4.0
-        version: 1.4.0
-      chalk:
-        specifier: ^5.3.0
-        version: 5.3.0
       dotenv:
         specifier: ^16.3.1
         version: 16.3.1
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
       mongodb:
         specifier: ^5.7.0
         version: 5.7.0
@@ -167,9 +158,6 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
     devDependencies:
-      '@types/lodash':
-        specifier: 4.14.196
-        version: 4.14.196
       '@types/node':
         specifier: 20.4.9
         version: 20.4.9
