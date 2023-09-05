@@ -6,7 +6,7 @@ const envSchema = z.object({
   SFTP_PORT: z.string().transform((v, _) => parseInt(v)),
   SFTP_USERNAME: z.string(),
   SFTP_PRIVATE_KEY: z.string(),
-  SFTP_PATH: z.string(),
+  SFTP_PATH: z.string().transform(value => value.endsWith('/') ? value : value + '/'),
 
   MONGODB_REPLICA_SET: z.string().optional(),
   MONGODB_DIRECT_CONNECTION: z

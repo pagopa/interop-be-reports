@@ -7,6 +7,7 @@ import {
 } from '@interop-be-reports/commons'
 import { ReadModelQueries, SftpClient, TenantProcessService, importAttributes } from './service/index.js'
 import { SftpConfig, env } from './config/index.js'
+import { filenameFromDate } from './utils/index.js'
 
 const readModelConfig: ReadModelConfig = {
   mongodbReplicaSet: env.MONGODB_REPLICA_SET,
@@ -20,12 +21,14 @@ const readModelConfig: ReadModelConfig = {
   readModelDbName: env.READ_MODEL_DB_NAME,
 }
 
+const csvFileName = env.FORCE_REMOTE_FILE_NAME ?? filenameFromDate(new Date())
+
 const sftpConfig: SftpConfig = {
   host: env.SFTP_HOST,
   port: env.SFTP_PORT,
   username: env.SFTP_USERNAME,
   privateKey: env.SFTP_PRIVATE_KEY,
-  filePath: env.SFTP_PATH + env.FORCE_REMOTE_FILE_NAME,
+  filePath: env.SFTP_PATH + csvFileName,
 }
 
 const tokenGeneratorConfig: TokenGenerationConfig = {
