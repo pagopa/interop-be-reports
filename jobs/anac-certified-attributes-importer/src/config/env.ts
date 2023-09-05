@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import dotenv from 'dotenv'
 
-const envSchema = z.object({
+const Env = z.object({
   SFTP_HOST: z.string(),
   SFTP_PORT: z.string().transform((v, _) => parseInt(v)),
   SFTP_USERNAME: z.string(),
@@ -42,9 +42,9 @@ const envSchema = z.object({
   FORCE_REMOTE_FILE_NAME: z.string().optional(),
 })
 
-export type Env = z.infer<typeof envSchema>
+export type Env = z.infer<typeof Env>
 
 dotenv.config()
 
 // Import env variables only for non-test environment
-export const env: Env = process.env.NODE_ENV !== 'test' ? envSchema.parse(process.env) : ({} as Env)
+export const env: Env = process.env.NODE_ENV !== 'test' ? Env.parse(process.env) : ({} as Env)
