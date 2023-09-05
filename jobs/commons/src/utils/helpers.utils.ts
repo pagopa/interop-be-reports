@@ -77,5 +77,5 @@ export function zipBy<A, B, K>(a: A[], b: B[], getValueA: (a: A) => K, getValueB
 
   return a
     .map(av => [av, mapB.get(getValueA(av))])
-    .filter(([_, bv]) => bv !== undefined) as [A, B][] // TODO Is there a better way to match types?
+    .filter(([_, bv]) => bv !== undefined) as [A, B][]
 }

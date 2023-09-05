@@ -37,7 +37,6 @@ export async function importAttributes(
   do {
     const batchResult: BatchParseResult = getBatch(fileContent, fromLine, batchSize, jobCorrelationId)
 
-    // TODO Not sure this is the best way to satisfy type checks
     const paOrgs: PaRow[] = batchResult.records
       .map((org: CsvRow) => {
         if ('codice_ipa' in org) return org
@@ -51,7 +50,6 @@ export async function importAttributes(
         else return org
       })
       .filter((r): r is NonPaRow => r !== null)
-    //
 
     await preparedProcessTenants(
       paOrgs,
