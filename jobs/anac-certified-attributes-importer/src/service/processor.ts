@@ -40,7 +40,7 @@ export async function importAttributes(
     // TODO Not sure this is the best way to satisfy type checks
     const paOrgs: PaRow[] = batchResult.records
       .map((org: CsvRow) => {
-        if ('codice_ipa' in org && org.codice_ipa) return org as PaRow
+        if ('codice_ipa' in org) return org
         else return null
       })
       .filter((r): r is PaRow => r !== null)
