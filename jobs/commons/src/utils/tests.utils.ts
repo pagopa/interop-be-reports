@@ -1,4 +1,5 @@
-import { cloneDeep, merge } from 'lodash'
+import cloneDeep from 'lodash/cloneDeep.js'
+import merge from 'lodash/merge.js'
 import { EService, Attribute, Tenant, Agreement } from '../models/index.js'
 
 /**
