@@ -11,7 +11,7 @@ import { env } from './configs/env.js'
 
 const log = console.log
 
-async function main() {
+async function main(): Promise<void> {
   const dtdCatalogBucketClient = new AwsS3BucketClient(env.DTD_CATALOG_STORAGE_BUCKET)
   log('Connecting to database...')
   const mongoDBEServiceClient = await MongoDBEServiceClient.connect()

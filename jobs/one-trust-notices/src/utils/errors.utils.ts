@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 
-export function resolveError(error: unknown) {
+export function resolveError(error: unknown): string {
   if (error instanceof AxiosError) {
     if (error.response) {
       // The request was made and the server responded with a status code

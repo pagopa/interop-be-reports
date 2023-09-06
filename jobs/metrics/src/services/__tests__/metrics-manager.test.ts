@@ -42,8 +42,8 @@ describe('MetricsManager', () => {
     await mongoServer?.stop()
   })
 
-  function seedCollection(collection: string, data: Array<{ data: unknown }>) {
-    return mongoClient.db(DB_NAME).collection(collection).insertMany(data)
+  async function seedCollection(collection: string, data: Array<{ data: unknown }>): Promise<void> {
+    await mongoClient.db(DB_NAME).collection(collection).insertMany(data)
   }
 
   function repeatObjInArray<T extends Record<'data', unknown>>(item: T, length: number): T[] {

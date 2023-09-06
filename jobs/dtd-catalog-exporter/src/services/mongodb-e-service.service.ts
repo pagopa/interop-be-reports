@@ -55,7 +55,7 @@ export class MongoDBEServiceClient {
    * @param attributeIds - The array of attributes ids
    * @returns The array of attributes
    **/
-  async getEServicesAttributes(attributeIds: Array<string>) {
+  async getEServicesAttributes(attributeIds: Array<string>): Promise<Array<Attribute>> {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: Attribute }>(env.ATTRIBUTES_COLLECTION_NAME)
@@ -72,7 +72,7 @@ export class MongoDBEServiceClient {
    * @param eservices - The array of e-services which all the attributes ids will be taken from
    * @returns The array of attributes
    **/
-  async getEServicesTenants(tenantIds: Array<string>) {
+  async getEServicesTenants(tenantIds: Array<string>): Promise<Array<Tenant>> {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: Tenant }>(env.TENANTS_COLLECTION_NAME)
@@ -87,7 +87,7 @@ export class MongoDBEServiceClient {
   /**
    * Closes the connection to the database
    * */
-  async close() {
+  async close(): Promise<void> {
     await this.client.close()
   }
 }

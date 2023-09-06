@@ -6,7 +6,7 @@ import { env } from './configs/env.js'
 
 const log = console.log
 
-async function main() {
+async function main(): Promise<void> {
   log('Starting program')
 
   const connectionConfig = {

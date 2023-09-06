@@ -13,7 +13,7 @@ export class ReadModelQueriesClient {
   /**
    * Connects to the mongodb database
    */
-  public static async connect() {
+  public static async connect(): Promise<ReadModelQueriesClient> {
     const connectionConfig = {
       replicaSet: env.MONGODB_REPLICA_SET,
       directConnection: env.MONGODB_DIRECT_CONNECTION,
@@ -30,7 +30,7 @@ export class ReadModelQueriesClient {
    * Retrieves all the purposes related to the e-service with id PN_ESERVICE_ID, having at
    * least one version with state Active, Suspended or WaitingForApproval.
    */
-  async getPNEServicePurposes() {
+  async getPNEServicePurposes(): Promise<Array<Purpose>> {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: Purpose }>(env.PURPOSES_COLLECTION_NAME)
@@ -62,7 +62,7 @@ export class ReadModelQueriesClient {
    * @param tenantsIds - The ids of the tenants to retrieve
    * @returns The tenants
    **/
-  async getComuniByTenantsIds(tenantsIds: Array<string>) {
+  async getComuniByTenantsIds(tenantsIds: Array<string>): Promise<Array<Tenant>> {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: Tenant }>(env.TENANTS_COLLECTION_NAME)
@@ -88,7 +88,7 @@ export class ReadModelQueriesClient {
   /**
    * Closes the connection to the database
    * */
-  async close() {
+  async close(): Promise<void> {
     await this.client.close()
   }
 }

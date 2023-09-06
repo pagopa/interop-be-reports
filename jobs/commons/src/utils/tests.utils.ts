@@ -5,10 +5,12 @@ import { EService, Attribute, Tenant, Agreement } from '../models/index.js'
 /**
  * Create and returns a mock factory function
  */
-function createMockFactory<TDefaultValue>(defaultValue: TDefaultValue) {
-  type RecursivePartial<T> = {
-    [P in keyof T]?: RecursivePartial<T[P]>
-  }
+type RecursivePartial<T> = {
+  [P in keyof T]?: RecursivePartial<T[P]>
+}
+function createMockFactory<TDefaultValue>(
+  defaultValue: TDefaultValue
+): <T>(overwrites?: RecursivePartial<TDefaultValue>) => T {
   return <T>(overwrites: RecursivePartial<TDefaultValue> = {}) => {
     return merge(cloneDeep(defaultValue), overwrites) as T
   }
