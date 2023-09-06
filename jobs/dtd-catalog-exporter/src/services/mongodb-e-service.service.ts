@@ -1,6 +1,7 @@
 import { MongoClient } from 'mongodb'
 import { env } from '../configs/env.js'
-import { EService, Attribute, Tenant, EServices } from '@interop-be-reports/commons'
+import { EService, EServices } from '@interop-be-reports/commons'
+import { Attribute, Tenant } from '../models/index.js'
 
 export class MongoDBEServiceClient {
   private client: MongoClient

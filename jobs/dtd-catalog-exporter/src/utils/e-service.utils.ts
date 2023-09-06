@@ -1,12 +1,10 @@
-import { PublicEService, PublicEServiceAttributes } from '../models/index.js'
+import { Attribute, PublicEService, PublicEServiceAttributes, Tenant } from '../models/index.js'
 import {
   SafeMap,
   EService,
   EServiceDescriptor,
   EServices,
-  Attribute,
   DescriptorAttributes,
-  Tenant,
 } from '@interop-be-reports/commons'
 
 /**
@@ -19,7 +17,7 @@ import {
 export function remapEServiceToPublicEService(
   eservice: EService,
   attributesMap: SafeMap<string, Attribute>,
-  producersMap: SafeMap<string, Pick<Tenant, 'id' | 'name'>>
+  producersMap: SafeMap<string, Tenant>
 ): PublicEService {
   const activeDescriptor = getEServiceActiveDescriptor(eservice)
 
