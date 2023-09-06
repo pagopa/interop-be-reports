@@ -1,0 +1,13 @@
+import {
+  Purpose as ReadModelPurpose,
+  PurposeVersion as ReadModelPurposeVersion,
+} from '@interop-be-reports/commons'
+import { z } from 'zod'
+
+export const PurposeVersion = ReadModelPurposeVersion.pick({ firstActivationAt: true, state: true })
+export const Purpose = ReadModelPurpose.pick({ id: true, consumerId: true }).merge(
+  z.object({ versions: z.array(PurposeVersion) })
+)
+
+export type PurposeVersion = z.infer<typeof PurposeVersion>
+export type Purpose = z.infer<typeof Purpose>

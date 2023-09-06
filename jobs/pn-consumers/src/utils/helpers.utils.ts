@@ -1,4 +1,5 @@
-import { Purpose, PurposeState, SafeMap } from '@interop-be-reports/commons'
+import { PurposeState, SafeMap } from '@interop-be-reports/commons'
+import { Purpose } from '../models/index.js'
 
 /**
  * Transforms a purpose to a CSV output row.
