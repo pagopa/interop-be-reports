@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 const DescriptorAttribute = z.object({
   explicitAttributeVerification: z.boolean(),
-  id: z.string(),
+  id: z.string().uuid(),
 })
 
 const DescriptorAttributeSingle = z.object({
@@ -19,20 +19,50 @@ const DescriptorAttributes = z.object({
   declared: z.array(z.union([DescriptorAttributeSingle, DescriptorAttributesGroup])),
 })
 
+export const DescriptorState = z.enum(['Published', 'Draft', 'Deprecated', 'Suspended', 'Archived'])
+
+export const CatalogDocument = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  contentType: z.string(),
+  prettyName: z.string(),
+  path: z.string(),
+  checksum: z.string(),
+  uploadDate: z.string().pipe(z.coerce.date()),
+})
+
+export const AgreementApprovalPolicy = z.enum(['Automatic', 'Manual'])
+
 export const EServiceDescriptor = z.object({
-  id: z.string(),
-  state: z.enum(['Published', 'Draft', 'Deprecated', 'Suspended']),
+  id: z.string().uuid(),
   version: z.string(),
+  description: z.string().optional(),
+  interface: CatalogDocument.optional(),
+  docs: z.array(CatalogDocument),
+  state: DescriptorState,
+  audience: z.array(z.string()),
+  voucherLifespan: z.number(),
+  dailyCallsPerConsumer: z.number(),
+  dailyCallsTotal: z.number(),
+  agreementApprovalPolicy: AgreementApprovalPolicy,
+  createdAt: z.string().pipe(z.coerce.date()),
+  serverUrls: z.array(z.string()),
+  publishedAt: z.string().pipe(z.coerce.date()).optional(),
+  suspendedAt: z.string().pipe(z.coerce.date()).optional(),
+  deprecatedAt: z.string().pipe(z.coerce.date()).optional(),
+  archivedAt: z.string().pipe(z.coerce.date()).optional(),
   attributes: DescriptorAttributes,
 })
 
 export const EService = z.object({
-  description: z.string(),
-  descriptors: z.array(EServiceDescriptor),
-  id: z.string(),
+  id: z.string().uuid(),
+  producerId: z.string().uuid(),
   name: z.string(),
-  producerId: z.string(),
+  description: z.string(),
   technology: z.enum(['Rest', 'Soap']),
+  attributes: DescriptorAttributes.optional(),
+  descriptors: z.array(EServiceDescriptor),
+  createdAt: z.string().pipe(z.coerce.date()),
 })
 
 export type EService = z.infer<typeof EService>
