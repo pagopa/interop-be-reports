@@ -2,20 +2,19 @@ import { Collection, Db, MongoClient, MongoClientOptions, ReadPreferenceMode } f
 import { ATTRIBUTES_COLLECTION_NAME, Attribute, ESERVICES_COLLECTION_NAME, EService, PURPOSES_COLLECTION_NAME, Purpose, ReadModelConfig, TENANTS_COLLECTION_NAME, Tenant } from '../index.js'
 
 export class ReadModelClient {
-  private mongodbClient: MongoClient
 
   eservices: Collection<{ data: EService }>
   tenants: Collection<{ data: Tenant }>
   purposes: Collection<{ data: Purpose }>
   attributes: Collection<{ data: Attribute }>
 
-  private constructor(mongodbClient: MongoClient, db: Db) {
+  private constructor(private mongodbClient: MongoClient, db: Db) {
     this.mongodbClient = mongodbClient
 
-    this.attributes = db.collection<{ data: Attribute }>(ATTRIBUTES_COLLECTION_NAME)
-    this.eservices = db.collection<{ data: EService }>(ESERVICES_COLLECTION_NAME)
-    this.tenants = db.collection<{ data: Tenant }>(TENANTS_COLLECTION_NAME)
-    this.purposes = db.collection<{ data: Purpose }>(PURPOSES_COLLECTION_NAME)
+    this.attributes = db.collection(ATTRIBUTES_COLLECTION_NAME)
+    this.eservices = db.collection(ESERVICES_COLLECTION_NAME)
+    this.tenants = db.collection(TENANTS_COLLECTION_NAME)
+    this.purposes = db.collection(PURPOSES_COLLECTION_NAME)
   }
 
   /**
