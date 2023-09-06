@@ -9,7 +9,7 @@ RUN apk update
 WORKDIR /app
 RUN corepack enable
 COPY . .
-RUN pnpm --package=turbo dlx turbo prune --scope=metrics --docker
+RUN pnpm --package=turbo dlx turbo prune --scope=dtd-metrics --docker
 
 # remove all empty node_modules folder structure
 RUN rm -rf /app/out/full/*/*/node_modules
@@ -29,6 +29,6 @@ RUN pnpm install --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN pnpm dlx turbo run build --filter=metrics
+RUN pnpm dlx turbo run build --filter=dtd-metrics
 
-CMD node ./jobs/metrics/dist
+CMD node ./jobs/dtd-metrics/dist

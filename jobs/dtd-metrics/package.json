@@ -1,5 +1,5 @@
 {
-  "name": "metrics",
+  "name": "dtd-metrics",
   "main": "./dist/index.js",
   "type": "module",
   "scripts": {
