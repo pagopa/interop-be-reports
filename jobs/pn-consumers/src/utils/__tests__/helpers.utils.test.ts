@@ -1,5 +1,6 @@
-import { Purpose, SafeMap } from '@interop-be-reports/commons'
+import { SafeMap } from '@interop-be-reports/commons'
 import { toCsvDataRow } from '../helpers.utils.js'
+import { Purpose } from '../../models/index.js'
 
 describe('toCsvDataRow', () => {
   it('should return the correct data row (Active)', () => {
