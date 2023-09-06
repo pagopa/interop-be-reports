@@ -41,11 +41,7 @@ const tokenGeneratorConfig: TokenGenerationConfig = {
 
 const sftpClient: SftpClient = new SftpClient(sftpConfig)
 const readModelClient: ReadModelClient = await ReadModelClient.connect(readModelConfig)
-const readModelQueries: ReadModelQueries = new ReadModelQueries(
-  readModelClient,
-  env.TENANTS_COLLECTION_NAME,
-  env.ATTRIBUTES_COLLECTION_NAME
-)
+const readModelQueries: ReadModelQueries = new ReadModelQueries(readModelClient)
 
 const tokenGenerator = new InteropTokenGenerator(tokenGeneratorConfig)
 const refreshableToken = new RefreshableInteropToken(tokenGenerator)

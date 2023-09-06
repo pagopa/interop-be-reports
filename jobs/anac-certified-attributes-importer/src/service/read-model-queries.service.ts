@@ -22,19 +22,13 @@ const projectUnrevokedCertifiedAttributes = {
 }
 
 export class ReadModelQueries {
-  constructor(
-    private readModelClient: ReadModelClient,
-    private tenantsCollectionName: string,
-    private attributesCollectionName: string
-  ) {}
+  constructor(private readModelClient: ReadModelClient) { }
 
   /**
    * Retrieve all PA tenants that matches the given IPA codes, with their unrevoked certified attribute
    */
   async getPATenants(ipaCodes: string[]): Promise<PersistentTenant[]> {
-    return await this.readModelClient
-      .db()
-      .collection<{ data: PersistentTenant }>(this.tenantsCollectionName)
+    return await this.readModelClient.tenants
       .aggregate([
         {
           $match: {
@@ -54,9 +48,7 @@ export class ReadModelQueries {
    * Retrieve all non-PA tenants that matches the given tax codes, with their unrevoked certified attribute
    */
   async getNonPATenants(taxCodes: string[]): Promise<PersistentTenant[]> {
-    return await this.readModelClient
-      .db()
-      .collection<{ data: PersistentTenant }>(this.tenantsCollectionName)
+    return await this.readModelClient.tenants
       .aggregate([
         {
           $match: {
@@ -73,9 +65,7 @@ export class ReadModelQueries {
   }
 
   async getTenantById(tenantId: string): Promise<PersistentTenant> {
-    const result = await this.readModelClient
-      .db()
-      .collection<{ data: PersistentTenant }>(this.tenantsCollectionName)
+    const result = await this.readModelClient.tenants
       .aggregate([
         {
           $match: {
@@ -94,9 +84,7 @@ export class ReadModelQueries {
   }
 
   async getAttributeByExternalId(origin: string, code: string): Promise<PersistentAttribute> {
-    const result = await this.readModelClient
-      .db()
-      .collection<{ data: PersistentAttribute }>(this.attributesCollectionName)
+    const result = await this.readModelClient.attributes
       .find(
         {
           'data.origin': origin,

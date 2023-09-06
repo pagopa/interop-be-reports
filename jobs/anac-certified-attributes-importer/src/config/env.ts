@@ -24,9 +24,6 @@ const Env = z.object({
   READ_MODEL_DB_PORT: z.string(),
   READ_MODEL_DB_NAME: z.string(),
 
-  TENANTS_COLLECTION_NAME: z.string(),
-  ATTRIBUTES_COLLECTION_NAME: z.string(),
-
   TENANT_PROCESS_URL: z.string(),
 
   INTERNAL_JWT_KID: z.string(),
