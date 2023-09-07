@@ -30,7 +30,7 @@ describe('ANAC Certified Attributes Importer', () => {
   const tenantProcessMock = new TenantProcessService('url')
   const sftpClientMock = new SftpClient(sftpConfigTest)
   const readModelClient = {} as ReadModelClient
-  const readModelQueriesMock = new ReadModelQueries(readModelClient, 'tenants', 'attributes')
+  const readModelQueriesMock = new ReadModelQueries(readModelClient)
 
   const run = () =>
     importAttributes(
