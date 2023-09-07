@@ -24,6 +24,9 @@ export const Env = z.object({
     .string()
     .transform((value) => value === 'true')
     .optional(),
+
+  STORAGE_BUCKET: z.string(),
+  FILENAME: z.string(),
 })
 
 export type Env = z.infer<typeof Env>

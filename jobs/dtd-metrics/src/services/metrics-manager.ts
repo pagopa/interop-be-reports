@@ -4,6 +4,7 @@ import { Agreement, EService, EServiceDescriptor } from '@interop-be-reports/com
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import {
   MacroCategoriesPublishedEServicesMetric,
+  Metrics,
   PublishedEServicesMetric,
   Top10MostSubscribedEServicesMetric,
   Top10MostSubscribedEServicesPerMacroCategoryMetric,
@@ -17,7 +18,9 @@ export class MetricsManager {
   /**
    * @see https://pagopa.atlassian.net/browse/PIN-3744
    **/
-  async getPublishedEServicesMetric(): Promise<PublishedEServicesMetric> {
+  async getPublishedEServicesMetric(
+    oldMetrics: Metrics | undefined
+  ): Promise<PublishedEServicesMetric> {
     const publishedEServicesCount = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
@@ -27,7 +30,14 @@ export class MetricsManager {
         },
       })
 
-    const variation = getVariationPercentage(0, publishedEServicesCount) // TODO get previous value from the bucket
+    let variation = 0
+
+    if (oldMetrics) {
+      variation = getVariationPercentage(
+        oldMetrics.publishedEServicesMetric.publishedEServicesCount,
+        publishedEServicesCount
+      )
+    }
 
     return PublishedEServicesMetric.parse({ publishedEServicesCount, variation })
   }
