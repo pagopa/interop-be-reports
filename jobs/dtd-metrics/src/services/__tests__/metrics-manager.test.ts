@@ -67,7 +67,7 @@ describe('MetricsManager', () => {
       { data: getEServiceMock({ descriptors: [{ state: 'Draft' }] }) },
     ])
 
-    const result = await metricsManager.getPublishedEServicesMetric()
+    const result = await metricsManager.getPublishedEServicesMetric(undefined)
     expect(result.publishedEServicesCount).toStrictEqual(3)
   })
 
