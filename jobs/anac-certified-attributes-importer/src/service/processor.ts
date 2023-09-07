@@ -29,7 +29,7 @@ export async function importAttributes(
 
   const attributes: AnacAttributes = await getAttributesIdentifiers(readModel, anacTenantId)
 
-  const preparedProcessTenants = processTenants(tenantProcess, refreshableToken, attributes, jobCorrelationId)
+  const processTenants = prepareTenantsProcessor(tenantProcess, refreshableToken, attributes, jobCorrelationId)
 
   let scanComplete = false
   let fromLine = 1
@@ -51,12 +51,12 @@ export async function importAttributes(
       })
       .filter((r): r is NonPaRow => r !== null)
 
-    await preparedProcessTenants(
+    await processTenants(
       paOrgs,
       (org) => org.codice_ipa,
       (codes) => readModel.getPATenants(codes)
     )
-    await preparedProcessTenants(
+    await processTenants(
       nonPaOrgs,
       (org) => org.cf_gestore,
       (codes) => readModel.getNonPATenants(codes)
@@ -92,44 +92,43 @@ async function getAttributesIdentifiers(readModel: ReadModelQueries, anacTenantI
   }
 }
 
-const processTenants =
+const prepareTenantsProcessor =
   (
     tenantProcess: TenantProcessService,
     refreshableToken: RefreshableInteropToken,
     attributes: AnacAttributes,
     jobCorrelationId: string
-  ) =>
-  async <T extends CsvRow>(
+  ) => async function processTenants<T extends CsvRow>(
     orgs: T[],
     extractTenantCode: (org: T) => string,
     retrieveTenants: (codes: string[]) => Promise<PersistentTenant[]>
-  ): Promise<void> => {
-    if (orgs.length === 0) return
+  ): Promise<void> {
+      if (orgs.length === 0) return
 
-    const codes = orgs.map(extractTenantCode)
+      const codes = orgs.map(extractTenantCode)
 
-    const tenants = await retrieveTenants(codes)
+      const tenants = await retrieveTenants(codes)
 
-    const missingTenants = getMissingTenants(codes, tenants)
+      const missingTenants = getMissingTenants(codes, tenants)
 
-    if (missingTenants.length !== 0)
-      logWarn(jobCorrelationId, `Organizations in CSV not found in Tenants for codes: ${missingTenants}`)
+      if (missingTenants.length !== 0)
+        logWarn(jobCorrelationId, `Organizations in CSV not found in Tenants for codes: ${missingTenants}`)
 
-    await Promise.all(
-      zipBy(orgs, tenants, extractTenantCode, (tenant) => tenant.externalId.value).map(async ([org, tenant]) => {
-        if (org.anac_abilitato) await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacAbilitato)
-        else await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacAbilitato)
+      await Promise.all(
+        zipBy(orgs, tenants, extractTenantCode, (tenant) => tenant.externalId.value).map(async ([org, tenant]) => {
+          if (org.anac_abilitato) await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacAbilitato)
+          else await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacAbilitato)
 
-        if (org.anac_in_convalida)
-          await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacInConvalida)
-        else await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacInConvalida)
+          if (org.anac_in_convalida)
+            await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacInConvalida)
+          else await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacInConvalida)
 
-        if (org.anac_incaricato)
-          await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacIncaricato)
-        else await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacIncaricato)
-      })
-    )
-  }
+          if (org.anac_incaricato)
+            await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacIncaricato)
+          else await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacIncaricato)
+        })
+      )
+    }
 
 async function assignAttribute(
   tenantProcess: TenantProcessService,
