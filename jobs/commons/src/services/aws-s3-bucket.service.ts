@@ -1,4 +1,10 @@
-import { ListObjectsV2Command, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import {
+  GetObjectCommand,
+  ListObjectsV2Command,
+  NoSuchKey,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
 import * as crypto from 'crypto'
 
 export class AwsS3BucketClient {
@@ -27,6 +33,30 @@ export class AwsS3BucketClient {
         ContentMD5: this.getMD5HashFromFile(fileData),
       })
     )
+  }
+
+  /**
+   * Gets the data stored in the specified path.
+   * If the path does not exist, `undefined` is returned.
+   * @param path The path of the data to be retrieved.
+   * @returns The data stored in the specified path as a string.
+   */
+  public async getJSONData(path: string): Promise<string | undefined> {
+    try {
+      const response = await this.s3Client.send(
+        new GetObjectCommand({
+          Bucket: this.bucket,
+          Key: path,
+        })
+      )
+
+      const data = await response.Body?.transformToString()
+
+      return data ? JSON.parse(data) : undefined
+    } catch (e) {
+      if (e instanceof NoSuchKey) return undefined
+      else throw e
+    }
   }
 
   /**
