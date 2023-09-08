@@ -1,12 +1,16 @@
-import { PublicEService, PublicEServiceAttributes } from '../models/index.js'
+import {
+  Attribute,
+  PublicEService,
+  PublicEServiceAttribute,
+  PublicEServiceAttributes,
+  Tenant,
+} from '../models/index.js'
 import {
   SafeMap,
   EService,
   EServiceDescriptor,
   EServices,
-  Attribute,
   DescriptorAttributes,
-  Tenant,
 } from '@interop-be-reports/commons'
 
 /**
@@ -56,8 +60,8 @@ function remapDescriptorAttributesToPublicAttributes(
 
   function remapDescriptorAttributesToPublicAttributes(
     attribute: DescriptorAttributes['certified'][0]
-  ) {
-    function remapEserviceAttributeToPublicEServiceAttribute(id: string) {
+  ): PublicEServiceAttributes['certified'][number] {
+    function remapEserviceAttributeToPublicEServiceAttribute(id: string): PublicEServiceAttribute {
       const attributeData = attributesMap.get(id)
       return {
         description: attributeData.description,
@@ -107,7 +111,9 @@ export function getEServiceActiveDescriptor(eservice: EService): EServiceDescrip
  * @param eservices - The array of eservices
  * @returns The array of attributes ids
  */
-export function getAllAttributesIdsInEServicesActiveDescriptors(eservices: EServices) {
+export function getAllAttributesIdsInEServicesActiveDescriptors(
+  eservices: EServices
+): Array<string> {
   const attributesIds: Set<string> = new Set()
 
   eservices.forEach((eservice) => {
@@ -131,6 +137,6 @@ export function getAllAttributesIdsInEServicesActiveDescriptors(eservices: EServ
  * @param eservices - The array of eservices
  * @returns The array of tenants ids
  */
-export function getAllTenantsIdsInEServices(eservices: EServices) {
+export function getAllTenantsIdsInEServices(eservices: EServices): Array<string> {
   return Array.from(new Set(eservices.map((eservice) => eservice.producerId)))
 }

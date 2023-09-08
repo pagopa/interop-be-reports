@@ -1,13 +1,7 @@
 import { MongoClient } from 'mongodb'
 import { env } from '../configs/env.js'
-import {
-  EService,
-  eserviceSchema,
-  Attribute,
-  attributeSchema,
-  Tenant,
-  tenantSchema,
-} from '@interop-be-reports/commons'
+import { EService, EServices } from '@interop-be-reports/commons'
+import { Attribute, Tenant } from '../models/index.js'
 
 export class MongoDBEServiceClient {
   private client: MongoClient
@@ -19,7 +13,7 @@ export class MongoDBEServiceClient {
   /**
    * Connects to the mongodb database
    */
-  public static async connect() {
+  public static async connect(): Promise<MongoDBEServiceClient> {
     const connectionConfig = {
       replicaSet: 'rs0',
       readPreference: 'secondaryPreferred',
@@ -43,7 +37,7 @@ export class MongoDBEServiceClient {
    *
    * @returns The array of e-services
    */
-  async getEServices() {
+  async getEServices(): Promise<EServices> {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
@@ -51,10 +45,7 @@ export class MongoDBEServiceClient {
         { 'data.descriptors.state': { $in: ['Published', 'Suspended'] } },
         { projection: { _id: 0, metadata: 0 } }
       )
-      .map(({ data }) => {
-        console.log(data)
-        return eserviceSchema.parse(data)
-      })
+      .map(({ data }) => EService.parse(data))
       .toArray()
   }
 
@@ -64,7 +55,7 @@ export class MongoDBEServiceClient {
    * @param attributeIds - The array of attributes ids
    * @returns The array of attributes
    **/
-  async getEServicesAttributes(attributeIds: Array<string>) {
+  async getEServicesAttributes(attributeIds: Array<string>): Promise<Array<Attribute>> {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: Attribute }>(env.ATTRIBUTES_COLLECTION_NAME)
@@ -72,7 +63,7 @@ export class MongoDBEServiceClient {
         { 'data.id': { $in: attributeIds } },
         { projection: { _id: 0, 'data.id': 1, 'data.name': 1, 'data.description': 1 } }
       )
-      .map(({ data }) => attributeSchema.parse(data))
+      .map(({ data }) => Attribute.parse(data))
       .toArray()
   }
   /**
@@ -81,7 +72,7 @@ export class MongoDBEServiceClient {
    * @param eservices - The array of e-services which all the attributes ids will be taken from
    * @returns The array of attributes
    **/
-  async getEServicesTenants(tenantIds: Array<string>) {
+  async getEServicesTenants(tenantIds: Array<string>): Promise<Array<Tenant>> {
     return await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: Tenant }>(env.TENANTS_COLLECTION_NAME)
@@ -89,14 +80,14 @@ export class MongoDBEServiceClient {
         { 'data.id': { $in: tenantIds } },
         { projection: { _id: 0, 'data.id': 1, 'data.name': 1 } }
       )
-      .map(({ data }) => tenantSchema.parse(data))
+      .map(({ data }) => Tenant.pick({ id: true, name: true }).parse(data))
       .toArray()
   }
 
   /**
    * Closes the connection to the database
    * */
-  async close() {
+  async close(): Promise<void> {
     await this.client.close()
   }
 }

@@ -1,4 +1,11 @@
-import { AttributeValue, DynamoDB, DynamoDBClientConfig } from '@aws-sdk/client-dynamodb'
+import {
+  AttributeValue,
+  DeleteItemCommandOutput,
+  DynamoDB,
+  DynamoDBClientConfig,
+  UpdateItemCommandInput,
+  UpdateItemCommandOutput,
+} from '@aws-sdk/client-dynamodb'
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 
 /**
@@ -33,7 +40,7 @@ export class DynamoDbTableClient<
    * Get all the records in the table.
    * @returns The list of records in the table.
    */
-  public async getAll() {
+  public async getAll(): Promise<Array<TSchema>> {
     const result = await this.client.scan({ TableName: this.tableName })
     return (result.Items ?? []).map((item) => unmarshall(item)) as Array<TSchema>
   }
@@ -44,7 +51,7 @@ export class DynamoDbTableClient<
    * @param key The key of the item.
    * @returns The item with the given key in the given table.
    * */
-  public async getSingle(key: DynamoDBKeyOf<TSchema>) {
+  public async getSingle(key: DynamoDBKeyOf<TSchema>): Promise<TSchema | undefined> {
     const result = await this.client.getItem({
       TableName: this.tableName,
       Key: marshall(key),
@@ -58,7 +65,10 @@ export class DynamoDbTableClient<
    * @param updateExpression The update expression to use.
    * @returns The result of the update.
    */
-  public async updateItem(key: DynamoDBKeyOf<TSchema>, updatedObj: DeepPartial<TSchema>) {
+  public async updateItem(
+    key: DynamoDBKeyOf<TSchema>,
+    updatedObj: DeepPartial<TSchema>
+  ): Promise<UpdateItemCommandOutput> {
     return await this.client.updateItem({
       TableName: this.tableName,
       Key: marshall(key),
@@ -71,7 +81,7 @@ export class DynamoDbTableClient<
    * @param key The key of the item.
    * @returns The result of the deletion.
    */
-  public async deleteItem(key: DynamoDBKeyOf<TSchema>) {
+  public async deleteItem(key: DynamoDBKeyOf<TSchema>): Promise<DeleteItemCommandOutput> {
     return await this.client.deleteItem({
       TableName: this.tableName,
       Key: marshall(key),
@@ -84,7 +94,9 @@ export class DynamoDbTableClient<
    * @param updatedObj The object to generate the update expression for.
    * @returns The update expression and the expression attribute values.
    * */
-  private generateUpdateExpression(updatedObj: DeepPartial<TSchema>) {
+  private generateUpdateExpression(
+    updatedObj: DeepPartial<TSchema>
+  ): Pick<UpdateItemCommandInput, 'UpdateExpression' | 'ExpressionAttributeValues'> {
     return {
       UpdateExpression: `SET ${Object.keys(updatedObj)
         .map((key) => `${key} = :${key}`)

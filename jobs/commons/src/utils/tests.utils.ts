@@ -1,14 +1,16 @@
 import cloneDeep from 'lodash/cloneDeep.js'
 import merge from 'lodash/merge.js'
-import { EService, Attribute, Tenant } from '../models/index.js'
+import { EService, Attribute, Tenant, Agreement } from '../models/index.js'
 
 /**
  * Create and returns a mock factory function
  */
-function createMockFactory<TDefaultValue>(defaultValue: TDefaultValue) {
-  type RecursivePartial<T> = {
-    [P in keyof T]?: RecursivePartial<T[P]>
-  }
+type RecursivePartial<T> = {
+  [P in keyof T]?: RecursivePartial<T[P]>
+}
+function createMockFactory<TDefaultValue>(
+  defaultValue: TDefaultValue
+): <T>(overwrites?: RecursivePartial<TDefaultValue>) => T {
   return <T>(overwrites: RecursivePartial<TDefaultValue> = {}) => {
     return merge(cloneDeep(defaultValue), overwrites) as T
   }
@@ -83,21 +85,56 @@ export const getEServiceMock = createMockFactory<EService>({
           },
         ],
       },
+      docs: [],
+      serverUrls: [],
+      voucherLifespan: 1,
+      dailyCallsPerConsumer: 1,
+      dailyCallsTotal: 1,
+      audience: ['audience'],
+      createdAt: new Date(),
+      agreementApprovalPolicy: 'Automatic',
     },
   ],
   id: '4747d063-0d9c-4a5d-b143-9f2fdc4d7f22',
   name: 'Servizio con tanti attributi',
   producerId: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
   technology: 'Rest',
+  createdAt: new Date(),
 })
 
 export const getAttributeMock = createMockFactory<Attribute>({
   id: '929188a4-bbc8-4509-8999-b2d424de3870',
   name: 'Nome attributo 1',
   description: 'Descrizione attributo 1',
+  code: 'L6',
+  kind: 'Certified',
+  creationTime: new Date(),
 })
 
-export const getProducerMock = createMockFactory<Tenant>({
+export const getTenantMock = createMockFactory<Tenant>({
   id: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
   name: 'Nome produttore 1',
+  attributes: [],
+  createdAt: new Date(),
+  externalId: {
+    origin: 'origin',
+    value: 'value',
+  },
+  features: [],
+  mails: [],
+})
+
+export const getAgreementMock = createMockFactory<Agreement>({
+  id: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
+  eserviceId: '4747d063-0d9c-4a5d-b143-9f2fdc4d7f22',
+  consumerId: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
+  producerId: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
+  state: 'Active',
+  descriptorId: 'a9c705d9-ecdb-47ff-bcd2-667495b111f2',
+  certifiedAttributes: [],
+  verifiedAttributes: [],
+  declaredAttributes: [],
+  consumerDocuments: [],
+  stamps: {},
+  createdAt: new Date(),
 })

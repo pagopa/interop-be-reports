@@ -1,11 +1,15 @@
-import { InteropToken, MAX_EXP_SECONDS_DELAY_BEFORE_REFRESH, TokenGenerationConfig } from "../../index.js"
+import {
+  InteropToken,
+  MAX_EXP_SECONDS_DELAY_BEFORE_REFRESH,
+  TokenGenerationConfig,
+} from '../../index.js'
 
 export const tokenConfig: TokenGenerationConfig = {
   kid: 'a-kid',
   subject: 'the-subject',
   issuer: 'the-issuer',
   audience: ['aud1', 'aud2'],
-  secondsDuration: 100
+  secondsDuration: 100,
 }
 
 export const generateInternalTokenMock = (): Promise<InteropToken> => Promise.resolve(interopToken)
@@ -30,6 +34,7 @@ export const interopToken: InteropToken = {
   serialized: 'the-token',
 }
 
-export const futureTimestamp = () => Date.now() / 1000 + 10000
-export const pastTimestamp = () => Date.now() / 1000 - 10000
-export const nearExpirationTimestamp = () => Date.now() / 1000 + MAX_EXP_SECONDS_DELAY_BEFORE_REFRESH / 2
+export const futureTimestamp = (): number => Date.now() / 1000 + 10000
+export const pastTimestamp = (): number => Date.now() / 1000 - 10000
+export const nearExpirationTimestamp = (): number =>
+  Date.now() / 1000 + MAX_EXP_SECONDS_DELAY_BEFORE_REFRESH / 2
