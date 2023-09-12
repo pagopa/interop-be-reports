@@ -44,7 +44,7 @@ export const EServiceDescriptor = z.object({
   voucherLifespan: z.number(),
   dailyCallsPerConsumer: z.number(),
   dailyCallsTotal: z.number(),
-  agreementApprovalPolicy: AgreementApprovalPolicy,
+  agreementApprovalPolicy: AgreementApprovalPolicy.optional(),
   createdAt: z.string().pipe(z.coerce.date()),
   serverUrls: z.array(z.string()),
   publishedAt: z.string().pipe(z.coerce.date()).optional(),
