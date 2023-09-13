@@ -401,22 +401,26 @@ export class MetricsManager {
   private async getMacroCategoryAttributeIds(
     macroCategory: (typeof MACRO_CATEGORIES)[number]
   ): Promise<Array<string>> {
-    return (
-      this._attributeIdsCache[macroCategory.name] ??
-      this.client
-        .db(env.READ_MODEL_DB_NAME)
-        .collection<{ data: Attribute }>(env.ATTRIBUTES_COLLECTION_NAME)
-        .find({
-          'data.code': {
-            $in: macroCategory.ipaCodes,
-          },
-        })
-        .project({
-          _id: 0,
-          'data.id': 1,
-        })
-        .toArray()
-        .then((attributes) => attributes.map((attribute) => attribute.data.id))
-    )
+    if (this._attributeIdsCache[macroCategory.id]) {
+      return this._attributeIdsCache[macroCategory.id]
+    }
+
+    const attributesIds: Array<string> = await this.client
+      .db(env.READ_MODEL_DB_NAME)
+      .collection<{ data: Attribute }>(env.ATTRIBUTES_COLLECTION_NAME)
+      .find({
+        'data.code': {
+          $in: macroCategory.ipaCodes,
+        },
+      })
+      .project({
+        _id: 0,
+        'data.id': 1,
+      })
+      .map((attribute) => attribute.data.id)
+      .toArray()
+
+    this._attributeIdsCache[macroCategory.id] = attributesIds
+    return attributesIds
   }
 }
