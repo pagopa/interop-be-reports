@@ -240,24 +240,70 @@ describe('MetricsManager', () => {
     ])
 
     await seedCollection('agreements', [
-      { data: getAgreementMock({ eserviceId: 'eservice-1', consumerId: 'comune-1' }) },
-      { data: getAgreementMock({ eserviceId: 'eservice-2', consumerId: 'comune-2' }) },
-      { data: getAgreementMock({ eserviceId: 'eservice-2', consumerId: 'comune-3' }) },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-1',
+          consumerId: 'comune-1',
+          producerId: 'producer',
+          certifiedAttributes: [{ id: 'attribute-comune' }],
+        }),
+      },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-2',
+          consumerId: 'comune-2',
+          producerId: 'producer',
+          certifiedAttributes: [{ id: 'attribute-comune' }],
+        }),
+      },
       {
         data: getAgreementMock({
           eserviceId: 'eservice-2',
           consumerId: 'comune-3',
-          state: 'Draft',
+          producerId: 'producer',
+          certifiedAttributes: [{ id: 'attribute-comune' }],
         }),
       },
-      { data: getAgreementMock({ eserviceId: 'eservice-3', consumerId: 'azienda-ospedaliera-1' }) },
-      { data: getAgreementMock({ eserviceId: 'eservice-3', consumerId: 'azienda-ospedaliera-2' }) },
-      { data: getAgreementMock({ eserviceId: 'eservice-3', consumerId: 'azienda-ospedaliera-3' }) },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-2',
+          consumerId: 'comune-3',
+          producerId: 'producer',
+          state: 'Draft',
+          certifiedAttributes: [{ id: 'attribute-comune' }],
+        }),
+      },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-3',
+          consumerId: 'azienda-ospedaliera-1',
+          producerId: 'producer',
+          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
+        }),
+      },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-3',
+          consumerId: 'azienda-ospedaliera-2',
+          producerId: 'producer',
+          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
+        }),
+      },
       {
         data: getAgreementMock({
           eserviceId: 'eservice-3',
           consumerId: 'azienda-ospedaliera-3',
+          producerId: 'producer',
+          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
+        }),
+      },
+      {
+        data: getAgreementMock({
+          eserviceId: 'eservice-3',
+          consumerId: 'azienda-ospedaliera-3',
+          producerId: 'producer',
           state: 'Pending',
+          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
         }),
       },
     ])
@@ -345,24 +391,12 @@ describe('MetricsManager', () => {
     expect(comuniTop10?.[1].producerName).toStrictEqual('Producer')
     expect(comuniTop10?.[1].agreementsCount).toStrictEqual(1)
 
-    expect(comuniTop10?.[2].name).toStrictEqual('eservice-3')
-    expect(comuniTop10?.[2].producerName).toStrictEqual('Producer')
-    expect(comuniTop10?.[2].agreementsCount).toStrictEqual(0)
-
     const aziendeOspedaliereTop10 = result.find((a) => a.name === 'Aziende Ospedaliere')
       ?.top10MostSubscribedEServices
 
     expect(aziendeOspedaliereTop10?.[0].name).toStrictEqual('eservice-3')
     expect(aziendeOspedaliereTop10?.[0].producerName).toStrictEqual('Producer')
     expect(aziendeOspedaliereTop10?.[0].agreementsCount).toStrictEqual(3)
-
-    expect(aziendeOspedaliereTop10?.[1].name).toStrictEqual('eservice-1')
-    expect(aziendeOspedaliereTop10?.[1].producerName).toStrictEqual('Producer')
-    expect(aziendeOspedaliereTop10?.[1].agreementsCount).toStrictEqual(0)
-
-    expect(aziendeOspedaliereTop10?.[2].name).toStrictEqual('eservice-2')
-    expect(aziendeOspedaliereTop10?.[2].producerName).toStrictEqual('Producer')
-    expect(aziendeOspedaliereTop10?.[2].agreementsCount).toStrictEqual(0)
   })
 
   it('getTop10ProviderWithMostSubscriberMetric', async () => {
@@ -378,6 +412,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-1',
           producerId: 'producer-1',
           consumerId: 'comune',
+          certifiedAttributes: [{ id: 'attribute-comune' }],
         }),
       },
       {
@@ -385,6 +420,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-2',
           producerId: 'producer-1',
           consumerId: 'comune',
+          certifiedAttributes: [{ id: 'attribute-comune' }],
         }),
       },
       {
@@ -392,6 +428,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-3',
           producerId: 'producer-2',
           consumerId: 'comune',
+          certifiedAttributes: [{ id: 'attribute-comune' }],
         }),
       },
       {
@@ -399,6 +436,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-1',
           producerId: 'producer-1',
           consumerId: 'azienda-ospedaliera',
+          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
         }),
       },
       {
@@ -406,6 +444,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-2',
           producerId: 'producer-1',
           consumerId: 'azienda-ospedaliera',
+          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
         }),
       },
       {
@@ -413,6 +452,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-3',
           producerId: 'producer-2',
           consumerId: 'azienda-ospedaliera',
+          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
           state: 'Pending',
         }),
       },
