@@ -45,7 +45,13 @@ export class MetricsManager {
       )
     }
 
-    return PublishedEServicesMetric.parse({ publishedEServicesCount, variation })
+    return PublishedEServicesMetric.parse({
+      publishedEServicesCount,
+      variation: new Intl.NumberFormat('it-IT', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(variation),
+    })
   }
 
   /**
@@ -153,86 +159,84 @@ export class MetricsManager {
     const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection(env.AGREEMENTS_COLLECTION_NAME)
-      .aggregate(
-        [
-          {
-            $match: {
-              'data.state': {
-                $in: ['Active', 'Suspended'] satisfies Array<Agreement['state']>,
-              },
-              'data.certifiedAttributes': {
-                $elemMatch: { id: { $in: allMacroCategoriesAttributeIds } },
-              },
+      .aggregate([
+        {
+          $match: {
+            'data.state': {
+              $in: ['Active', 'Suspended'] satisfies Array<Agreement['state']>,
+            },
+            'data.certifiedAttributes': {
+              $elemMatch: { id: { $in: allMacroCategoriesAttributeIds } },
             },
           },
-          {
-            $group: {
-              _id: '$data.producerId',
-              agreements: {
-                $push: '$data.certifiedAttributes.id',
-              },
-              agreementsCount: { $sum: 1 },
+        },
+        {
+          $group: {
+            _id: '$data.producerId',
+            agreements: {
+              $push: '$data.certifiedAttributes.id',
             },
+            agreementsCount: { $sum: 1 },
           },
-          { $sort: { agreementsCount: -1 } },
-          { $limit: 10 },
-          {
-            $lookup: {
-              from: env.TENANTS_COLLECTION_NAME,
-              localField: '_id',
-              foreignField: 'data.id',
-              as: 'producer',
-            },
+        },
+        { $sort: { agreementsCount: -1 } },
+        { $limit: 10 },
+        {
+          $lookup: {
+            from: env.TENANTS_COLLECTION_NAME,
+            localField: '_id',
+            foreignField: 'data.id',
+            as: 'producer',
           },
-          {
-            $project: {
-              _id: 0,
-              name: { $arrayElemAt: ['$producer.data.name', 0] },
-              agreements: 1,
-            },
+        },
+        {
+          $project: {
+            _id: 0,
+            name: { $arrayElemAt: ['$producer.data.name', 0] },
+            agreements: 1,
           },
-          {
-            $project: {
-              name: 1,
-              topSubscribers: macroCategories.map((macroCategory) => ({
-                id: macroCategory.id,
-                name: macroCategory.name,
-                agreementsCount: {
-                  $map: {
-                    input: '$agreements',
-                    as: 'agreement',
-                    in: {
-                      $filter: {
-                        input: '$$agreement',
-                        as: 'attributeId',
-                        cond: {
-                          $in: ['$$attributeId', macroCategory.attributeIds],
-                        },
-                      },
-                    },
-                  },
-                },
-              })),
-            },
-          },
-          {
-            $project: {
-              name: 1,
-              topSubscribers: {
+        },
+        {
+          $project: {
+            name: 1,
+            topSubscribers: macroCategories.map((macroCategory) => ({
+              id: macroCategory.id,
+              name: macroCategory.name,
+              agreementsCount: {
                 $map: {
-                  input: '$topSubscribers',
-                  as: 'topSubscriber',
+                  input: '$agreements',
+                  as: 'agreement',
                   in: {
-                    id: '$$topSubscriber.id',
-                    name: '$$topSubscriber.name',
-                    agreementsCount: {
-                      $size: {
-                        $filter: {
-                          input: '$$topSubscriber.agreementsCount',
-                          as: 'agreement',
-                          cond: {
-                            $gt: [{ $size: '$$agreement' }, 0],
-                          },
+                    $filter: {
+                      input: '$$agreement',
+                      as: 'attributeId',
+                      cond: {
+                        $in: ['$$attributeId', macroCategory.attributeIds],
+                      },
+                    },
+                  },
+                },
+              },
+            })),
+          },
+        },
+        {
+          $project: {
+            name: 1,
+            topSubscribers: {
+              $map: {
+                input: '$topSubscribers',
+                as: 'topSubscriber',
+                in: {
+                  id: '$$topSubscriber.id',
+                  name: '$$topSubscriber.name',
+                  agreementsCount: {
+                    $size: {
+                      $filter: {
+                        input: '$$topSubscriber.agreementsCount',
+                        as: 'agreement',
+                        cond: {
+                          $gt: [{ $size: '$$agreement' }, 0],
                         },
                       },
                     },
@@ -241,12 +245,11 @@ export class MetricsManager {
               },
             },
           },
-        ],
-        { allowDiskUse: true }
-      )
+        },
+      ])
       .toArray()
 
-    return result as unknown as Top10ProviderWithMostSubscriberMetric
+    return Top10ProviderWithMostSubscriberMetric.parse(result)
   }
 
   private async getMacroCategoryTop10MostSubscribedEServices(
@@ -257,53 +260,50 @@ export class MetricsManager {
     const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection<{ data: Agreement }>(env.AGREEMENTS_COLLECTION_NAME)
-      .aggregate(
-        [
-          {
-            $match: {
-              'data.state': {
-                $in: ['Active', 'Suspended'] satisfies Array<AgreementState>,
-              },
-              'data.certifiedAttributes': {
-                $elemMatch: { id: { $in: attributeIds } },
-              },
+      .aggregate([
+        {
+          $match: {
+            'data.state': {
+              $in: ['Active', 'Suspended'] satisfies Array<AgreementState>,
+            },
+            'data.certifiedAttributes': {
+              $elemMatch: { id: { $in: attributeIds } },
             },
           },
-          {
-            $group: {
-              _id: { eserviceId: '$data.eserviceId', producerId: '$data.producerId' },
-              agreementsCount: { $sum: 1 },
-            },
+        },
+        {
+          $group: {
+            _id: { eserviceId: '$data.eserviceId', producerId: '$data.producerId' },
+            agreementsCount: { $sum: 1 },
           },
-          { $sort: { agreementsCount: -1 } },
-          { $limit: 10 },
-          {
-            $lookup: {
-              from: env.ESERVICES_COLLECTION_NAME,
-              localField: '_id.eserviceId',
-              foreignField: 'data.id',
-              as: 'eservice',
-            },
+        },
+        { $sort: { agreementsCount: -1 } },
+        { $limit: 10 },
+        {
+          $lookup: {
+            from: env.ESERVICES_COLLECTION_NAME,
+            localField: '_id.eserviceId',
+            foreignField: 'data.id',
+            as: 'eservice',
           },
-          {
-            $lookup: {
-              from: env.TENANTS_COLLECTION_NAME,
-              localField: '_id.producerId',
-              foreignField: 'data.id',
-              as: 'producer',
-            },
+        },
+        {
+          $lookup: {
+            from: env.TENANTS_COLLECTION_NAME,
+            localField: '_id.producerId',
+            foreignField: 'data.id',
+            as: 'producer',
           },
-          {
-            $project: {
-              _id: 0,
-              name: { $arrayElemAt: ['$eservice.data.name', 0] },
-              producerName: { $arrayElemAt: ['$producer.data.name', 0] },
-              agreementsCount: 1,
-            },
+        },
+        {
+          $project: {
+            _id: 0,
+            name: { $arrayElemAt: ['$eservice.data.name', 0] },
+            producerName: { $arrayElemAt: ['$producer.data.name', 0] },
+            agreementsCount: 1,
           },
-        ],
-        { allowDiskUse: true }
-      )
+        },
+      ])
       .toArray()
 
     return {
