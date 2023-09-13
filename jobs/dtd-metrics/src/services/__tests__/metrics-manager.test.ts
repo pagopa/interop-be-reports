@@ -412,6 +412,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-1',
           producerId: 'producer-1',
           consumerId: 'comune',
+          certifiedAttributes: [{ id: 'attribute-comune' }],
         }),
       },
       {
@@ -419,6 +420,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-2',
           producerId: 'producer-1',
           consumerId: 'comune',
+          certifiedAttributes: [{ id: 'attribute-comune' }],
         }),
       },
       {
@@ -426,6 +428,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-3',
           producerId: 'producer-2',
           consumerId: 'comune',
+          certifiedAttributes: [{ id: 'attribute-comune' }],
         }),
       },
       {
@@ -433,6 +436,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-1',
           producerId: 'producer-1',
           consumerId: 'azienda-ospedaliera',
+          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
         }),
       },
       {
@@ -440,6 +444,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-2',
           producerId: 'producer-1',
           consumerId: 'azienda-ospedaliera',
+          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
         }),
       },
       {
@@ -447,6 +452,7 @@ describe('MetricsManager', () => {
           eserviceId: 'eservice-3',
           producerId: 'producer-2',
           consumerId: 'azienda-ospedaliera',
+          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
           state: 'Pending',
         }),
       },
@@ -499,6 +505,8 @@ describe('MetricsManager', () => {
     ])
 
     const result = await metricsManager.getTop10ProviderWithMostSubscriberMetric()
+
+    console.log(JSON.stringify(result, null, 2))
 
     const producer1 = result[0]
     expect(producer1.name).toStrictEqual('Producer 1')
