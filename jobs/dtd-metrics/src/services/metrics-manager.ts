@@ -156,8 +156,6 @@ export class MetricsManager {
 
     const allMacroCategoriesAttributeIds = macroCategories.map((macro) => macro.attributeIds).flat()
 
-    console.log(allMacroCategoriesAttributeIds)
-
     const result = await this.client
       .db(env.READ_MODEL_DB_NAME)
       .collection(env.AGREEMENTS_COLLECTION_NAME)

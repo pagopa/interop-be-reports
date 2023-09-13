@@ -506,8 +506,6 @@ describe('MetricsManager', () => {
 
     const result = await metricsManager.getTop10ProviderWithMostSubscriberMetric()
 
-    console.log(JSON.stringify(result, null, 2))
-
     const producer1 = result[0]
     expect(producer1.name).toStrictEqual('Producer 1')
     const producer1Comuni = producer1.topSubscribers.find(
