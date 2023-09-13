@@ -249,7 +249,7 @@ export class MetricsManager {
       ])
       .toArray()
 
-    return result as unknown as Top10ProviderWithMostSubscriberMetric
+    return Top10ProviderWithMostSubscriberMetric.parse(result)
   }
 
   private async getMacroCategoryTop10MostSubscribedEServices(
