@@ -5,18 +5,10 @@ const DescriptorAttribute = z.object({
   id: z.string().uuid(),
 })
 
-const DescriptorAttributeSingle = z.object({
-  id: DescriptorAttribute,
-})
-
-const DescriptorAttributesGroup = z.object({
-  ids: z.array(DescriptorAttribute),
-})
-
 const DescriptorAttributes = z.object({
-  certified: z.array(z.union([DescriptorAttributeSingle, DescriptorAttributesGroup])),
-  verified: z.array(z.union([DescriptorAttributeSingle, DescriptorAttributesGroup])),
-  declared: z.array(z.union([DescriptorAttributeSingle, DescriptorAttributesGroup])),
+  certified: z.array(z.array(DescriptorAttribute)),
+  verified: z.array(z.array(DescriptorAttribute)),
+  declared: z.array(z.array(DescriptorAttribute)),
 })
 
 export const DescriptorState = z.enum(['Published', 'Draft', 'Deprecated', 'Suspended', 'Archived'])
