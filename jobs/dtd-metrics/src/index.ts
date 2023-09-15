@@ -52,9 +52,12 @@ async function main(): Promise<void> {
     top10ProviderWithMostSubscriberMetric,
   })
 
+  await bucket.uploadData(output, env.FILENAME)
+
   log('Done!\n')
 
-  await bucket.uploadData(output, env.FILENAME)
+  await client.close()
+  process.exit(0)
 }
 
 withExecutionTime(main)
