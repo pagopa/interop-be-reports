@@ -50,8 +50,15 @@ export class AwsS3BucketClient {
         })
       )
 
-      const data = await response.Body?.transformToString()
+      const statusCode = response.$metadata.httpStatusCode
 
+      // NoSuchKey is thrown when the key does not exist.
+      // AWS S3 does not distinguish between “NoSuchKey” and “AccessDenied”.
+      // This is a security measure to prevent attackers from discovering information about the existence of keys.
+      if (statusCode === 403)
+        throw new NoSuchKey({ $metadata: response.$metadata, message: 'Access Denied' })
+
+      const data = await response.Body?.transformToString()
       return data ? JSON.parse(data) : undefined
     } catch (e) {
       if (e instanceof NoSuchKey) return undefined
