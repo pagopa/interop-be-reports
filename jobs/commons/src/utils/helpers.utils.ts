@@ -5,7 +5,7 @@
  * @param data - The array of objects to convert to CSV
  * @returns The CSV string
  */
-export function toCSV(data: Array<Record<string, string>>) {
+export function toCSV(data: Array<Record<string, string>>): string {
   if (data.length === 0) return ''
 
   const headers = Object.keys(data[0]).join(',') + '\n'
@@ -35,7 +35,7 @@ export class SafeMap<K, V> extends Map<K, V> {
  * @param fn The function to call
  * @returns The result of the function
  */
-export async function withExecutionTime(fn: () => void | Promise<void>) {
+export async function withExecutionTime(fn: () => void | Promise<void>): Promise<void> {
   const t0 = performance.now()
   await fn()
   const t1 = performance.now()

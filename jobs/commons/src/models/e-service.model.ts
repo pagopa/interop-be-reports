@@ -1,44 +1,74 @@
 import { z } from 'zod'
 
-const descriptorAttributeSchema = z.object({
+const DescriptorAttribute = z.object({
   explicitAttributeVerification: z.boolean(),
-  id: z.string(),
+  id: z.string().uuid(),
 })
 
-const descriptorAttributeSingleSchema = z.object({
-  id: descriptorAttributeSchema,
+const DescriptorAttributeSingle = z.object({
+  id: DescriptorAttribute,
 })
 
-const descriptorAttributesGroupSchema = z.object({
-  ids: z.array(descriptorAttributeSchema),
+const DescriptorAttributesGroup = z.object({
+  ids: z.array(DescriptorAttribute),
 })
 
-const descriptorAttributesSchema = z.object({
-  certified: z.array(z.union([descriptorAttributeSingleSchema, descriptorAttributesGroupSchema])),
-  verified: z.array(z.union([descriptorAttributeSingleSchema, descriptorAttributesGroupSchema])),
-  declared: z.array(z.union([descriptorAttributeSingleSchema, descriptorAttributesGroupSchema])),
+const DescriptorAttributes = z.object({
+  certified: z.array(z.union([DescriptorAttributeSingle, DescriptorAttributesGroup])),
+  verified: z.array(z.union([DescriptorAttributeSingle, DescriptorAttributesGroup])),
+  declared: z.array(z.union([DescriptorAttributeSingle, DescriptorAttributesGroup])),
 })
 
-export const eserviceDescriptorSchema = z.object({
-  id: z.string(),
-  state: z.enum(['Published', 'Draft', 'Deprecated', 'Suspended']),
-  version: z.string(),
-  attributes: descriptorAttributesSchema,
-})
+export const DescriptorState = z.enum(['Published', 'Draft', 'Deprecated', 'Suspended', 'Archived'])
 
-export const eserviceSchema = z.object({
-  description: z.string(),
-  descriptors: z.array(eserviceDescriptorSchema),
-  id: z.string(),
+export const CatalogDocument = z.object({
+  id: z.string().uuid(),
   name: z.string(),
-  producerId: z.string(),
-  technology: z.enum(['Rest', 'Soap']),
+  contentType: z.string(),
+  prettyName: z.string(),
+  path: z.string(),
+  checksum: z.string(),
+  uploadDate: z.string().pipe(z.coerce.date()),
 })
 
-export type EService = z.infer<typeof eserviceSchema>
-export type EServiceDescriptor = z.infer<typeof eserviceDescriptorSchema>
-export type DescriptorAttribute = z.infer<typeof descriptorAttributeSchema>
-export type DescriptorAttributes = z.infer<typeof descriptorAttributesSchema>
+export const AgreementApprovalPolicy = z.enum(['Automatic', 'Manual'])
 
-export const eservicesSchema = z.array(eserviceSchema)
-export type EServices = z.infer<typeof eservicesSchema>
+export const EServiceDescriptor = z.object({
+  id: z.string().uuid(),
+  version: z.string(),
+  description: z.string().optional(),
+  interface: CatalogDocument.optional(),
+  docs: z.array(CatalogDocument),
+  state: DescriptorState,
+  audience: z.array(z.string()),
+  voucherLifespan: z.number(),
+  dailyCallsPerConsumer: z.number(),
+  dailyCallsTotal: z.number(),
+  agreementApprovalPolicy: AgreementApprovalPolicy.optional(),
+  createdAt: z.string().pipe(z.coerce.date()),
+  serverUrls: z.array(z.string()),
+  publishedAt: z.string().pipe(z.coerce.date()).optional(),
+  suspendedAt: z.string().pipe(z.coerce.date()).optional(),
+  deprecatedAt: z.string().pipe(z.coerce.date()).optional(),
+  archivedAt: z.string().pipe(z.coerce.date()).optional(),
+  attributes: DescriptorAttributes,
+})
+
+export const EService = z.object({
+  id: z.string().uuid(),
+  producerId: z.string().uuid(),
+  name: z.string(),
+  description: z.string(),
+  technology: z.enum(['Rest', 'Soap']),
+  attributes: DescriptorAttributes.optional(),
+  descriptors: z.array(EServiceDescriptor),
+  createdAt: z.string().pipe(z.coerce.date()),
+})
+
+export type EService = z.infer<typeof EService>
+export type EServiceDescriptor = z.infer<typeof EServiceDescriptor>
+export type DescriptorAttribute = z.infer<typeof DescriptorAttribute>
+export type DescriptorAttributes = z.infer<typeof DescriptorAttributes>
+
+export const EServices = z.array(EService)
+export type EServices = z.infer<typeof EServices>

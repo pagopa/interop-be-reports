@@ -1,4 +1,10 @@
-import { ListObjectsV2Command, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import {
+  GetObjectCommand,
+  ListObjectsV2Command,
+  NoSuchKey,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
 import * as crypto from 'crypto'
 
 export class AwsS3BucketClient {
@@ -15,7 +21,7 @@ export class AwsS3BucketClient {
    * @param data The data to be uploaded. The data will be stringified if it is not a string.
    * @param path The path in which the data will be stored in the bucket.
    */
-  public async uploadData(data: string | unknown, path: string) {
+  public async uploadData(data: string | unknown, path: string): Promise<void> {
     const stringifiedData = typeof data === 'string' ? data : JSON.stringify(data)
     const fileData = Buffer.from(stringifiedData)
 
@@ -30,10 +36,41 @@ export class AwsS3BucketClient {
   }
 
   /**
+   * Gets the data stored in the specified path.
+   * If the path does not exist, `undefined` is returned.
+   * @param path The path of the data to be retrieved.
+   * @returns The data stored in the specified path as a string.
+   */
+  public async getJSONData(path: string): Promise<string | undefined> {
+    try {
+      const response = await this.s3Client.send(
+        new GetObjectCommand({
+          Bucket: this.bucket,
+          Key: path,
+        })
+      )
+
+      const statusCode = response.$metadata.httpStatusCode
+
+      // NoSuchKey is thrown when the key does not exist.
+      // AWS S3 does not distinguish between “NoSuchKey” and “AccessDenied”.
+      // This is a security measure to prevent attackers from discovering information about the existence of keys.
+      if (statusCode === 403)
+        throw new NoSuchKey({ $metadata: response.$metadata, message: 'Access Denied' })
+
+      const data = await response.Body?.transformToString()
+      return data ? JSON.parse(data) : undefined
+    } catch (e) {
+      if (e instanceof NoSuchKey) return undefined
+      else throw e
+    }
+  }
+
+  /**
    * Get the list of objects .
    * @returns The list of objects .
    * */
-  async getBucketContentList() {
+  async getBucketContentList(): Promise<Array<string>> {
     const response = await this.s3Client.send(
       new ListObjectsV2Command({
         Bucket: this.bucket,

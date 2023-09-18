@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const oneTrustNoticeDBSchema = z.object({
+const OneTrustNoticeDBSchema = z.object({
   persistedAt: z.string(),
   lastPublishedDate: z.string(),
   privacyNoticeVersion: z.object({
@@ -15,4 +15,4 @@ const oneTrustNoticeDBSchema = z.object({
   privacyNoticeId: z.string(),
 })
 
-export type OneTrustNoticeDBSchema = z.infer<typeof oneTrustNoticeDBSchema>
+export type OneTrustNoticeDBSchema = z.infer<typeof OneTrustNoticeDBSchema>

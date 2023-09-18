@@ -1,4 +1,5 @@
-import { Purpose, PurposeState, SafeMap } from '@interop-be-reports/commons'
+import { PurposeState, SafeMap } from '@interop-be-reports/commons'
+import { Purpose, PurposeVersion } from '../models/index.js'
 
 /**
  * Transforms a purpose to a CSV output row.
@@ -11,8 +12,15 @@ import { Purpose, PurposeState, SafeMap } from '@interop-be-reports/commons'
  *    4. If the purpose has no active, suspended or waiting for approval version, an error is thrown. This should never happen since the query that retrieves the purposes filters out purposes that do not have an active, suspended or waiting for approval version.
  * - `data_attivazione`: The first activation date of the purpose. It is retrieved from the firstActivationAt field of the active, suspended or waiting for approval version.
  */
-export function toCsvDataRow(tenantNamesMap: SafeMap<string, string>, purpose: Purpose) {
-  function getPurposeVersionWithState(state: PurposeState) {
+export function toCsvDataRow(
+  tenantNamesMap: SafeMap<string, string>,
+  purpose: Purpose
+): {
+  nome_comune: string
+  stato_finalita_migliore: string
+  data_attivazione: string
+} {
+  function getPurposeVersionWithState(state: PurposeState): PurposeVersion | undefined {
     return purpose.versions.find((version) => version.state === state)
   }
 

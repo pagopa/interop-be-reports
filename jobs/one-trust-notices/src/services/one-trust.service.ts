@@ -1,10 +1,6 @@
 import axios, { AxiosInstance, toFormData } from 'axios'
 import { env, ONE_STRUST_API_ENDPOINT } from '../config/index.js'
-import {
-  GetNoticeContentResponseData,
-  getNoticeContentResponseDataSchema,
-  oneTrustNoticeVersion,
-} from '../models/index.js'
+import { GetNoticeContentResponseData, OneTrustNoticeVersion } from '../models/index.js'
 
 export class OneTrustClient {
   private otAxiosInstance: AxiosInstance
@@ -22,7 +18,7 @@ export class OneTrustClient {
    * Retrives the OneTrust session token and creates a new OneTrustClient instance.
    * @returns A new OneTrustClient instance.
    */
-  public static async connect() {
+  public static async connect(): Promise<OneTrustClient> {
     const form = toFormData({
       client_id: env.ONETRUST_CLIENT_ID,
       client_secret: env.ONETRUST_CLIENT_SECRET,
@@ -43,27 +39,16 @@ export class OneTrustClient {
   }
 
   /**
-   * Get the list of all the notices.
-   * @returns The list of all the notices.
-   * */
-  public async getNotices() {
-    const url = `${ONE_STRUST_API_ENDPOINT}/privacynotice/v2/privacynotices`
-    const response = await this.otAxiosInstance.get(url)
-
-    return response.data
-  }
-
-  /**
    * Get the active version of the notice with the given id.
    * @param noticeId The id of the notice.
    * @returns The active version of the notice with the given id.
    * */
-  public async getNoticeActiveVersion(noticeId: string) {
+  public async getNoticeActiveVersion(noticeId: string): Promise<OneTrustNoticeVersion> {
     // Date iso format without seconds
     const date = new Date().toISOString().slice(0, -5)
     const url = `${ONE_STRUST_API_ENDPOINT}/privacynotice/v2/privacynotices/${noticeId}?date=${date}`
     const response = await this.otAxiosInstance.get(url)
-    return oneTrustNoticeVersion.parse(response.data)
+    return OneTrustNoticeVersion.parse(response.data)
   }
 
   /**
@@ -83,6 +68,6 @@ export class OneTrustClient {
        */
       headers: { 'Accept-Encoding': 'identity' },
     })
-    return getNoticeContentResponseDataSchema.parse(response.data)
+    return GetNoticeContentResponseData.parse(response.data)
   }
 }

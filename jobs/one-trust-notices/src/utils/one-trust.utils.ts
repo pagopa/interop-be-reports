@@ -10,7 +10,9 @@ import {
  * @param oneTrustResponseBody The OneTrust notice data.
  * @returns The notice content.
  * */
-export function getNoticeContent(oneTrustResponseBody: GetNoticeContentResponseData) {
+export function getNoticeContent(
+  oneTrustResponseBody: GetNoticeContentResponseData
+): OneTrustPublicNotice {
   return Object.values(oneTrustResponseBody.notices)[0]
 }
 

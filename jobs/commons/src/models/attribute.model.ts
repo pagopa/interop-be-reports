@@ -1,12 +1,18 @@
 import { z } from 'zod'
 
-export const attributeSchema = z.object({
-  id: z.string(),
-  name: z.string(),
+export const AttributeKind = z.enum(['Certified', 'Verified', 'Declared'])
+export const Attribute = z.object({
+  id: z.string().uuid(),
+  code: z.string().optional(),
+  origin: z.string().optional(),
+  kind: AttributeKind,
   description: z.string(),
+  name: z.string(),
+  creationTime: z.string().pipe(z.coerce.date()),
 })
 
-export type Attribute = z.infer<typeof attributeSchema>
+export type AttributeKind = z.infer<typeof AttributeKind>
+export type Attribute = z.infer<typeof Attribute>
 
-export const attributesSchema = z.array(attributeSchema)
-export type Attributes = z.infer<typeof attributesSchema>
+export const Attributes = z.array(Attribute)
+export type Attributes = z.infer<typeof Attributes>

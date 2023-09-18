@@ -1,7 +1,7 @@
 import h2j from 'html2json'
 import isEmpty from 'lodash/isEmpty.js'
 
-export function html2json(html: string) {
+export function html2json(html: string): h2j.Node {
   const jsonHtlmNodes = h2j.html2json(html)
   removeUselessAttributesFromHtmlNodes(jsonHtlmNodes)
   removeDangerousAttributesFromHtmlNodes(jsonHtlmNodes)
@@ -14,7 +14,7 @@ export function html2json(html: string) {
  *
  * Mutates the given object.
  */
-function removeUselessAttributesFromHtmlNodes(node: h2j.Node) {
+function removeUselessAttributesFromHtmlNodes(node: h2j.Node): void {
   if (node.attr?.class) delete node.attr.class
   if (node.attr?.style) delete node.attr.style
   if (node.attr?.id === 'isPasted') delete node.attr.id
@@ -35,7 +35,7 @@ function removeUselessAttributesFromHtmlNodes(node: h2j.Node) {
  *
  * Mutates the given object.
  */
-function removeDangerousAttributesFromHtmlNodes(node: h2j.Node) {
+function removeDangerousAttributesFromHtmlNodes(node: h2j.Node): void {
   if (node.tag === 'script') {
     delete node.attr
     node.child = []

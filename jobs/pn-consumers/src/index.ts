@@ -5,7 +5,7 @@ import { Mailer, SafeMap, toCSV, withExecutionTime } from '@interop-be-reports/c
 
 const log = console.log
 
-async function main() {
+async function main(): Promise<void> {
   log('Program started.\n')
 
   log('> Connecting to database...')
