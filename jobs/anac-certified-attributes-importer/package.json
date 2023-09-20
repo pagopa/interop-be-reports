@@ -26,7 +26,7 @@
     "axios": "^1.5.0",
     "csv": "^6.3.2",
     "dotenv": "^16.3.1",
-    "mongodb": "^5.7.0",
+    "mongodb": "^5.8.0",
     "ssh2-sftp-client": "^9.1.0",
     "zod": "^3.21.4",
     "@interop-be-reports/commons": "workspace:*"
