@@ -56,10 +56,8 @@ function remapDescriptorAttributesToPublicAttributes(
   attributes: DescriptorAttributes,
   attributesMap: SafeMap<string, Attribute>
 ): PublicEServiceAttributes {
-  const { certified, verified, declared } = attributes
-
   function remapDescriptorAttributesToPublicAttributes(
-    attribute: DescriptorAttributes['certified'][0]
+    attributesGroup: DescriptorAttributes['certified'][0]
   ): PublicEServiceAttributes['certified'][number] {
     function remapEserviceAttributeToPublicEServiceAttribute(id: string): PublicEServiceAttribute {
       const attributeData = attributesMap.get(id)
@@ -69,16 +67,18 @@ function remapDescriptorAttributesToPublicAttributes(
       }
     }
 
-    if ('id' in attribute) {
+    if (attributesGroup.length === 1) {
       return {
-        single: remapEserviceAttributeToPublicEServiceAttribute(attribute.id.id),
+        single: remapEserviceAttributeToPublicEServiceAttribute(attributesGroup[0].id),
       }
     }
 
     return {
-      group: attribute.ids.map(({ id }) => remapEserviceAttributeToPublicEServiceAttribute(id)),
+      group: attributesGroup.map(({ id }) => remapEserviceAttributeToPublicEServiceAttribute(id)),
     }
   }
+
+  const { certified, verified, declared } = attributes
 
   return {
     certified: certified.map(remapDescriptorAttributesToPublicAttributes),
@@ -119,13 +119,8 @@ export function getAllAttributesIdsInEServicesActiveDescriptors(
   eservices.forEach((eservice) => {
     const activeDescriptor = getEServiceActiveDescriptor(eservice)
     const { certified, verified, declared } = activeDescriptor.attributes
-    ;[...certified, ...verified, ...declared].forEach((attribute) => {
-      if ('ids' in attribute) {
-        attribute.ids.forEach(({ id }) => attributesIds.add(id))
-      }
-      if ('id' in attribute) {
-        attributesIds.add(attribute.id.id)
-      }
+    ;[...certified, ...verified, ...declared].forEach((attributesGroup) => {
+      attributesGroup.forEach(({ id }) => attributesIds.add(id))
     })
   })
 
