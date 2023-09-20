@@ -48,6 +48,7 @@ export class ReadModelQueriesClient {
             'data.consumerId': 1,
             'data.versions.firstActivationAt': 1,
             'data.versions.state': 1,
+            'data.versions.dailyCalls': 1,
           },
         }
       )
@@ -78,6 +79,7 @@ export class ReadModelQueriesClient {
             _id: 0,
             'data.id': 1,
             'data.name': 1,
+            'data.externalId': 1,
           },
         }
       )

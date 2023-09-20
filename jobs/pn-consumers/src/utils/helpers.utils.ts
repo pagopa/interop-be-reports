@@ -1,5 +1,6 @@
 import { PurposeState, SafeMap } from '@interop-be-reports/commons'
-import { Purpose, PurposeVersion } from '../models/index.js'
+import { Purpose, PurposeVersion, Tenant } from '../models/index.js'
+import { PNDataCSVRow, StatoFinalitaMigliore } from '../models/pn-data-csv-row.model.js'
 
 /**
  * Transforms a purpose to a CSV output row.
@@ -11,15 +12,11 @@ import { Purpose, PurposeVersion } from '../models/index.js'
  *    3. If the purpose has no active or suspended version, but has a waiting for approval version, the state is "In attesa di attivazione";
  *    4. If the purpose has no active, suspended or waiting for approval version, an error is thrown. This should never happen since the query that retrieves the purposes filters out purposes that do not have an active, suspended or waiting for approval version.
  * - `data_attivazione`: The first activation date of the purpose. It is retrieved from the firstActivationAt field of the active, suspended or waiting for approval version.
+ * - `fonte_codice`: `tenant.externalId.origin``
+ * - `codice`: `tenant.externalId.value`
+ * - `carico_finalita_migliore`: `dailyCalls` value from the purpose of the `stato_finalita_migliore` field
  */
-export function toCsvDataRow(
-  tenantNamesMap: SafeMap<string, string>,
-  purpose: Purpose
-): {
-  nome_comune: string
-  stato_finalita_migliore: string
-  data_attivazione: string
-} {
+export function toCsvDataRow(tenantsMap: SafeMap<string, Tenant>, purpose: Purpose): PNDataCSVRow {
   function getPurposeVersionWithState(state: PurposeState): PurposeVersion | undefined {
     return purpose.versions.find((version) => version.state === state)
   }
@@ -36,11 +33,20 @@ export function toCsvDataRow(
     )
   }
 
-  const state = activeVersion ? 'Attivo' : suspendedVersion ? 'Sospeso' : 'In attesa di attivazione'
+  const state: StatoFinalitaMigliore = activeVersion
+    ? 'Attivo'
+    : suspendedVersion
+    ? 'Sospeso'
+    : 'In attesa di attivazione'
 
-  return {
-    nome_comune: tenantNamesMap.get(purpose.consumerId),
+  const tenant = tenantsMap.get(purpose.consumerId)
+
+  return PNDataCSVRow.parse({
+    nome_comune: tenant.name,
     stato_finalita_migliore: state,
-    data_attivazione: relevantVersion.firstActivationAt as string,
-  }
+    data_attivazione: relevantVersion.firstActivationAt,
+    fonte_codice: tenant.externalId.origin,
+    codice: tenant.externalId.value,
+    carico_finalita_migliore: relevantVersion.dailyCalls,
+  })
 }

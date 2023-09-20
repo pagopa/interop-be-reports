@@ -23,8 +23,8 @@ async function main(): Promise<void> {
   const tenantsIds = [...new Set(purposes.map((purpose) => purpose.consumerId))]
   const tenants = await readModelsQueriesClient.getComuniByTenantsIds(tenantsIds)
 
-  const tenantNamesMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant.name]))
-  const csvData = purposes.map(toCsvDataRow.bind(null, tenantNamesMap))
+  const tenantsMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant]))
+  const csvData = purposes.map(toCsvDataRow.bind(null, tenantsMap))
 
   log('> Data csv produced!\n')
 

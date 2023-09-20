@@ -4,7 +4,11 @@ import {
 } from '@interop-be-reports/commons'
 import { z } from 'zod'
 
-export const PurposeVersion = ReadModelPurposeVersion.pick({ firstActivationAt: true, state: true })
+export const PurposeVersion = ReadModelPurposeVersion.pick({
+  firstActivationAt: true,
+  state: true,
+  dailyCalls: true,
+})
 export const Purpose = ReadModelPurpose.pick({ id: true, consumerId: true }).merge(
   z.object({ versions: z.array(PurposeVersion) })
 )

@@ -5,7 +5,7 @@
  * @param data - The array of objects to convert to CSV
  * @returns The CSV string
  */
-export function toCSV(data: Array<Record<string, string>>): string {
+export function toCSV(data: Array<Record<string, string | number>>): string {
   if (data.length === 0) return ''
 
   const headers = Object.keys(data[0]).join(',') + '\n'
