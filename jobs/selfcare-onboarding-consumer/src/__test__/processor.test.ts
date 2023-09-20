@@ -1,7 +1,7 @@
-import { InteropTokenGenerator, RefreshableInteropToken } from "@interop-be-reports/commons"
+import { InteropTokenGenerator, RefreshableInteropToken, generateInternalTokenMock, interopToken, tokenConfig } from "@interop-be-reports/commons"
 import { processMessage } from "../services/processor.js"
 import { TenantProcessService } from "../services/tenantProcessService.js"
-import { correctEventPayload, correctInstitutionEventField, generateInternalTokenMock, interopProductName, interopToken, kafkaMessage, selfcareUpsertTenantMock, tokenConfig } from "./helpers.js"
+import { correctEventPayload, correctInstitutionEventField, interopProductName, kafkaMessage, selfcareUpsertTenantMock } from "./helpers.js"
 
 
 describe('Message processor', () => {
@@ -20,6 +20,7 @@ describe('Message processor', () => {
 
   beforeAll(() => {
     vitest.spyOn(console, 'log').mockImplementation(loggerMock)
+    vitest.spyOn(console, 'error').mockImplementation(loggerMock)
   })
 
   afterEach(() => {
@@ -41,7 +42,7 @@ describe('Message processor', () => {
 
     const message = { ...kafkaMessage, value: Buffer.from('{ not-a : "correct-json"') }
 
-    expect(() => configuredProcessor(message, 0)).rejects.toThrowError(/Error.*partition.*offset.*Reason/)
+    await expect(() => configuredProcessor(message, 0)).rejects.toThrowError(/Error.*partition.*offset.*Reason/)
 
     expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(0)
@@ -63,7 +64,7 @@ describe('Message processor', () => {
 
     const message = { ...kafkaMessage, value: Buffer.from(`{ "product" : "${interopProductName}", "this-schema" : "was-unexpected" }`) }
 
-    expect(() => configuredProcessor(message, 0)).rejects.toThrowError(/Error.*partition.*offset.*Reason/)
+    await expect(() => configuredProcessor(message, 0)).rejects.toThrowError(/Error.*partition.*offset.*Reason/)
 
     expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
     expect(selfcareUpsertTenantSpy).toBeCalledTimes(0)

@@ -54,6 +54,8 @@ jobs:
             package_path: ./jobs/pn-consumers
           - image_name: selfcare-onboarding-consumer
             package_path: ./jobs/selfcare-onboarding-consumer
+          - image_name: anac-certified-attributes-importer
+            package_path: ./jobs/anac-certified-attributes-importer
           - image_name: dtd-metrics
             package_path: ./jobs/dtd-metrics
 

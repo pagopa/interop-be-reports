@@ -1,39 +1,11 @@
-import { InteropToken, TokenGenerationConfig } from "@interop-be-reports/commons"
 import { SelfcareTenantSeed, SelfcareUpsertTenantResponse } from "../model/tenant-process.js"
 import { InteropContext } from "../model/interop-context.js"
 import { MessageSetEntry } from "kafkajs"
+import { interopToken } from "@interop-be-reports/commons"
 
 export const interopProductName = "test-interop-product"
 
-export const interopToken: InteropToken = {
-  header: {
-    alg: 'algorithm',
-    use: 'use',
-    typ: 'type',
-    kid: 'key-id',
-  },
-  payload: {
-    jti: 'token-id',
-    iss: 'issuer',
-    aud: ['audience1'],
-    sub: 'subject',
-    iat: 0,
-    nbf: 0,
-    exp: 10,
-    role: 'role1',
-  },
-  serialized: 'the-token',
-}
 export const selfcareUpsertTenantMock = (_seed: SelfcareTenantSeed, _context: InteropContext): Promise<SelfcareUpsertTenantResponse> => Promise.resolve({ id: "tenant-id" })
-export const generateInternalTokenMock = (): Promise<InteropToken> => Promise.resolve(interopToken)
-
-export const tokenConfig: TokenGenerationConfig = {
-  kid: 'a-kid',
-  subject: 'the-subject',
-  issuer: 'the-issuer',
-  audience: ['aud1', 'aud2'],
-  secondsDuration: 100
-}
 
 export const correctInstitutionEventField = {
   "institutionType": "PA",
