@@ -15,12 +15,12 @@ export class TenantProcessService {
     const { data } = await axios
       .post<void>(
         `${this.tenantProcessUrl}/internal/origin/${tenantOrigin}/externalId/${tenantExternalId}/attributes/origin/${attributeOrigin}/externalId/${attributeExternalId}`,
-        null,
+        undefined,
         {
           headers: {
             'X-Correlation-Id': context.correlationId,
-            Authorization: `Bearer ${context.bearerToken}`,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${context.bearerToken}`,
+            'Content-Type': false,
           },
         }
       )
@@ -44,7 +44,7 @@ export class TenantProcessService {
         {
           headers: {
             'X-Correlation-Id': context.correlationId,
-            Authorization: `Bearer ${context.bearerToken}`,
+            'Authorization': `Bearer ${context.bearerToken}`,
             'Content-Type': 'application/json',
           },
         }
