@@ -15,6 +15,7 @@ export class TenantProcessService {
     const { data } = await axios
       .post<void>(
         `${this.tenantProcessUrl}/internal/origin/${tenantOrigin}/externalId/${tenantExternalId}/attributes/origin/${attributeOrigin}/externalId/${attributeExternalId}`,
+        {},
         {
           headers: {
             'X-Correlation-Id': context.correlationId,
