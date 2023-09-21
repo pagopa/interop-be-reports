@@ -21,7 +21,7 @@ const readModelConfig: ReadModelConfig = {
   readModelDbName: env.READ_MODEL_DB_NAME,
 }
 
-const csvFileName = env.FORCE_REMOTE_FILE_NAME ?? filenameFromDate(new Date())
+const csvFileName = env.FORCE_REMOTE_FILE_NAME ?? filenameFromDate(env.SFTP_FILENAME_PREFIX, new Date())
 
 const sftpConfig: SftpConfig = {
   host: env.SFTP_HOST,

@@ -7,6 +7,7 @@ const Env = z.object({
   SFTP_USERNAME: z.string(),
   SFTP_PRIVATE_KEY: z.string(),
   SFTP_PATH: z.string().transform(value => value.endsWith('/') ? value : value + '/'),
+  SFTP_FILENAME_PREFIX: z.string(),
 
   MONGODB_REPLICA_SET: z.string().optional(),
   MONGODB_DIRECT_CONNECTION: z
