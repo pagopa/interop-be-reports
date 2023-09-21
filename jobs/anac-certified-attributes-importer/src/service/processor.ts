@@ -11,7 +11,7 @@ import {
   AttributeIdentifiers,
 } from '../model/index.js'
 import { ReadModelQueries, SftpClient, TenantProcessService } from '../service/index.js'
-import { RefreshableInteropToken, zipBy, logError, logWarn } from '@interop-be-reports/commons'
+import { RefreshableInteropToken, zipBy, logError, logWarn, logInfo } from '@interop-be-reports/commons'
 import crypto from 'crypto'
 
 export async function importAttributes(
@@ -23,6 +23,9 @@ export async function importAttributes(
   anacTenantId: string
 ): Promise<void> {
   const jobCorrelationId = crypto.randomUUID()
+
+  logInfo(jobCorrelationId, "ANAC Certified attributes importer started")
+
   const batchSize = recordsBatchSize
 
   const fileContent = await sftpClient.downloadCSV()
@@ -65,6 +68,8 @@ export async function importAttributes(
     fromLine = fromLine + batchSize
     scanComplete = batchResult.processedRecordsCount === 0
   } while (!scanComplete)
+
+  logInfo(jobCorrelationId, "ANAC Certified attributes importer completed")
 }
 
 async function getAttributesIdentifiers(readModel: ReadModelQueries, anacTenantId: string): Promise<AnacAttributes> {

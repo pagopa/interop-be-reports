@@ -1,5 +1,6 @@
-import { Consumer, Kafka } from "kafkajs";
+import { Consumer, Kafka, logLevel } from "kafkajs";
 import { Env } from "../config/env.js";
+import { SimpleKafkaLogCreator } from "./simpleKafkaLogger.js";
 
 
 export async function initConsumer(env: Env): Promise<Consumer> {
@@ -13,6 +14,8 @@ export async function initConsumer(env: Env): Promise<Consumer> {
       username: '$ConnectionString',
       password: env.BROKER_CONNECTION_STRING
     },
+    logLevel: logLevel.INFO,
+    logCreator: SimpleKafkaLogCreator
   })
 
   const consumer = kafka.consumer({ groupId: env.KAFKA_GROUP_ID })
