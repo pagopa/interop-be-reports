@@ -160,25 +160,25 @@ describe('MetricsManager', () => {
       {
         data: getAttributeMock({
           id: 'attribute-comune',
-          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
+          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
         }),
       },
       {
         data: getAttributeMock({
           id: 'attribute-altra-pub-amm-loc-1',
-          code: 'C16' satisfies MacroCategoryCodeFor<'Altre Pubbliche Amministrazioni locali'>,
+          code: 'C16' satisfies MacroCategoryCodeFor<'Pubbliche Amministrazioni Centrali'>,
         }),
       },
       {
         data: getAttributeMock({
           id: 'attribute-altra-pub-amm-loc-2',
-          code: 'C1' satisfies MacroCategoryCodeFor<'Altre Pubbliche Amministrazioni locali'>,
+          code: 'C1' satisfies MacroCategoryCodeFor<'Pubbliche Amministrazioni Centrali'>,
         }),
       },
       {
         data: getAttributeMock({
           id: 'attribute-azienda-ospedaliera',
-          code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere'>,
+          code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
         }),
       },
     ])
@@ -366,13 +366,13 @@ describe('MetricsManager', () => {
       {
         data: getAttributeMock({
           id: 'attribute-comune',
-          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
+          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
         }),
       },
       {
         data: getAttributeMock({
           id: 'attribute-azienda-ospedaliera',
-          code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere'>,
+          code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
         }),
       },
     ])
@@ -485,14 +485,14 @@ describe('MetricsManager', () => {
       {
         data: getAttributeMock({
           id: 'attribute-comune',
-          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
+          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
           kind: 'Certified',
         }),
       },
       {
         data: getAttributeMock({
           id: 'attribute-azienda-ospedaliera',
-          code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere'>,
+          code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
           kind: 'Certified',
         }),
       },
