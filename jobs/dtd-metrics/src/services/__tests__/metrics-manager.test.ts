@@ -70,17 +70,31 @@ describe('MetricsManager', () => {
   >['ipaCodes'][number]
 
   it('getPublishedEServicesMetric', async () => {
+    const today = new Date()
+    const moreThanOneMonthAgo = new Date(today)
+    moreThanOneMonthAgo.setDate(moreThanOneMonthAgo.getDate() - 40)
+
     await seedCollection('eservices', [
-      { data: getEServiceMock({ descriptors: [{ state: 'Published' }] }) },
-      { data: getEServiceMock({ descriptors: [{ state: 'Suspended' }, { state: 'Draft' }] }) },
+      { data: getEServiceMock({ descriptors: [{ state: 'Published', publishedAt: today.toISOString() }] }) },
       {
-        data: getEServiceMock({ descriptors: [{ state: 'Suspended' }, { state: 'Deprecated' }] }),
+        data: getEServiceMock({
+          descriptors: [{ state: 'Suspended', publishedAt: today.toISOString() }, { state: 'Draft' }],
+        }),
+      },
+      {
+        data: getEServiceMock({
+          descriptors: [
+            { state: 'Suspended', publishedAt: moreThanOneMonthAgo.toISOString() },
+            { state: 'Deprecated' },
+          ],
+        }),
       },
       { data: getEServiceMock({ descriptors: [{ state: 'Draft' }] }) },
     ])
 
-    const result = await metricsManager.getPublishedEServicesMetric(undefined)
+    const result = await metricsManager.getPublishedEServicesMetric()
     expect(result.publishedEServicesCount).toStrictEqual(3)
+    expect(result.lastMonthPublishedEServicesCount).toStrictEqual(2)
   })
 
   it('getMacroCategoriesPublishedEServicesMetric', async () => {
