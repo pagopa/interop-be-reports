@@ -2,12 +2,6 @@ import dotenv from 'dotenv'
 import { z } from 'zod'
 
 export const Env = z.object({
-  TENANTS_COLLECTION_NAME: z.string(),
-  PURPOSES_COLLECTION_NAME: z.string(),
-  ESERVICES_COLLECTION_NAME: z.string(),
-  ATTRIBUTES_COLLECTION_NAME: z.string(),
-  AGREEMENTS_COLLECTION_NAME: z.string(),
-
   READ_MODEL_DB_USER: z.string(),
   READ_MODEL_DB_PASSWORD: z.string(),
   READ_MODEL_DB_HOST: z.string(),

@@ -1,7 +1,7 @@
-import { MongoClient } from 'mongodb'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { MetricsManager } from '../metrics-manager.js'
 import {
+  ReadModelClient,
   getAgreementMock,
   getAttributeMock,
   getEServiceMock,
@@ -11,7 +11,7 @@ import { MACRO_CATEGORIES } from '../../configs/macro-categories.js'
 
 describe('MetricsManager', () => {
   const DB_NAME = 'read-model'
-  let mongoClient: MongoClient
+  let readModel: ReadModelClient
   let mongoServer: MongoMemoryServer
   let metricsManager: MetricsManager
 
@@ -19,31 +19,43 @@ describe('MetricsManager', () => {
     mongoServer = await MongoMemoryServer.create({
       instance: {
         dbName: DB_NAME,
+        auth: true,
+      },
+      auth: {
+        customRootName: 'root',
+        customRootPwd: 'root',
       },
     })
 
-    process.env.READ_MODEL_DB_NAME = DB_NAME
-    process.env.ESERVICES_COLLECTION_NAME = 'eservices'
-    process.env.ATTRIBUTES_COLLECTION_NAME = 'attributes'
-    process.env.AGREEMENTS_COLLECTION_NAME = 'agreements'
-    process.env.TENANTS_COLLECTION_NAME = 'tenants'
-    process.env.PURPOSES_COLLECTION_NAME = 'purposes'
+    readModel = await ReadModelClient.connect({
+      readModelDbUser: mongoServer.auth?.customRootName as string,
+      readModelDbPassword: mongoServer.auth?.customRootPwd as string,
+      readModelDbHost: mongoServer.instanceInfo?.ip as string,
+      readModelDbPort: mongoServer.instanceInfo?.port.toString() as string,
+      readModelDbName: DB_NAME,
+    })
 
-    mongoClient = await new MongoClient(mongoServer.getUri(), {}).connect()
-    metricsManager = new MetricsManager(mongoClient)
+    metricsManager = new MetricsManager(readModel)
   })
 
   afterEach(async () => {
-    await mongoClient.db(DB_NAME).dropDatabase()
+    await readModel.eservices.deleteMany({})
+    await readModel.agreements.deleteMany({})
+    await readModel.attributes.deleteMany({})
+    await readModel.purposes.deleteMany({})
+    await readModel.tenants.deleteMany({})
   })
 
   afterAll(async () => {
-    await mongoClient?.close()
+    await readModel?.close()
     await mongoServer?.stop()
   })
 
-  async function seedCollection(collection: string, data: Array<{ data: unknown }>): Promise<void> {
-    await mongoClient.db(DB_NAME).collection(collection).insertMany(data)
+  async function seedCollection(
+    collection: 'eservices' | 'agreements' | 'tenants' | 'purposes' | 'attributes',
+    data: Array<{ data: unknown }>
+  ): Promise<void> {
+    await readModel[collection].insertMany(data as never)
   }
 
   function repeatObjInArray<T extends Record<'data', unknown>>(item: T, length: number): T[] {
@@ -127,25 +139,19 @@ describe('MetricsManager', () => {
       {
         data: getTenantMock({
           id: 'altra-pub-amm-loc-1',
-          attributes: [
-            { id: 'attribute-altra-pub-amm-loc-1', type: 'PersistentCertifiedAttribute' },
-          ],
+          attributes: [{ id: 'attribute-altra-pub-amm-loc-1', type: 'PersistentCertifiedAttribute' }],
         }),
       },
       {
         data: getTenantMock({
           id: 'altra-pub-amm-loc-2',
-          attributes: [
-            { id: 'attribute-altra-pub-amm-loc-2', type: 'PersistentCertifiedAttribute' },
-          ],
+          attributes: [{ id: 'attribute-altra-pub-amm-loc-2', type: 'PersistentCertifiedAttribute' }],
         }),
       },
       {
         data: getTenantMock({
           id: 'azienda-ospedaliera',
-          attributes: [
-            { id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' },
-          ],
+          attributes: [{ id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' }],
         }),
       },
     ])
@@ -179,14 +185,11 @@ describe('MetricsManager', () => {
 
     const result = await metricsManager.getMacroCategoriesPublishedEServicesMetric()
     expect(
-      result.find((a) => a.name === 'Altre Pubbliche Amministrazioni locali')
-        ?.publishedEServicesCount
+      result.find((a) => a.name === 'Altre Pubbliche Amministrazioni locali')?.publishedEServicesCount
     ).toStrictEqual(2)
 
     expect(result.find((a) => a.name === 'Comuni')?.publishedEServicesCount).toStrictEqual(2)
-    expect(
-      result.find((a) => a.name === 'Aziende Ospedaliere')?.publishedEServicesCount
-    ).toStrictEqual(1)
+    expect(result.find((a) => a.name === 'Aziende Ospedaliere')?.publishedEServicesCount).toStrictEqual(1)
   })
 
   it('getTop10MostSubscribedEServicesMetric', async () => {
@@ -342,25 +345,19 @@ describe('MetricsManager', () => {
       {
         data: getTenantMock({
           id: 'azienda-ospedaliera-1',
-          attributes: [
-            { id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' },
-          ],
+          attributes: [{ id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' }],
         }),
       },
       {
         data: getTenantMock({
           id: 'azienda-ospedaliera-2',
-          attributes: [
-            { id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' },
-          ],
+          attributes: [{ id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' }],
         }),
       },
       {
         data: getTenantMock({
           id: 'azienda-ospedaliera-3',
-          attributes: [
-            { id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' },
-          ],
+          attributes: [{ id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' }],
         }),
       },
     ])
@@ -391,8 +388,7 @@ describe('MetricsManager', () => {
     expect(comuniTop10?.[1].producerName).toStrictEqual('Producer')
     expect(comuniTop10?.[1].agreementsCount).toStrictEqual(1)
 
-    const aziendeOspedaliereTop10 = result.find((a) => a.name === 'Aziende Ospedaliere')
-      ?.top10MostSubscribedEServices
+    const aziendeOspedaliereTop10 = result.find((a) => a.name === 'Aziende Ospedaliere')?.top10MostSubscribedEServices
 
     expect(aziendeOspedaliereTop10?.[0].name).toStrictEqual('eservice-3')
     expect(aziendeOspedaliereTop10?.[0].producerName).toStrictEqual('Producer')
@@ -480,9 +476,7 @@ describe('MetricsManager', () => {
       {
         data: getTenantMock({
           id: 'azienda-ospedaliera',
-          attributes: [
-            { id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' },
-          ],
+          attributes: [{ id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' }],
         }),
       },
     ])
@@ -508,9 +502,7 @@ describe('MetricsManager', () => {
 
     const producer1 = result[0]
     expect(producer1.name).toStrictEqual('Producer 1')
-    const producer1Comuni = producer1.topSubscribers.find(
-      (a: { name: string }) => a.name === 'Comuni'
-    )
+    const producer1Comuni = producer1.topSubscribers.find((a: { name: string }) => a.name === 'Comuni')
     const producer1AziendeOspedaliere = producer1.topSubscribers.find(
       (a: { name: string }) => a.name === 'Aziende Ospedaliere'
     )

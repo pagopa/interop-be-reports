@@ -1,5 +1,7 @@
 import { Collection, Db, MongoClient, MongoClientOptions, ReadPreferenceMode } from 'mongodb'
 import {
+  AGREEMENTS_COLLECTION_NAME,
+  Agreement,
   ATTRIBUTES_COLLECTION_NAME,
   Attribute,
   ESERVICES_COLLECTION_NAME,
@@ -16,6 +18,7 @@ export class ReadModelClient {
   tenants: Collection<{ data: Tenant }>
   purposes: Collection<{ data: Purpose }>
   attributes: Collection<{ data: Attribute }>
+  agreements: Collection<{ data: Agreement }>
 
   private constructor(
     private mongodbClient: MongoClient,
@@ -27,6 +30,7 @@ export class ReadModelClient {
     this.eservices = db.collection(ESERVICES_COLLECTION_NAME)
     this.tenants = db.collection(TENANTS_COLLECTION_NAME)
     this.purposes = db.collection(PURPOSES_COLLECTION_NAME)
+    this.agreements = db.collection(AGREEMENTS_COLLECTION_NAME)
   }
 
   /**
