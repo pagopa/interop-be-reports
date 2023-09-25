@@ -1,5 +1,13 @@
-import { env } from '../configs/env.js'
-import { Agreement, AgreementState, EServiceDescriptor, ReadModelClient } from '@interop-be-reports/commons'
+import {
+  AGREEMENTS_COLLECTION_NAME,
+  ATTRIBUTES_COLLECTION_NAME,
+  Agreement,
+  AgreementState,
+  ESERVICES_COLLECTION_NAME,
+  EServiceDescriptor,
+  ReadModelClient,
+  TENANTS_COLLECTION_NAME,
+} from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import {
   MacroCategoriesPublishedEServicesMetric,
@@ -68,7 +76,7 @@ export class MetricsManager {
         { $replaceRoot: { newRoot: '$data' } },
         {
           $lookup: {
-            from: env.AGREEMENTS_COLLECTION_NAME,
+            from: AGREEMENTS_COLLECTION_NAME,
             localField: 'id',
             foreignField: 'data.eserviceId',
             as: 'agreements',
@@ -76,7 +84,7 @@ export class MetricsManager {
         },
         {
           $lookup: {
-            from: env.TENANTS_COLLECTION_NAME,
+            from: TENANTS_COLLECTION_NAME,
             localField: 'producerId',
             foreignField: 'data.id',
             as: 'producer',
@@ -160,7 +168,7 @@ export class MetricsManager {
         { $limit: 10 },
         {
           $lookup: {
-            from: env.TENANTS_COLLECTION_NAME,
+            from: TENANTS_COLLECTION_NAME,
             localField: '_id',
             foreignField: 'data.id',
             as: 'producer',
@@ -256,7 +264,7 @@ export class MetricsManager {
         { $limit: 10 },
         {
           $lookup: {
-            from: env.ESERVICES_COLLECTION_NAME,
+            from: ESERVICES_COLLECTION_NAME,
             localField: '_id.eserviceId',
             foreignField: 'data.id',
             as: 'eservice',
@@ -264,7 +272,7 @@ export class MetricsManager {
         },
         {
           $lookup: {
-            from: env.TENANTS_COLLECTION_NAME,
+            from: TENANTS_COLLECTION_NAME,
             localField: '_id.producerId',
             foreignField: 'data.id',
             as: 'producer',
@@ -310,7 +318,7 @@ export class MetricsManager {
         },
         {
           $lookup: {
-            from: env.TENANTS_COLLECTION_NAME,
+            from: TENANTS_COLLECTION_NAME,
             localField: 'producerId',
             foreignField: 'data.id',
             as: 'producer',
@@ -318,7 +326,7 @@ export class MetricsManager {
         },
         {
           $lookup: {
-            from: env.ATTRIBUTES_COLLECTION_NAME,
+            from: ATTRIBUTES_COLLECTION_NAME,
             localField: 'producer.data.attributes.id',
             foreignField: 'data.id',
             as: 'producerAttributes',
