@@ -11,13 +11,11 @@ import {
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import {
   MacroCategoriesPublishedEServicesMetric,
-  Metrics,
   PublishedEServicesMetric,
   Top10MostSubscribedEServicesMetric,
   Top10MostSubscribedEServicesPerMacroCategoryMetric,
   Top10ProviderWithMostSubscriberMetric,
 } from '../models/metrics.model.js'
-import { getVariationPercentage } from '../utils/helpers.utils.js'
 
 export class MetricsManager {
   constructor(private readModel: ReadModelClient) {}
@@ -25,27 +23,34 @@ export class MetricsManager {
   /**
    * @see https://pagopa.atlassian.net/browse/PIN-3744
    **/
-  async getPublishedEServicesMetric(oldMetrics: Metrics | undefined): Promise<PublishedEServicesMetric> {
+  async getPublishedEServicesMetric(): Promise<PublishedEServicesMetric> {
     const publishedEServicesCount = await this.readModel.eservices.countDocuments({
       'data.descriptors.state': {
         $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
       },
     })
 
-    let variation = 0
+    const oneMonthAgo = new Date()
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
 
-    if (oldMetrics) {
-      variation = getVariationPercentage(
-        oldMetrics.publishedEServicesMetric.publishedEServicesCount,
-        publishedEServicesCount
-      )
-    }
+    const lastMonthPublishedEServicesCount = await this.readModel.eservices.countDocuments({
+      'data.descriptors.state': {
+        $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
+      },
+      // QUESTION: Is it correct to assume that the version 1 descriptor of the e-service is always at index 0?
+      'data.descriptors.0.publishedAt': {
+        $gte: oneMonthAgo.toISOString(),
+      },
+    })
+
+    const variation = lastMonthPublishedEServicesCount / publishedEServicesCount
 
     return PublishedEServicesMetric.parse({
       publishedEServicesCount,
+      lastMonthPublishedEServicesCount,
       variation: new Intl.NumberFormat('it-IT', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
       }).format(variation),
     })
   }

@@ -3,14 +3,15 @@ import { AwsS3BucketClient, ReadModelClient, withExecutionTime } from '@interop-
 import { MetricsManager } from './services/index.js'
 import { env } from './configs/env.js'
 import { Metrics } from './models/metrics.model.js'
-import { z } from 'zod'
 
 const log = console.log
+
+let readModel: ReadModelClient
 
 async function main(): Promise<void> {
   log('Starting program\n')
 
-  const readModel = await ReadModelClient.connect({
+  readModel = await ReadModelClient.connect({
     mongodbReplicaSet: env.MONGODB_REPLICA_SET,
     mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
     mongodbReadPreference: env.MONGODB_READ_PREFERENCE as ReadPreferenceMode,
@@ -27,8 +28,6 @@ async function main(): Promise<void> {
 
   log('Retrieving metrics...')
 
-  const oldMetrics = z.optional(Metrics).parse(await bucket.getJSONData(env.FILENAME))
-
   const [
     publishedEServicesMetric,
     macroCategoriesPublishedEServicesMetric,
@@ -36,7 +35,7 @@ async function main(): Promise<void> {
     top10MostSubscribedEServicesPerMacroCategoryMetric,
     top10ProviderWithMostSubscriberMetric,
   ] = await Promise.all([
-    metricsManager.getPublishedEServicesMetric(oldMetrics),
+    metricsManager.getPublishedEServicesMetric(),
     metricsManager.getMacroCategoriesPublishedEServicesMetric(),
     metricsManager.getTop10MostSubscribedEServicesMetric(),
     metricsManager.getTop10MostSubscribedEServicesPerMacroCategoryMetric(),
@@ -55,11 +54,9 @@ async function main(): Promise<void> {
   })
 
   await bucket.uploadData(output, env.FILENAME)
-
   log('Done!\n')
-
-  await readModel.close()
-  process.exit(0)
 }
 
-withExecutionTime(main)
+withExecutionTime(main).finally(async () => {
+  if (readModel) await readModel.close()
+})
