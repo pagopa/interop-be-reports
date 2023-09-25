@@ -1,14 +1,26 @@
 import { Collection, Db, MongoClient, MongoClientOptions, ReadPreferenceMode } from 'mongodb'
-import { ATTRIBUTES_COLLECTION_NAME, Attribute, ESERVICES_COLLECTION_NAME, EService, PURPOSES_COLLECTION_NAME, Purpose, ReadModelConfig, TENANTS_COLLECTION_NAME, Tenant } from '../index.js'
+import {
+  ATTRIBUTES_COLLECTION_NAME,
+  Attribute,
+  ESERVICES_COLLECTION_NAME,
+  EService,
+  PURPOSES_COLLECTION_NAME,
+  Purpose,
+  ReadModelConfig,
+  TENANTS_COLLECTION_NAME,
+  Tenant,
+} from '../index.js'
 
 export class ReadModelClient {
-
   eservices: Collection<{ data: EService }>
   tenants: Collection<{ data: Tenant }>
   purposes: Collection<{ data: Purpose }>
   attributes: Collection<{ data: Attribute }>
 
-  private constructor(private mongodbClient: MongoClient, db: Db) {
+  private constructor(
+    private mongodbClient: MongoClient,
+    db: Db
+  ) {
     this.mongodbClient = mongodbClient
 
     this.attributes = db.collection(ATTRIBUTES_COLLECTION_NAME)
@@ -20,7 +32,7 @@ export class ReadModelClient {
   /**
    * Connects to the mongodb database
    */
-  public static async connect(config: ReadModelConfig) {
+  public static async connect(config: ReadModelConfig): Promise<ReadModelClient> {
     const connectionConfig = {
       replicaSet: config.mongodbReplicaSet,
       directConnection: config.mongodbDirectConnection,
@@ -36,7 +48,7 @@ export class ReadModelClient {
   /**
    * Closes the connection to the database
    * */
-  async close() {
+  async close(): Promise<void> {
     await this.mongodbClient.close()
   }
 }

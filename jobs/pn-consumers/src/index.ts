@@ -1,7 +1,7 @@
 import { ReadModelQueriesClient } from './services/index.js'
 import { toCsvDataRow } from './utils/index.js'
 import { CSV_FILENAME, MAIL_BODY, MAIL_SUBJECT, env } from './configs/index.js'
-import { Mailer, SafeMap, toCSV, withExecutionTime } from '@interop-be-reports/commons'
+import { Mailer, ReadModelClient, SafeMap, toCSV, withExecutionTime } from '@interop-be-reports/commons'
 
 const log = console.log
 
@@ -9,7 +9,20 @@ async function main(): Promise<void> {
   log('Program started.\n')
 
   log('> Connecting to database...')
-  const readModelsQueriesClient = await ReadModelQueriesClient.connect()
+  const readModel = await ReadModelClient.connect({
+    mongodbReplicaSet: env.MONGODB_REPLICA_SET,
+    mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
+    mongodbReadPreference: env.MONGODB_READ_PREFERENCE,
+    mongodbRetryWrites: env.MONGODB_RETRY_WRITES,
+
+    readModelDbUser: env.READ_MODEL_DB_USER,
+    readModelDbPassword: env.READ_MODEL_DB_PASSWORD,
+    readModelDbHost: env.READ_MODEL_DB_HOST,
+    readModelDbPort: env.READ_MODEL_DB_PORT,
+    readModelDbName: env.READ_MODEL_DB_NAME,
+  })
+
+  const readModelsQueriesClient = new ReadModelQueriesClient(readModel)
   log('> Connected to database!\n')
 
   log('> Getting data...')
@@ -23,8 +36,8 @@ async function main(): Promise<void> {
   const tenantsIds = [...new Set(purposes.map((purpose) => purpose.consumerId))]
   const tenants = await readModelsQueriesClient.getComuniByTenantsIds(tenantsIds)
 
-  const tenantNamesMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant.name]))
-  const csvData = purposes.map(toCsvDataRow.bind(null, tenantNamesMap))
+  const tenantsMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant]))
+  const csvData = purposes.map(toCsvDataRow.bind(null, tenantsMap))
 
   log('> Data csv produced!\n')
 
