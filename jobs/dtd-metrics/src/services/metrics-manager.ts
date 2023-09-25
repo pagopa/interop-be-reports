@@ -1,12 +1,5 @@
-import { MongoClient } from 'mongodb'
 import { env } from '../configs/env.js'
-import {
-  Agreement,
-  AgreementState,
-  Attribute,
-  EService,
-  EServiceDescriptor,
-} from '@interop-be-reports/commons'
+import { Agreement, AgreementState, EServiceDescriptor, ReadModelClient } from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import {
   MacroCategoriesPublishedEServicesMetric,
@@ -19,22 +12,17 @@ import {
 import { getVariationPercentage } from '../utils/helpers.utils.js'
 
 export class MetricsManager {
-  constructor(private client: MongoClient) {}
+  constructor(private readModel: ReadModelClient) {}
 
   /**
    * @see https://pagopa.atlassian.net/browse/PIN-3744
    **/
-  async getPublishedEServicesMetric(
-    oldMetrics: Metrics | undefined
-  ): Promise<PublishedEServicesMetric> {
-    const publishedEServicesCount = await this.client
-      .db(env.READ_MODEL_DB_NAME)
-      .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
-      .countDocuments({
-        'data.descriptors.state': {
-          $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
-        },
-      })
+  async getPublishedEServicesMetric(oldMetrics: Metrics | undefined): Promise<PublishedEServicesMetric> {
+    const publishedEServicesCount = await this.readModel.eservices.countDocuments({
+      'data.descriptors.state': {
+        $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
+      },
+    })
 
     let variation = 0
 
@@ -59,9 +47,7 @@ export class MetricsManager {
    */
   async getMacroCategoriesPublishedEServicesMetric(): Promise<MacroCategoriesPublishedEServicesMetric> {
     const result = await Promise.all(
-      MACRO_CATEGORIES.map((macroCategory) =>
-        this.getMacroCategoryPublishedEServiceCount(macroCategory)
-      )
+      MACRO_CATEGORIES.map((macroCategory) => this.getMacroCategoryPublishedEServiceCount(macroCategory))
     )
     return MacroCategoriesPublishedEServicesMetric.parse(result)
   }
@@ -70,9 +56,7 @@ export class MetricsManager {
    * @see https://pagopa.atlassian.net/browse/PIN-3746
    */
   async getTop10MostSubscribedEServicesMetric(): Promise<Top10MostSubscribedEServicesMetric> {
-    const result = await this.client
-      .db(env.READ_MODEL_DB_NAME)
-      .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
+    const result = await this.readModel.eservices
       .aggregate([
         {
           $match: {
@@ -109,10 +93,7 @@ export class MetricsManager {
                 $filter: {
                   input: '$agreements',
                   cond: {
-                    $or: [
-                      { $eq: ['$$this.data.state', 'Active'] },
-                      { $eq: ['$$this.data.state', 'Suspended'] },
-                    ],
+                    $or: [{ $eq: ['$$this.data.state', 'Active'] }, { $eq: ['$$this.data.state', 'Suspended'] }],
                   },
                 },
               },
@@ -132,9 +113,7 @@ export class MetricsManager {
    */
   async getTop10MostSubscribedEServicesPerMacroCategoryMetric(): Promise<Top10MostSubscribedEServicesPerMacroCategoryMetric> {
     const result = await Promise.all(
-      MACRO_CATEGORIES.map((macroCategory) =>
-        this.getMacroCategoryTop10MostSubscribedEServices(macroCategory)
-      )
+      MACRO_CATEGORIES.map((macroCategory) => this.getMacroCategoryTop10MostSubscribedEServices(macroCategory))
     )
 
     return Top10MostSubscribedEServicesPerMacroCategoryMetric.parse(result)
@@ -156,9 +135,7 @@ export class MetricsManager {
 
     const allMacroCategoriesAttributeIds = macroCategories.map((macro) => macro.attributeIds).flat()
 
-    const result = await this.client
-      .db(env.READ_MODEL_DB_NAME)
-      .collection(env.AGREEMENTS_COLLECTION_NAME)
+    const result = await this.readModel.agreements
       .aggregate([
         {
           $match: {
@@ -257,9 +234,7 @@ export class MetricsManager {
   ): Promise<Top10MostSubscribedEServicesPerMacroCategoryMetric[number]> {
     const attributeIds = await this.getMacroCategoryAttributeIds(macroCategory)
 
-    const result = await this.client
-      .db(env.READ_MODEL_DB_NAME)
-      .collection<{ data: Agreement }>(env.AGREEMENTS_COLLECTION_NAME)
+    const result = await this.readModel.agreements
       .aggregate([
         {
           $match: {
@@ -316,9 +291,7 @@ export class MetricsManager {
   private async getMacroCategoryPublishedEServiceCount(
     macroCategory: (typeof MACRO_CATEGORIES)[number]
   ): Promise<MacroCategoriesPublishedEServicesMetric[number]> {
-    const result = await this.client
-      .db(env.READ_MODEL_DB_NAME)
-      .collection<{ data: EService }>(env.ESERVICES_COLLECTION_NAME)
+    const result = await this.readModel.eservices
       .aggregate([
         {
           $match: {
@@ -398,16 +371,12 @@ export class MetricsManager {
 
   private _attributeIdsCache: Record<string, Array<string>> = {}
 
-  private async getMacroCategoryAttributeIds(
-    macroCategory: (typeof MACRO_CATEGORIES)[number]
-  ): Promise<Array<string>> {
+  private async getMacroCategoryAttributeIds(macroCategory: (typeof MACRO_CATEGORIES)[number]): Promise<Array<string>> {
     if (this._attributeIdsCache[macroCategory.id]) {
       return this._attributeIdsCache[macroCategory.id]
     }
 
-    const attributesIds: Array<string> = await this.client
-      .db(env.READ_MODEL_DB_NAME)
-      .collection<{ data: Attribute }>(env.ATTRIBUTES_COLLECTION_NAME)
+    const attributesIds: Array<string> = await this.readModel.attributes
       .find({
         'data.code': {
           $in: macroCategory.ipaCodes,
