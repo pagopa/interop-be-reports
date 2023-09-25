@@ -27,13 +27,6 @@ describe('MetricsManager', () => {
       },
     })
 
-    process.env.READ_MODEL_DB_NAME = DB_NAME
-    process.env.ESERVICES_COLLECTION_NAME = 'eservices'
-    process.env.ATTRIBUTES_COLLECTION_NAME = 'attributes'
-    process.env.AGREEMENTS_COLLECTION_NAME = 'agreements'
-    process.env.TENANTS_COLLECTION_NAME = 'tenants'
-    process.env.PURPOSES_COLLECTION_NAME = 'purposes'
-
     readModel = await ReadModelClient.connect({
       readModelDbUser: mongoServer.auth?.customRootName as string,
       readModelDbPassword: mongoServer.auth?.customRootPwd as string,
