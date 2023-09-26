@@ -9,6 +9,8 @@
 // } from '@interop-be-reports/commons'
 // import { MACRO_CATEGORIES } from '../../configs/macro-categories.js'
 
+// type MacroCategoryName = (typeof MACRO_CATEGORIES)[number]['name']
+
 // describe('MetricsManager', () => {
 //   const DB_NAME = 'read-model'
 //   let readModel: ReadModelClient
@@ -174,36 +176,41 @@
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-comune',
-//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
+//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
 //         }),
 //       },
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-altra-pub-amm-loc-1',
-//           code: 'C16' satisfies MacroCategoryCodeFor<'Altre Pubbliche Amministrazioni locali'>,
+//           code: 'C16' satisfies MacroCategoryCodeFor<'Pubbliche Amministrazioni Centrali'>,
 //         }),
 //       },
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-altra-pub-amm-loc-2',
-//           code: 'C1' satisfies MacroCategoryCodeFor<'Altre Pubbliche Amministrazioni locali'>,
+//           code: 'C1' satisfies MacroCategoryCodeFor<'Pubbliche Amministrazioni Centrali'>,
 //         }),
 //       },
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-azienda-ospedaliera',
-//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere'>,
+//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
 //         }),
 //       },
 //     ])
 
 //     const result = await metricsManager.getMacroCategoriesPublishedEServicesMetric()
 //     expect(
-//       result.find((a) => a.name === 'Altre Pubbliche Amministrazioni locali')?.publishedEServicesCount
+//       result.find((a) => (a.name as MacroCategoryName) === 'Pubbliche Amministrazioni Centrali')
+//         ?.publishedEServicesCount
 //     ).toStrictEqual(2)
 
-//     expect(result.find((a) => a.name === 'Comuni')?.publishedEServicesCount).toStrictEqual(2)
-//     expect(result.find((a) => a.name === 'Aziende Ospedaliere')?.publishedEServicesCount).toStrictEqual(1)
+//     expect(
+//       result.find((a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane')?.publishedEServicesCount
+//     ).toStrictEqual(2)
+//     expect(
+//       result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')?.publishedEServicesCount
+//     ).toStrictEqual(1)
 //   })
 
 //   it('getTop10MostSubscribedEServicesMetric', async () => {
@@ -279,6 +286,14 @@
 //           consumerId: 'comune-3',
 //           producerId: 'producer',
 //           certifiedAttributes: [{ id: 'attribute-comune' }],
+//         }),
+//       },
+//       {
+//         data: getAgreementMock({
+//           eserviceId: 'eservice-1',
+//           consumerId: 'azienda-ospedaliera-3',
+//           producerId: 'producer',
+//           certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
 //         }),
 //       },
 //       {
@@ -380,19 +395,20 @@
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-comune',
-//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
+//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
 //         }),
 //       },
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-azienda-ospedaliera',
-//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere'>,
+//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
 //         }),
 //       },
 //     ])
 
 //     const result = await metricsManager.getTop10MostSubscribedEServicesPerMacroCategoryMetric()
-//     const comuniTop10 = result.find((a) => a.name === 'Comuni')?.top10MostSubscribedEServices
+//     const comuniTop10 = result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')
+//       ?.top10MostSubscribedEServices
 
 //     expect(comuniTop10?.[0].name).toStrictEqual('eservice-2')
 //     expect(comuniTop10?.[0].producerName).toStrictEqual('Producer')
@@ -402,7 +418,8 @@
 //     expect(comuniTop10?.[1].producerName).toStrictEqual('Producer')
 //     expect(comuniTop10?.[1].agreementsCount).toStrictEqual(1)
 
-//     const aziendeOspedaliereTop10 = result.find((a) => a.name === 'Aziende Ospedaliere')?.top10MostSubscribedEServices
+//     const aziendeOspedaliereTop10 = result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')
+//       ?.top10MostSubscribedEServices
 
 //     expect(aziendeOspedaliereTop10?.[0].name).toStrictEqual('eservice-3')
 //     expect(aziendeOspedaliereTop10?.[0].producerName).toStrictEqual('Producer')
@@ -499,14 +516,14 @@
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-comune',
-//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
+//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
 //           kind: 'Certified',
 //         }),
 //       },
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-azienda-ospedaliera',
-//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere'>,
+//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
 //           kind: 'Certified',
 //         }),
 //       },
@@ -516,20 +533,25 @@
 
 //     const producer1 = result[0]
 //     expect(producer1.name).toStrictEqual('Producer 1')
-//     const producer1Comuni = producer1.topSubscribers.find((a: { name: string }) => a.name === 'Comuni')
-//     const producer1AziendeOspedaliere = producer1.topSubscribers.find(
-//       (a: { name: string }) => a.name === 'Aziende Ospedaliere'
+
+//     const producer1Comuni = producer1.topSubscribers.find(
+//       (a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane'
 //     )
+
+//     const producer1AziendeOspedaliere = producer1.topSubscribers.find(
+//       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
+//     )
+
 //     expect(producer1Comuni?.agreementsCount).toStrictEqual(2)
 //     expect(producer1AziendeOspedaliere?.agreementsCount).toStrictEqual(2)
 
 //     const producer2 = result[1]
 //     expect(producer2.name).toStrictEqual('Producer 2')
 //     const producer2Comuni = producer2.topSubscribers.find(
-//       (a: { name: string }) => a.name === 'Comuni' //TODO: Fix typing
+//       (a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane' //TODO: Fix typing
 //     )
 //     const producer2AziendeOspedaliere = producer2.topSubscribers.find(
-//       (a: { name: string }) => a.name === 'Aziende Ospedaliere' //TODO: Fix typing
+//       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL' //TODO: Fix typing
 //     )
 //     expect(producer2Comuni?.agreementsCount).toStrictEqual(1)
 //     expect(producer2AziendeOspedaliere?.agreementsCount).toStrictEqual(0)
