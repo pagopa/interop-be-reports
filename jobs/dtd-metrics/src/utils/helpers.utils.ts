@@ -1,11 +1,9 @@
+import sub from 'date-fns/sub'
+
 export function getSixMonthsAgoDate(): Date {
-  const date = new Date()
-  date.setMonth(date.getMonth() - 6)
-  return date
+  return sub(new Date(), { months: 6 })
 }
 
-export function getOneYearAgoDate(): Date {
-  const date = new Date()
-  date.setFullYear(date.getFullYear() - 1)
-  return date
+export function getTwelveYearAgoDate(): Date {
+  return sub(new Date(), { years: 1 })
 }

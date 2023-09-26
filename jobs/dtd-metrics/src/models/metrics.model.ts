@@ -14,13 +14,31 @@ export const PublishedEServicesByMacroCategoriesMetric = z.array(
   })
 )
 
-export const Top10MostSubscribedEServicesMetric = z.array(
-  z.object({
-    name: z.string(),
-    producerName: z.string(),
-    agreementsCount: z.number(),
-  })
-)
+export const Top10MostSubscribedEServicesMetric = z.object({
+  lastSixMonths: z.array(
+    z.object({
+      name: z.string(),
+      producerName: z.string(),
+      agreementsCount: z.number(),
+    })
+  ),
+
+  lastTwelveMonths: z.array(
+    z.object({
+      name: z.string(),
+      producerName: z.string(),
+      agreementsCount: z.number(),
+    })
+  ),
+
+  fromTheBeginning: z.array(
+    z.object({
+      name: z.string(),
+      producerName: z.string(),
+      agreementsCount: z.number(),
+    })
+  ),
+})
 
 export const Top10MostSubscribedEServicesPerMacroCategoriesMetric = z.array(
   z.object({
