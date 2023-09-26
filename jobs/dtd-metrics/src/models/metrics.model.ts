@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const PublishedEServicesMetric = z.object({
   publishedEServicesCount: z.number(),
+  lastMonthPublishedEServicesCount: z.number(),
   variation: z.string(),
 })
 

@@ -1,34 +1,37 @@
 import { EServiceDescriptor, ReadModelClient } from '@interop-be-reports/commons'
-import { getVariationPercentage } from '../utils/helpers.utils.js'
-import { Metrics, PublishedEServicesMetric } from '../models/metrics.model.js'
+import { PublishedEServicesMetric } from '../models/metrics.model.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3744
  **/
-export async function getPublishedEServicesMetric(
-  oldMetrics: Metrics | undefined,
-  readModel: ReadModelClient
-): Promise<PublishedEServicesMetric> {
+export async function getPublishedEServicesMetric(readModel: ReadModelClient): Promise<PublishedEServicesMetric> {
   const publishedEServicesCount = await readModel.eservices.countDocuments({
     'data.descriptors.state': {
       $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
     },
   })
 
-  let variation = 0
+  const oneMonthAgo = new Date()
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
 
-  if (oldMetrics) {
-    variation = getVariationPercentage(
-      oldMetrics.publishedEServicesMetric.publishedEServicesCount,
-      publishedEServicesCount
-    )
-  }
+  const lastMonthPublishedEServicesCount = await readModel.eservices.countDocuments({
+    'data.descriptors.state': {
+      $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
+    },
+    // QUESTION: Is it correct to assume that the version 1 descriptor of the e-service is always at index 0?
+    'data.descriptors.0.publishedAt': {
+      $gte: oneMonthAgo.toISOString(),
+    },
+  })
+
+  const variation = lastMonthPublishedEServicesCount / publishedEServicesCount
 
   return PublishedEServicesMetric.parse({
     publishedEServicesCount,
+    lastMonthPublishedEServicesCount,
     variation: new Intl.NumberFormat('it-IT', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
     }).format(variation),
   })
 }

@@ -9,8 +9,6 @@
 // } from '@interop-be-reports/commons'
 // import { MACRO_CATEGORIES } from '../../configs/macro-categories.js'
 
-// type MacroCategoryName = (typeof MACRO_CATEGORIES)[number]['name']
-
 // describe('MetricsManager', () => {
 //   const DB_NAME = 'read-model'
 //   let readModel: ReadModelClient
@@ -72,17 +70,31 @@
 //   >['ipaCodes'][number]
 
 //   it('getPublishedEServicesMetric', async () => {
+//     const today = new Date()
+//     const moreThanOneMonthAgo = new Date(today)
+//     moreThanOneMonthAgo.setDate(moreThanOneMonthAgo.getDate() - 40)
+
 //     await seedCollection('eservices', [
-//       { data: getEServiceMock({ descriptors: [{ state: 'Published' }] }) },
-//       { data: getEServiceMock({ descriptors: [{ state: 'Suspended' }, { state: 'Draft' }] }) },
+//       { data: getEServiceMock({ descriptors: [{ state: 'Published', publishedAt: today.toISOString() }] }) },
 //       {
-//         data: getEServiceMock({ descriptors: [{ state: 'Suspended' }, { state: 'Deprecated' }] }),
+//         data: getEServiceMock({
+//           descriptors: [{ state: 'Suspended', publishedAt: today.toISOString() }, { state: 'Draft' }],
+//         }),
+//       },
+//       {
+//         data: getEServiceMock({
+//           descriptors: [
+//             { state: 'Suspended', publishedAt: moreThanOneMonthAgo.toISOString() },
+//             { state: 'Deprecated' },
+//           ],
+//         }),
 //       },
 //       { data: getEServiceMock({ descriptors: [{ state: 'Draft' }] }) },
 //     ])
 
-//     const result = await metricsManager.getPublishedEServicesMetric(undefined)
+//     const result = await metricsManager.getPublishedEServicesMetric()
 //     expect(result.publishedEServicesCount).toStrictEqual(3)
+//     expect(result.lastMonthPublishedEServicesCount).toStrictEqual(2)
 //   })
 
 //   it('getMacroCategoriesPublishedEServicesMetric', async () => {
@@ -162,41 +174,36 @@
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-comune',
-//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
+//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
 //         }),
 //       },
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-altra-pub-amm-loc-1',
-//           code: 'C16' satisfies MacroCategoryCodeFor<'Pubbliche Amministrazioni Centrali'>,
+//           code: 'C16' satisfies MacroCategoryCodeFor<'Altre Pubbliche Amministrazioni locali'>,
 //         }),
 //       },
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-altra-pub-amm-loc-2',
-//           code: 'C1' satisfies MacroCategoryCodeFor<'Pubbliche Amministrazioni Centrali'>,
+//           code: 'C1' satisfies MacroCategoryCodeFor<'Altre Pubbliche Amministrazioni locali'>,
 //         }),
 //       },
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-azienda-ospedaliera',
-//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
+//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere'>,
 //         }),
 //       },
 //     ])
 
 //     const result = await metricsManager.getMacroCategoriesPublishedEServicesMetric()
 //     expect(
-//       result.find((a) => (a.name as MacroCategoryName) === 'Pubbliche Amministrazioni Centrali')
-//         ?.publishedEServicesCount
+//       result.find((a) => a.name === 'Altre Pubbliche Amministrazioni locali')?.publishedEServicesCount
 //     ).toStrictEqual(2)
 
-//     expect(
-//       result.find((a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane')?.publishedEServicesCount
-//     ).toStrictEqual(2)
-//     expect(
-//       result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')?.publishedEServicesCount
-//     ).toStrictEqual(1)
+//     expect(result.find((a) => a.name === 'Comuni')?.publishedEServicesCount).toStrictEqual(2)
+//     expect(result.find((a) => a.name === 'Aziende Ospedaliere')?.publishedEServicesCount).toStrictEqual(1)
 //   })
 
 //   it('getTop10MostSubscribedEServicesMetric', async () => {
@@ -309,14 +316,6 @@
 //       },
 //       {
 //         data: getAgreementMock({
-//           eserviceId: 'eservice-1',
-//           consumerId: 'azienda-ospedaliera-3',
-//           producerId: 'producer',
-//           certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
-//         }),
-//       },
-//       {
-//         data: getAgreementMock({
 //           eserviceId: 'eservice-3',
 //           consumerId: 'azienda-ospedaliera-3',
 //           producerId: 'producer',
@@ -381,31 +380,29 @@
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-comune',
-//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
+//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
 //         }),
 //       },
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-azienda-ospedaliera',
-//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
+//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere'>,
 //         }),
 //       },
 //     ])
 
 //     const result = await metricsManager.getTop10MostSubscribedEServicesPerMacroCategoryMetric()
-//     const comuniTop10 = result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')
-//       ?.top10MostSubscribedEServices
+//     const comuniTop10 = result.find((a) => a.name === 'Comuni')?.top10MostSubscribedEServices
 
-//     expect(comuniTop10?.[0].name).toStrictEqual('eservice-3')
+//     expect(comuniTop10?.[0].name).toStrictEqual('eservice-2')
 //     expect(comuniTop10?.[0].producerName).toStrictEqual('Producer')
-//     expect(comuniTop10?.[0].agreementsCount).toStrictEqual(3)
+//     expect(comuniTop10?.[0].agreementsCount).toStrictEqual(2)
 
 //     expect(comuniTop10?.[1].name).toStrictEqual('eservice-1')
 //     expect(comuniTop10?.[1].producerName).toStrictEqual('Producer')
 //     expect(comuniTop10?.[1].agreementsCount).toStrictEqual(1)
 
-//     const aziendeOspedaliereTop10 = result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')
-//       ?.top10MostSubscribedEServices
+//     const aziendeOspedaliereTop10 = result.find((a) => a.name === 'Aziende Ospedaliere')?.top10MostSubscribedEServices
 
 //     expect(aziendeOspedaliereTop10?.[0].name).toStrictEqual('eservice-3')
 //     expect(aziendeOspedaliereTop10?.[0].producerName).toStrictEqual('Producer')
@@ -502,14 +499,14 @@
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-comune',
-//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
+//           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
 //           kind: 'Certified',
 //         }),
 //       },
 //       {
 //         data: getAttributeMock({
 //           id: 'attribute-azienda-ospedaliera',
-//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
+//           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere'>,
 //           kind: 'Certified',
 //         }),
 //       },
@@ -519,11 +516,9 @@
 
 //     const producer1 = result[0]
 //     expect(producer1.name).toStrictEqual('Producer 1')
-//     const producer1Comuni = producer1.topSubscribers.find(
-//       (a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane'
-//     )
+//     const producer1Comuni = producer1.topSubscribers.find((a: { name: string }) => a.name === 'Comuni')
 //     const producer1AziendeOspedaliere = producer1.topSubscribers.find(
-//       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
+//       (a: { name: string }) => a.name === 'Aziende Ospedaliere'
 //     )
 //     expect(producer1Comuni?.agreementsCount).toStrictEqual(2)
 //     expect(producer1AziendeOspedaliere?.agreementsCount).toStrictEqual(2)
@@ -531,10 +526,10 @@
 //     const producer2 = result[1]
 //     expect(producer2.name).toStrictEqual('Producer 2')
 //     const producer2Comuni = producer2.topSubscribers.find(
-//       (a) => a.name === 'Comuni e città metropolitane' //TODO: Fix typing
+//       (a: { name: string }) => a.name === 'Comuni' //TODO: Fix typing
 //     )
 //     const producer2AziendeOspedaliere = producer2.topSubscribers.find(
-//       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
+//       (a: { name: string }) => a.name === 'Aziende Ospedaliere' //TODO: Fix typing
 //     )
 //     expect(producer2Comuni?.agreementsCount).toStrictEqual(1)
 //     expect(producer2AziendeOspedaliere?.agreementsCount).toStrictEqual(0)
