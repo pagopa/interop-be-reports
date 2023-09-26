@@ -9,7 +9,7 @@ export const sftpConfigTest = {
   filePath: '/',
 }
 
-const csvFileContent = `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
+const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,ANAC_incaricato,ANAC_abilitato,ANAC_in_convalida
 0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,FALSE,TRUE
 0011223344,E-Procurement 1,eprocurement1@pec.it,,TRUE,TRUE,FALSE
 0011223344,"E-Procurement 2 con , virgola nel nome",eprocurement1@pec.it,,TRUE,TRUE,FALSE`

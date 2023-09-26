@@ -90,7 +90,7 @@ describe('ANAC Certified Attributes Importer', () => {
   })
 
   it('should succeed, assigning only missing attributes', async () => {
-    const csvFileContent = `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
+    const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,ANAC_incaricato,ANAC_abilitato,ANAC_in_convalida
 0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE`
 
     const readModelTenants: PersistentTenant[] = [
@@ -122,7 +122,7 @@ describe('ANAC Certified Attributes Importer', () => {
   })
 
   it('should succeed, unassigning only existing attributes', async () => {
-    const csvFileContent = `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
+    const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,ANAC_incaricato,ANAC_abilitato,ANAC_in_convalida
 0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,FALSE,FALSE,FALSE`
 
     const readModelTenants: PersistentTenant[] = [
@@ -157,7 +157,7 @@ describe('ANAC Certified Attributes Importer', () => {
   })
 
   it('should succeed, only for tenants that exist on read model ', async () => {
-    const csvFileContent = `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
+    const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,ANAC_incaricato,ANAC_abilitato,ANAC_in_convalida
 0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE
 9876543210,Org name not in Tenants,gsp2@pec.it,ipa_code_456,TRUE,TRUE,TRUE`
 
@@ -190,7 +190,7 @@ describe('ANAC Certified Attributes Importer', () => {
   })
 
   it('should succeed with more than one batch', async () => {
-    const csvFileContent = `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
+    const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,ANAC_incaricato,ANAC_abilitato,ANAC_in_convalida
 0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE
 9876543210,Org name not in Tenants,gsp2@pec.it,ipa_code_456,TRUE,TRUE,TRUE
 9876543299,Org name not in Tenants,gsp3@pec.it,ipa_code_789,TRUE,TRUE,TRUE`
@@ -275,7 +275,7 @@ describe('ANAC Certified Attributes Importer', () => {
   })
 
   it('should skip CSV file rows with unexpected schema', async () => {
-    const csvFileContent = `cf_gestore,denominazione,domicilio_digitale,codice_ipa,anac_incaricato,anac_abilitato,anac_in_convalida
+    const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,ANAC_incaricato,ANAC_abilitato,ANAC_in_convalida
     ,Wrong format row,gsp1@pec.it,ipa_code_123,TRUE,TRUE,
     0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE`
 
