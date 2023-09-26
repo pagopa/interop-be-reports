@@ -5,7 +5,7 @@ export const PublishedEServicesMetric = z.object({
   variation: z.string(),
 })
 
-export const MacroCategoriesPublishedEServicesMetric = z.array(
+export const PublishedEServicesByMacroCategoriesMetric = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
@@ -21,7 +21,7 @@ export const Top10MostSubscribedEServicesMetric = z.array(
   })
 )
 
-export const Top10MostSubscribedEServicesPerMacroCategoryMetric = z.array(
+export const Top10MostSubscribedEServicesPerMacroCategoriesMetric = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
@@ -44,23 +44,18 @@ export const Top10ProviderWithMostSubscriberMetric = z.array(
 
 export const Metrics = z.object({
   publishedEServicesMetric: PublishedEServicesMetric,
-  macroCategoriesPublishedEServicesMetric: MacroCategoriesPublishedEServicesMetric,
+  macroCategoriesPublishedEServicesMetric: PublishedEServicesByMacroCategoriesMetric,
   top10MostSubscribedEServicesMetric: Top10MostSubscribedEServicesMetric,
-  top10MostSubscribedEServicesPerMacroCategoryMetric:
-    Top10MostSubscribedEServicesPerMacroCategoryMetric,
+  top10MostSubscribedEServicesPerMacroCategoryMetric: Top10MostSubscribedEServicesPerMacroCategoriesMetric,
   top10ProviderWithMostSubscriberMetric: Top10ProviderWithMostSubscriberMetric,
 })
 
 export type Metrics = z.infer<typeof Metrics>
 
 export type PublishedEServicesMetric = z.infer<typeof PublishedEServicesMetric>
-export type MacroCategoriesPublishedEServicesMetric = z.infer<
-  typeof MacroCategoriesPublishedEServicesMetric
->
+export type PublishedEServicesByMacroCategoriesMetric = z.infer<typeof PublishedEServicesByMacroCategoriesMetric>
 export type Top10MostSubscribedEServicesMetric = z.infer<typeof Top10MostSubscribedEServicesMetric>
-export type Top10MostSubscribedEServicesPerMacroCategoryMetric = z.infer<
-  typeof Top10MostSubscribedEServicesPerMacroCategoryMetric
+export type Top10MostSubscribedEServicesPerMacroCategoriesMetric = z.infer<
+  typeof Top10MostSubscribedEServicesPerMacroCategoriesMetric
 >
-export type Top10ProviderWithMostSubscriberMetric = z.infer<
-  typeof Top10ProviderWithMostSubscriberMetric
->
+export type Top10ProviderWithMostSubscriberMetric = z.infer<typeof Top10ProviderWithMostSubscriberMetric>

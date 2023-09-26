@@ -1,9 +1,15 @@
 import { ReadPreferenceMode } from 'mongodb'
 import { AwsS3BucketClient, ReadModelClient, withExecutionTime } from '@interop-be-reports/commons'
-import { MetricsManager } from './services/index.js'
 import { env } from './configs/env.js'
 import { Metrics } from './models/metrics.model.js'
 import { z } from 'zod'
+import {
+  getPublishedEServicesMetric,
+  getPublishedEServicesByMacroCategoriesMetric,
+  getTop10MostSubscribedEServicesMetric,
+  getTop10MostSubscribedEServicesPerMacroCategoriesMetric,
+  getTop10ProviderWithMostSubscriberMetric,
+} from './services/index.js'
 
 const log = console.log
 
@@ -23,7 +29,6 @@ async function main(): Promise<void> {
   })
 
   const bucket = new AwsS3BucketClient(env.STORAGE_BUCKET)
-  const metricsManager = new MetricsManager(readModel)
 
   log('Retrieving metrics...')
 
@@ -36,11 +41,11 @@ async function main(): Promise<void> {
     top10MostSubscribedEServicesPerMacroCategoryMetric,
     top10ProviderWithMostSubscriberMetric,
   ] = await Promise.all([
-    metricsManager.getPublishedEServicesMetric(oldMetrics),
-    metricsManager.getMacroCategoriesPublishedEServicesMetric(),
-    metricsManager.getTop10MostSubscribedEServicesMetric(),
-    metricsManager.getTop10MostSubscribedEServicesPerMacroCategoryMetric(),
-    metricsManager.getTop10ProviderWithMostSubscriberMetric(),
+    getPublishedEServicesMetric(oldMetrics, readModel),
+    getPublishedEServicesByMacroCategoriesMetric(readModel),
+    getTop10MostSubscribedEServicesMetric(readModel),
+    getTop10MostSubscribedEServicesPerMacroCategoriesMetric(readModel),
+    getTop10ProviderWithMostSubscriberMetric(readModel),
   ])
 
   log('Metrics retrieved!\n')
