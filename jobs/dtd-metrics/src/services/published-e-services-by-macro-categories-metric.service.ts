@@ -97,5 +97,6 @@ export async function getPublishedEServicesByMacroCategoriesMetric(
   const result = await Promise.all(
     MACRO_CATEGORIES.map((macroCategory) => getMacroCategoryPublishedEServiceCount(macroCategory))
   )
+
   return PublishedEServicesByMacroCategoriesMetric.parse(result)
 }

@@ -10,7 +10,7 @@ import {
   Top10MostSubscribedEServicesPerMacroCategoriesMetric,
 } from '../models/metrics.model.js'
 import { getMacroCategoryAttributesIds } from './macro-categories-attributes-ids.service.js'
-import { getSixMonthsAgoDate, getTwelveYearAgoDate } from '../utils/helpers.utils.js'
+import { getSixMonthsAgoDate, getOneYearAgoDate } from '../utils/helpers.utils.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3746
@@ -32,7 +32,7 @@ async function getMacroCategoryTop10MostSubscribedEServices(
   const attributeIds = await getMacroCategoryAttributesIds(macroCategory, readModel)
 
   const sixMonthsAgoDate = getSixMonthsAgoDate()
-  const twelveYearAgoDate = getTwelveYearAgoDate()
+  const twelveYearAgoDate = getOneYearAgoDate()
   const fromTheBeginningDate = undefined
 
   const [lastSixMonths, lastTwelveMonths, fromTheBeginning] = await Promise.all(

@@ -5,7 +5,7 @@ import {
   TENANTS_COLLECTION_NAME,
 } from '@interop-be-reports/commons'
 import { Top10MostSubscribedEServicesMetric } from '../models/metrics.model.js'
-import { getTwelveYearAgoDate, getSixMonthsAgoDate } from '../utils/helpers.utils.js'
+import { getOneYearAgoDate, getSixMonthsAgoDate } from '../utils/helpers.utils.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3746
@@ -17,7 +17,7 @@ export async function getTop10MostSubscribedEServicesMetric(
   yesterdayDate.setDate(yesterdayDate.getDate() - 1)
 
   const sixMonthsAgoDate = getSixMonthsAgoDate()
-  const twelveYearAgoDate = getTwelveYearAgoDate()
+  const twelveYearAgoDate = getOneYearAgoDate()
   const fromTheBeginningDate = undefined
 
   const [lastSixMonths, lastTwelveMonths, fromTheBeginning] = await Promise.all(

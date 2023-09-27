@@ -2,6 +2,7 @@ import { AgreementState, ReadModelClient, TENANTS_COLLECTION_NAME } from '@inter
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import { getMacroCategoryAttributesIds } from './macro-categories-attributes-ids.service.js'
 import { Top10ProviderWithMostSubscriberMetric } from '../models/metrics.model.js'
+import { getSixMonthsAgoDate, getOneYearAgoDate } from '../utils/helpers.utils.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3747
@@ -21,85 +22,94 @@ export async function getTop10ProviderWithMostSubscriberMetric(
 
   const allMacroCategoriesAttributeIds = macroCategories.map((macro) => macro.attributeIds).flat()
 
-  const result = await readModel.agreements
-    .aggregate([
-      {
-        $match: {
-          'data.state': {
-            $in: ['Active', 'Suspended'] satisfies Array<AgreementState>,
+  const sixMonthsAgoDate = getSixMonthsAgoDate()
+  const twelveYearAgoDate = getOneYearAgoDate()
+  const fromTheBeginningDate = undefined
+
+  const [lastSixMonths, lastTwelveMonths, fromTheBeginning] = await Promise.all(
+    [sixMonthsAgoDate, twelveYearAgoDate, fromTheBeginningDate].map((date) =>
+      readModel.agreements
+        .aggregate([
+          {
+            $match: {
+              'data.state': {
+                $in: ['Active', 'Suspended'] satisfies Array<AgreementState>,
+              },
+              'data.certifiedAttributes': {
+                $elemMatch: { id: { $in: allMacroCategoriesAttributeIds } },
+              },
+              ...(date ? { 'data.createdAt': { $gte: date } } : {}),
+            },
           },
-          'data.certifiedAttributes': {
-            $elemMatch: { id: { $in: allMacroCategoriesAttributeIds } },
+          {
+            $group: {
+              _id: '$data.producerId',
+              agreements: {
+                $push: '$data.certifiedAttributes.id',
+              },
+              agreementsCount: { $sum: 1 },
+            },
           },
-        },
-      },
-      {
-        $group: {
-          _id: '$data.producerId',
-          agreements: {
-            $push: '$data.certifiedAttributes.id',
+          { $sort: { agreementsCount: -1 } },
+          { $limit: 10 },
+          {
+            $lookup: {
+              from: TENANTS_COLLECTION_NAME,
+              localField: '_id',
+              foreignField: 'data.id',
+              as: 'producer',
+            },
           },
-          agreementsCount: { $sum: 1 },
-        },
-      },
-      { $sort: { agreementsCount: -1 } },
-      { $limit: 10 },
-      {
-        $lookup: {
-          from: TENANTS_COLLECTION_NAME,
-          localField: '_id',
-          foreignField: 'data.id',
-          as: 'producer',
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          name: { $arrayElemAt: ['$producer.data.name', 0] },
-          agreements: 1,
-        },
-      },
-      {
-        $project: {
-          name: 1,
-          topSubscribers: macroCategories.map((macroCategory) => ({
-            id: macroCategory.id,
-            name: macroCategory.name,
-            agreementsCount: {
-              $map: {
-                input: '$agreements',
-                as: 'agreement',
-                in: {
-                  $filter: {
-                    input: '$$agreement',
-                    as: 'attributeId',
-                    cond: {
-                      $in: ['$$attributeId', macroCategory.attributeIds],
+          {
+            $project: {
+              _id: 0,
+              name: { $arrayElemAt: ['$producer.data.name', 0] },
+              agreements: 1,
+            },
+          },
+          {
+            $project: {
+              name: 1,
+              topSubscribers: macroCategories.map((macroCategory) => ({
+                id: macroCategory.id,
+                name: macroCategory.name,
+                agreementsCount: {
+                  $map: {
+                    input: '$agreements',
+                    as: 'agreement',
+                    in: {
+                      $filter: {
+                        input: '$$agreement',
+                        as: 'attributeId',
+                        cond: {
+                          $in: ['$$attributeId', macroCategory.attributeIds],
+                        },
+                      },
                     },
                   },
                 },
-              },
+              })),
             },
-          })),
-        },
-      },
-      {
-        $project: {
-          name: 1,
-          topSubscribers: {
-            $map: {
-              input: '$topSubscribers',
-              as: 'topSubscriber',
-              in: {
-                id: '$$topSubscriber.id',
-                name: '$$topSubscriber.name',
-                agreementsCount: {
-                  $size: {
-                    $filter: {
-                      input: '$$topSubscriber.agreementsCount',
-                      as: 'agreement',
-                      cond: {
-                        $gt: [{ $size: '$$agreement' }, 0],
+          },
+          {
+            $project: {
+              name: 1,
+              topSubscribers: {
+                $map: {
+                  input: '$topSubscribers',
+                  as: 'topSubscriber',
+                  in: {
+                    id: '$$topSubscriber.id',
+                    name: '$$topSubscriber.name',
+                    agreementsCount: {
+                      $size: {
+                        $filter: {
+                          input: '$$topSubscriber.agreementsCount',
+                          as: 'agreement',
+                          cond: {
+                            $gt: [{ $size: '$$agreement' }, 0],
+                          },
+                        },
                       },
                     },
                   },
@@ -107,10 +117,10 @@ export async function getTop10ProviderWithMostSubscriberMetric(
               },
             },
           },
-        },
-      },
-    ])
-    .toArray()
+        ])
+        .toArray()
+    )
+  )
 
-  return Top10ProviderWithMostSubscriberMetric.parse(result)
+  return Top10ProviderWithMostSubscriberMetric.parse({ lastSixMonths, lastTwelveMonths, fromTheBeginning })
 }

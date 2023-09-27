@@ -48,18 +48,46 @@ export const Top10MostSubscribedEServicesPerMacroCategoriesMetric = z.array(
   })
 )
 
-export const Top10ProviderWithMostSubscriberMetric = z.array(
-  z.object({
-    name: z.string(),
-    topSubscribers: z.array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        agreementsCount: z.number(),
-      })
-    ),
-  })
-)
+export const Top10ProviderWithMostSubscriberMetric = z.object({
+  lastSixMonths: z.array(
+    z.object({
+      name: z.string(),
+      topSubscribers: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          agreementsCount: z.number(),
+        })
+      ),
+    })
+  ),
+
+  lastTwelveMonths: z.array(
+    z.object({
+      name: z.string(),
+      topSubscribers: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          agreementsCount: z.number(),
+        })
+      ),
+    })
+  ),
+
+  fromTheBeginning: z.array(
+    z.object({
+      name: z.string(),
+      topSubscribers: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          agreementsCount: z.number(),
+        })
+      ),
+    })
+  ),
+})
 
 export const Metrics = z.object({
   publishedEServicesMetric: PublishedEServicesMetric,
