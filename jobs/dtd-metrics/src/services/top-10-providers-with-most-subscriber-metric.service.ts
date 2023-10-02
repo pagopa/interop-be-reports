@@ -38,7 +38,7 @@ export async function getTop10ProviderWithMostSubscriberMetric(
               'data.certifiedAttributes': {
                 $elemMatch: { id: { $in: allMacroCategoriesAttributeIds } },
               },
-              ...(date ? { 'data.createdAt': { $gte: date } } : {}),
+              ...(date ? { 'data.createdAt': { $gte: date.toISOString() } } : {}),
             },
           },
           {
