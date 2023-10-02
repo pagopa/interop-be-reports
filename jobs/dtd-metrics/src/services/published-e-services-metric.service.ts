@@ -24,14 +24,11 @@ export async function getPublishedEServicesMetric(readModel: ReadModelClient): P
     },
   })
 
-  const variation = lastMonthPublishedEServicesCount / publishedEServicesCount
+  const variation = (lastMonthPublishedEServicesCount / publishedEServicesCount) * 100
 
   return PublishedEServicesMetric.parse({
     publishedEServicesCount,
     lastMonthPublishedEServicesCount,
-    variation: new Intl.NumberFormat('it-IT', {
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    }).format(variation),
+    variation: Number(variation.toFixed(1)),
   })
 }
