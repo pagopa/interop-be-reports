@@ -1,11 +1,6 @@
-import { SafeMap } from '@interop-be-reports/commons'
 import { toCsvDataRow } from '../helpers.utils.js'
-import { Purpose, Tenant } from '../../models/index.js'
+import { Purpose } from '../../models/index.js'
 import { PNDataCSVRow } from '../../models/pn-data-csv-row.model.js'
-
-const tenantNamesMap = new SafeMap<string, Tenant>([
-  ['tenantId', { id: 'id', name: 'tenantName', externalId: { origin: 'origin', value: 'value' } }],
-])
 
 describe('toCsvDataRow', () => {
   it('should return the correct data row (Active)', () => {
@@ -19,6 +14,11 @@ describe('toCsvDataRow', () => {
           dailyCalls: 200,
         },
       ],
+      consumerName: 'tenantName',
+      consumerExternalId: {
+        origin: 'origin',
+        value: 'value',
+      },
     }
 
     const expected: PNDataCSVRow = {
@@ -30,7 +30,7 @@ describe('toCsvDataRow', () => {
       carico_finalita_migliore: 200,
     }
 
-    expect(toCsvDataRow(tenantNamesMap, purpose)).toEqual(expected)
+    expect(toCsvDataRow(purpose)).toEqual(expected)
   })
 
   it('should return the correct data row (Suspended)', () => {
@@ -44,6 +44,11 @@ describe('toCsvDataRow', () => {
           dailyCalls: 200,
         },
       ],
+      consumerName: 'tenantName',
+      consumerExternalId: {
+        origin: 'origin',
+        value: 'value',
+      },
     }
     const expected: PNDataCSVRow = {
       nome_comune: 'tenantName',
@@ -54,7 +59,7 @@ describe('toCsvDataRow', () => {
       carico_finalita_migliore: 200,
     }
 
-    expect(toCsvDataRow(tenantNamesMap, purpose)).toEqual(expected)
+    expect(toCsvDataRow(purpose)).toEqual(expected)
   })
 
   it('should return the correct data row (WaitingForApproval)', () => {
@@ -68,6 +73,11 @@ describe('toCsvDataRow', () => {
           dailyCalls: 200,
         },
       ],
+      consumerName: 'tenantName',
+      consumerExternalId: {
+        origin: 'origin',
+        value: 'value',
+      },
     }
     const expected: PNDataCSVRow = {
       nome_comune: 'tenantName',
@@ -78,7 +88,7 @@ describe('toCsvDataRow', () => {
       carico_finalita_migliore: 200,
     }
 
-    expect(toCsvDataRow(tenantNamesMap, purpose)).toEqual(expected)
+    expect(toCsvDataRow(purpose)).toEqual(expected)
   })
 
   it('should throw an error if the purpose has no active, suspended or waiting for activation version', () => {
@@ -92,8 +102,13 @@ describe('toCsvDataRow', () => {
           dailyCalls: 200,
         },
       ],
+      consumerName: 'tenantName',
+      consumerExternalId: {
+        origin: 'origin',
+        value: 'value',
+      },
     }
 
-    expect(() => toCsvDataRow(tenantNamesMap, purpose)).toThrow()
+    expect(() => toCsvDataRow(purpose)).toThrow()
   })
 })

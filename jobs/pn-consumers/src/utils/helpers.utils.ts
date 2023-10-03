@@ -4,7 +4,7 @@ import { Purpose, PurposeVersion, PNDataCSVRow, StatoFinalitaMigliore } from '..
 /**
  * Transforms a purpose to a CSV output row.
  * The row contains the following fields:
- * - `nome_comune`: The name of the tenant related to the purpose, retrived from the tenants map
+ * - `nome_comune`: The name of the tenant related to the purpose
  * - `stato_finalita_migliore`: The state of the purpose. It follows the following logic:
  *    1. If the purpose has an active version, the state is "Attivo";
  *    2. If the purpose has no active version, but has a suspended version, the state is "Sospeso";
