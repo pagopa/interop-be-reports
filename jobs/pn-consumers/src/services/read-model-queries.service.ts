@@ -1,16 +1,15 @@
-import { env } from '../configs/env.js'
 import { PurposeState, ReadModelClient } from '@interop-be-reports/commons'
 import { Purpose } from '../models/index.js'
 
 export class ReadModelQueriesClient {
   constructor(private readModel: ReadModelClient) {}
 
-  async getSENDPurposes(): Promise<Array<Purpose>> {
+  async getSENDPurposes(pnEServiceId: string, comuniAttributeId: string): Promise<Array<Purpose>> {
     return await this.readModel.purposes
       .aggregate([
         {
           $match: {
-            'data.eserviceId': env.PN_ESERVICE_ID,
+            'data.eserviceId': pnEServiceId,
             'data.versions.state': {
               $in: ['Active', 'Suspended', 'WaitingForApproval'] satisfies Array<PurposeState>,
             },
@@ -32,7 +31,7 @@ export class ReadModelQueriesClient {
         {
           $match: {
             'data.consumer.data.attributes': {
-              $elemMatch: { id: env.COMUNI_E_LORO_CONSORZI_E_ASSOCIAZIONI_ATTRIBUTE_ID },
+              $elemMatch: { id: comuniAttributeId },
             },
           },
         },

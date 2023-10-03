@@ -27,7 +27,10 @@ async function main(): Promise<void> {
 
   log('> Getting data...')
 
-  const purposes = await readModelsQueriesClient.getSENDPurposes()
+  const purposes = await readModelsQueriesClient.getSENDPurposes(
+    env.PN_ESERVICE_ID,
+    env.COMUNI_E_LORO_CONSORZI_E_ASSOCIAZIONI_ATTRIBUTE_ID
+  )
 
   if (purposes.length === 0) {
     log('> No purposes data found. Exiting program.')
