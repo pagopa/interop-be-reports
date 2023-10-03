@@ -1,7 +1,7 @@
 import { ReadModelQueriesClient } from './services/index.js'
 import { toCsvDataRow } from './utils/index.js'
 import { CSV_FILENAME, MAIL_BODY, MAIL_SUBJECT, env } from './configs/index.js'
-import { Mailer, ReadModelClient, SafeMap, toCSV, withExecutionTime } from '@interop-be-reports/commons'
+import { Mailer, ReadModelClient, toCSV, withExecutionTime } from '@interop-be-reports/commons'
 
 const log = console.log
 
@@ -26,18 +26,15 @@ async function main(): Promise<void> {
   log('> Connected to database!\n')
 
   log('> Getting data...')
-  const purposes = await readModelsQueriesClient.getPNEServicePurposes()
+
+  const purposes = await readModelsQueriesClient.getSENDPurposes()
 
   if (purposes.length === 0) {
     log('> No purposes data found. Exiting program.')
     process.exit(0)
   }
 
-  const tenantsIds = [...new Set(purposes.map((purpose) => purpose.consumerId))]
-  const tenants = await readModelsQueriesClient.getComuniByTenantsIds(tenantsIds)
-
-  const tenantsMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant]))
-  const csvData = purposes.map(toCsvDataRow.bind(null, tenantsMap))
+  const csv = toCSV(purposes.map(toCsvDataRow))
 
   log('> Data csv produced!\n')
 
@@ -58,7 +55,7 @@ async function main(): Promise<void> {
     to: env.MAIL_RECIPIENTS,
     subject: MAIL_SUBJECT,
     text: MAIL_BODY,
-    attachments: [{ filename: CSV_FILENAME, content: toCSV(csvData) }],
+    attachments: [{ filename: CSV_FILENAME, content: csv }],
   })
 
   log('> Success!\n')

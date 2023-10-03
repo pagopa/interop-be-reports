@@ -1,6 +1,5 @@
-import { PurposeState, SafeMap } from '@interop-be-reports/commons'
-import { Purpose, PurposeVersion, Tenant } from '../models/index.js'
-import { PNDataCSVRow, StatoFinalitaMigliore } from '../models/pn-data-csv-row.model.js'
+import { PurposeState } from '@interop-be-reports/commons'
+import { Purpose, PurposeVersion, PNDataCSVRow, StatoFinalitaMigliore } from '../models/index.js'
 
 /**
  * Transforms a purpose to a CSV output row.
@@ -16,7 +15,7 @@ import { PNDataCSVRow, StatoFinalitaMigliore } from '../models/pn-data-csv-row.m
  * - `codice`: `tenant.externalId.value`
  * - `carico_finalita_migliore`: `dailyCalls` value from the purpose of the `stato_finalita_migliore` field
  */
-export function toCsvDataRow(tenantsMap: SafeMap<string, Tenant>, purpose: Purpose): PNDataCSVRow {
+export function toCsvDataRow(purpose: Purpose): PNDataCSVRow {
   function getPurposeVersionWithState(state: PurposeState): PurposeVersion | undefined {
     return purpose.versions.find((version) => version.state === state)
   }
@@ -29,7 +28,11 @@ export function toCsvDataRow(tenantsMap: SafeMap<string, Tenant>, purpose: Purpo
 
   if (!relevantVersion) {
     throw new Error(
-      `Purpose ${purpose.id} has no active, suspended or waiting for activation version.`
+      `Purpose ${purpose.id} has no active, suspended or waiting for activation version.\n${JSON.stringify(
+        purpose,
+        null,
+        2
+      )}`
     )
   }
 
@@ -39,14 +42,12 @@ export function toCsvDataRow(tenantsMap: SafeMap<string, Tenant>, purpose: Purpo
     ? 'Sospeso'
     : 'In attesa di attivazione'
 
-  const tenant = tenantsMap.get(purpose.consumerId)
-
   return PNDataCSVRow.parse({
-    nome_comune: tenant.name,
+    nome_comune: purpose.consumerName,
     stato_finalita_migliore: state,
     data_attivazione: relevantVersion.firstActivationAt,
-    fonte_codice: tenant.externalId.origin,
-    codice: tenant.externalId.value,
+    fonte_codice: purpose.consumerExternalId.origin,
+    codice: purpose.consumerExternalId.value,
     carico_finalita_migliore: relevantVersion.dailyCalls,
   })
 }
