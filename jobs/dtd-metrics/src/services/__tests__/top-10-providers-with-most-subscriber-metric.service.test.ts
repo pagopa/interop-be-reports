@@ -1,5 +1,5 @@
 import { getAgreementMock, getAttributeMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
-import { MacroCategoryCodeFor, MacroCategoryName, readModel, seedCollection } from './metrics-tests.utils.js'
+import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { getTop10ProviderWithMostSubscriberMetric } from '../top-10-providers-with-most-subscriber-metric.service.js'
 
 describe('getTop10ProviderWithMostSubscriberMetric', () => {
@@ -106,7 +106,7 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
       },
     ])
 
-    const result = await getTop10ProviderWithMostSubscriberMetric(readModel)
+    const result = await getTop10ProviderWithMostSubscriberMetric(readModelMock)
 
     const producer1 = result.fromTheBeginning[0]
     expect(producer1.name).toStrictEqual('Producer 1')

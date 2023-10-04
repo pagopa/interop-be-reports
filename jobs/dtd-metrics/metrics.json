@@ -1,0 +1,1822 @@
+{
+  "publishedEServicesMetric": {
+    "publishedEServicesCount": 831,
+    "lastMonthPublishedEServicesCount": 378,
+    "variation": 45.5
+  },
+  "macroCategoriesPublishedEServicesMetric": [
+    {
+      "id": "1",
+      "name": "Altre Pubbliche Amministrazioni locali",
+      "publishedEServicesCount": 9
+    },
+    {
+      "id": "2",
+      "name": "Aziende Ospedaliere e ASL",
+      "publishedEServicesCount": 0
+    },
+    {
+      "id": "3",
+      "name": "Comuni e città metropolitane",
+      "publishedEServicesCount": 671
+    },
+    {
+      "id": "4",
+      "name": "Province",
+      "publishedEServicesCount": 0
+    },
+    {
+      "id": "5",
+      "name": "Pubbliche Amministrazioni Centrali",
+      "publishedEServicesCount": 151
+    },
+    {
+      "id": "6",
+      "name": "Regioni",
+      "publishedEServicesCount": 0
+    },
+    {
+      "id": "7",
+      "name": "Scuole",
+      "publishedEServicesCount": 0
+    },
+    {
+      "id": "8",
+      "name": "Università e AFAM",
+      "publishedEServicesCount": 0
+    },
+    {
+      "id": "9",
+      "name": "Istituti di Ricerca",
+      "publishedEServicesCount": 0
+    },
+    {
+      "id": "10",
+      "name": "Stazioni Appaltanti",
+      "publishedEServicesCount": 0
+    }
+  ],
+  "top10MostSubscribedEServicesMetric": [
+    {
+      "id": "0",
+      "name": "Totale",
+      "top10MostSubscribedEServices": {
+        "lastSixMonths": [
+          {
+            "name": "SEND - Servizio Notifiche Digitali",
+            "producerName": "PagoPa S.p.A.",
+            "agreementsCount": 1228
+          },
+          {
+            "name": "INAD CONSULTAZIONE DD",
+            "producerName": "Agenzia per L'Italia Digitale",
+            "agreementsCount": 67
+          },
+          {
+            "name": "C020-servizioAccertamentoResidenza-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 34
+          },
+          {
+            "name": "C001–servizioNotifica-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 25
+          },
+          {
+            "name": "C008-servizioVerificaDichResidenza-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 23
+          },
+          {
+            "name": "C002-servizioComunicazione-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 19
+          },
+          {
+            "name": "C003-servizioVerificaDichGeneralita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 18
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 18
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia-approvazione_automati",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 16
+          },
+          {
+            "name": "C016-servizioAccertamentoDichDecesso-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 14
+          }
+        ],
+        "lastTwelveMonths": [
+          {
+            "name": "SEND - Servizio Notifiche Digitali",
+            "producerName": "PagoPa S.p.A.",
+            "agreementsCount": 1228
+          },
+          {
+            "name": "INAD CONSULTAZIONE DD",
+            "producerName": "Agenzia per L'Italia Digitale",
+            "agreementsCount": 67
+          },
+          {
+            "name": "C020-servizioAccertamentoResidenza-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 34
+          },
+          {
+            "name": "C001–servizioNotifica-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 25
+          },
+          {
+            "name": "C008-servizioVerificaDichResidenza-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 23
+          },
+          {
+            "name": "C002-servizioComunicazione-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 19
+          },
+          {
+            "name": "C003-servizioVerificaDichGeneralita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 18
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 18
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia-approvazione_automati",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 16
+          },
+          {
+            "name": "C016-servizioAccertamentoDichDecesso-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 14
+          }
+        ],
+        "fromTheBeginning": [
+          {
+            "name": "SEND - Servizio Notifiche Digitali",
+            "producerName": "PagoPa S.p.A.",
+            "agreementsCount": 1228
+          },
+          {
+            "name": "INAD CONSULTAZIONE DD",
+            "producerName": "Agenzia per L'Italia Digitale",
+            "agreementsCount": 67
+          },
+          {
+            "name": "C020-servizioAccertamentoResidenza-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 34
+          },
+          {
+            "name": "C001–servizioNotifica-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 25
+          },
+          {
+            "name": "C008-servizioVerificaDichResidenza-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 23
+          },
+          {
+            "name": "C002-servizioComunicazione-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 19
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 18
+          },
+          {
+            "name": "C003-servizioVerificaDichGeneralita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 18
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia-approvazione_automati",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 16
+          },
+          {
+            "name": "Consultazione ISEE - v1",
+            "producerName": "Istituto Nazionale Previdenza Sociale - INPS",
+            "agreementsCount": 15
+          }
+        ]
+      }
+    },
+    {
+      "id": "1",
+      "name": "Altre Pubbliche Amministrazioni locali",
+      "top10MostSubscribedEServices": {
+        "lastSixMonths": [
+          {
+            "name": "INAD CONSULTAZIONE DD",
+            "producerName": "Agenzia per L'Italia Digitale",
+            "agreementsCount": 3
+          },
+          {
+            "name": "Richieste CDC",
+            "producerName": "Istituto Nazionale Previdenza Sociale - INPS",
+            "agreementsCount": 1
+          },
+          {
+            "name": "CNCI1 - Accettazione Richiesta Documenti",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          }
+        ],
+        "lastTwelveMonths": [
+          {
+            "name": "INAD CONSULTAZIONE DD",
+            "producerName": "Agenzia per L'Italia Digitale",
+            "agreementsCount": 3
+          },
+          {
+            "name": "Richieste CDC",
+            "producerName": "Istituto Nazionale Previdenza Sociale - INPS",
+            "agreementsCount": 1
+          },
+          {
+            "name": "CNCI1 - Accettazione Richiesta Documenti",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          }
+        ],
+        "fromTheBeginning": [
+          {
+            "name": "INAD CONSULTAZIONE DD",
+            "producerName": "Agenzia per L'Italia Digitale",
+            "agreementsCount": 3
+          },
+          {
+            "name": "Verifica Booleana CodiceFiscale",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          },
+          {
+            "name": "Richieste CDC",
+            "producerName": "Istituto Nazionale Previdenza Sociale - INPS",
+            "agreementsCount": 1
+          },
+          {
+            "name": "CNCI1 - Accettazione Richiesta Documenti",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "2",
+      "name": "Aziende Ospedaliere e ASL",
+      "top10MostSubscribedEServices": {
+        "lastSixMonths": [],
+        "lastTwelveMonths": [],
+        "fromTheBeginning": []
+      }
+    },
+    {
+      "id": "3",
+      "name": "Comuni e città metropolitane",
+      "top10MostSubscribedEServices": {
+        "lastSixMonths": [
+          {
+            "name": "C020-servizioAccertamentoResidenza-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 34
+          },
+          {
+            "name": "C001–servizioNotifica-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 25
+          },
+          {
+            "name": "C002-servizioComunicazione-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 19
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 18
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia-approvazione_automati",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 16
+          },
+          {
+            "name": "C018-servizioAccertamentoCittadinanza-approvazione_automatic",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 14
+          },
+          {
+            "name": "C016-servizioAccertamentoDichDecesso-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 14
+          },
+          {
+            "name": "C024-servizioAccertamentoPaternita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 13
+          },
+          {
+            "name": "C025-servizioAccertamentoMaternita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 13
+          },
+          {
+            "name": "C019-servizioAccertamentoEsistenzaVita-approvazione_automati",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 13
+          }
+        ],
+        "lastTwelveMonths": [
+          {
+            "name": "C020-servizioAccertamentoResidenza-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 34
+          },
+          {
+            "name": "C001–servizioNotifica-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 25
+          },
+          {
+            "name": "C002-servizioComunicazione-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 19
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 18
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia-approvazione_automati",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 16
+          },
+          {
+            "name": "C016-servizioAccertamentoDichDecesso-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 14
+          },
+          {
+            "name": "C018-servizioAccertamentoCittadinanza-approvazione_automatic",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 14
+          },
+          {
+            "name": "C025-servizioAccertamentoMaternita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 13
+          },
+          {
+            "name": "C022-servizioAccertamentoStatoLibero-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 13
+          },
+          {
+            "name": "C019-servizioAccertamentoEsistenzaVita-approvazione_automati",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 13
+          }
+        ],
+        "fromTheBeginning": [
+          {
+            "name": "C020-servizioAccertamentoResidenza-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 34
+          },
+          {
+            "name": "C001–servizioNotifica-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 25
+          },
+          {
+            "name": "C002-servizioComunicazione-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 19
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 18
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia-approvazione_automati",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 16
+          },
+          {
+            "name": "C018-servizioAccertamentoCittadinanza-approvazione_automatic",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 14
+          },
+          {
+            "name": "C016-servizioAccertamentoDichDecesso-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 14
+          },
+          {
+            "name": "C024-servizioAccertamentoPaternita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 13
+          },
+          {
+            "name": "C025-servizioAccertamentoMaternita-approvazione_automatica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 13
+          },
+          {
+            "name": "C019-servizioAccertamentoEsistenzaVita-approvazione_automati",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 13
+          }
+        ]
+      }
+    },
+    {
+      "id": "4",
+      "name": "Province",
+      "top10MostSubscribedEServices": {
+        "lastSixMonths": [],
+        "lastTwelveMonths": [
+          {
+            "name": "C025-servizioAccertamentoMaternita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C024-servizioAccertamentoPaternita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C018-servizioAccertamentoCittadinanza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C020-servizioAccertamentoResidenza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C019-servizioAccertamentoEsistenzaVita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          }
+        ],
+        "fromTheBeginning": [
+          {
+            "name": "C025-servizioAccertamentoMaternita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C024-servizioAccertamentoPaternita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C018-servizioAccertamentoCittadinanza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C020-servizioAccertamentoResidenza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C019-servizioAccertamentoEsistenzaVita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "5",
+      "name": "Pubbliche Amministrazioni Centrali",
+      "top10MostSubscribedEServices": {
+        "lastSixMonths": [
+          {
+            "name": "C019-servizioAccertamentoEsistenzaVita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "VPIVA1 - Verifica Partita Iva",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          }
+        ],
+        "lastTwelveMonths": [
+          {
+            "name": "C019-servizioAccertamentoEsistenzaVita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 2
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C001–servizioNotifica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "Verifica Booleana CodiceFiscale",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C018-servizioAccertamentoCittadinanza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C020-servizioAccertamentoResidenza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "VCF1 - Verifica Booleana Codice Fiscale ",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "VPIVA1 - Verifica Partita Iva",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          }
+        ],
+        "fromTheBeginning": [
+          {
+            "name": "C019-servizioAccertamentoEsistenzaVita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 2
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C001–servizioNotifica",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "Verifica Booleana CodiceFiscale",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C018-servizioAccertamentoCittadinanza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C020-servizioAccertamentoResidenza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "VCF1 - Verifica Booleana Codice Fiscale ",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "VPIVA1 - Verifica Partita Iva",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "6",
+      "name": "Regioni",
+      "top10MostSubscribedEServices": {
+        "lastSixMonths": [
+          {
+            "name": "VCF1 - Verifica Booleana Codice Fiscale ",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 2
+          },
+          {
+            "name": "C020-servizioAccertamentoResidenza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "Consultazione ISEE - v1",
+            "producerName": "Istituto Nazionale Previdenza Sociale - INPS",
+            "agreementsCount": 1
+          },
+          {
+            "name": "VPIVA1 - Verifica Partita Iva",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          }
+        ],
+        "lastTwelveMonths": [
+          {
+            "name": "C020-servizioAccertamentoResidenza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 2
+          },
+          {
+            "name": "Consultazione ISEE - v1",
+            "producerName": "Istituto Nazionale Previdenza Sociale - INPS",
+            "agreementsCount": 2
+          },
+          {
+            "name": "VCF1 - Verifica Booleana Codice Fiscale ",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 2
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 2
+          },
+          {
+            "name": "C025-servizioAccertamentoMaternita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "VPIVA1 - Verifica Partita Iva",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C024-servizioAccertamentoPaternita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C019-servizioAccertamentoEsistenzaVita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          }
+        ],
+        "fromTheBeginning": [
+          {
+            "name": "VCF1 - Verifica Booleana Codice Fiscale ",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 2
+          },
+          {
+            "name": "Consultazione ISEE - v1",
+            "producerName": "Istituto Nazionale Previdenza Sociale - INPS",
+            "agreementsCount": 2
+          },
+          {
+            "name": "C020-servizioAccertamentoResidenza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 2
+          },
+          {
+            "name": "C015-servizioAccertamentoGeneralita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 2
+          },
+          {
+            "name": "C021-servizioAccertamentoStatoFamiglia",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C025-servizioAccertamentoMaternita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "VPIVA1 - Verifica Partita Iva",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          },
+          {
+            "name": "Verifica Booleana CodiceFiscale",
+            "producerName": "Agenzia delle Entrate",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C018-servizioAccertamentoCittadinanza",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          },
+          {
+            "name": "C019-servizioAccertamentoEsistenzaVita",
+            "producerName": "Ministero dell'Interno",
+            "agreementsCount": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "7",
+      "name": "Scuole",
+      "top10MostSubscribedEServices": {
+        "lastSixMonths": [],
+        "lastTwelveMonths": [],
+        "fromTheBeginning": []
+      }
+    },
+    {
+      "id": "8",
+      "name": "Università e AFAM",
+      "top10MostSubscribedEServices": {
+        "lastSixMonths": [],
+        "lastTwelveMonths": [
+          {
+            "name": "Consultazione ISEE - v1",
+            "producerName": "Istituto Nazionale Previdenza Sociale - INPS",
+            "agreementsCount": 1
+          }
+        ],
+        "fromTheBeginning": [
+          {
+            "name": "Consultazione ISEE - v1",
+            "producerName": "Istituto Nazionale Previdenza Sociale - INPS",
+            "agreementsCount": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "9",
+      "name": "Istituti di Ricerca",
+      "top10MostSubscribedEServices": {
+        "lastSixMonths": [],
+        "lastTwelveMonths": [],
+        "fromTheBeginning": []
+      }
+    },
+    {
+      "id": "10",
+      "name": "Stazioni Appaltanti",
+      "top10MostSubscribedEServices": {
+        "lastSixMonths": [],
+        "lastTwelveMonths": [],
+        "fromTheBeginning": []
+      }
+    }
+  ],
+  "top10ProviderWithMostSubscriberMetric": {
+    "lastSixMonths": [
+      {
+        "name": "Ministero dell'Interno",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 276
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 1
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 1
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Istituto Nazionale Previdenza Sociale - INPS",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 1
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 7
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 1
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Agenzia delle Entrate",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 1
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 0
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 1
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 3
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Agenzia per L'Italia Digitale",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 3
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 0
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 0
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Comune di Mortara",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 2
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 0
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "GEROPA SRL",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 1
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 0
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      }
+    ],
+    "lastTwelveMonths": [
+      {
+        "name": "Ministero dell'Interno",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 279
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 7
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 7
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 8
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Istituto Nazionale Previdenza Sociale - INPS",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 1
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 13
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 2
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 1
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Agenzia delle Entrate",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 1
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 0
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 3
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 3
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Agenzia per L'Italia Digitale",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 3
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 0
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 0
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Comune di Mortara",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 2
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 0
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "GEROPA SRL",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 1
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 0
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      }
+    ],
+    "fromTheBeginning": [
+      {
+        "name": "Ministero dell'Interno",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 279
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 7
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 7
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 9
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Istituto Nazionale Previdenza Sociale - INPS",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 1
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 15
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 2
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 1
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Agenzia delle Entrate",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 2
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 1
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 3
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 4
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Agenzia per L'Italia Digitale",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 3
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 0
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 0
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "Comune di Mortara",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 2
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 0
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      },
+      {
+        "name": "GEROPA SRL",
+        "topSubscribers": [
+          {
+            "id": "1",
+            "name": "Altre Pubbliche Amministrazioni locali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "2",
+            "name": "Aziende Ospedaliere e ASL",
+            "agreementsCount": 0
+          },
+          {
+            "id": "3",
+            "name": "Comuni e città metropolitane",
+            "agreementsCount": 1
+          },
+          {
+            "id": "4",
+            "name": "Province",
+            "agreementsCount": 0
+          },
+          {
+            "id": "5",
+            "name": "Pubbliche Amministrazioni Centrali",
+            "agreementsCount": 0
+          },
+          {
+            "id": "6",
+            "name": "Regioni",
+            "agreementsCount": 0
+          },
+          {
+            "id": "7",
+            "name": "Scuole",
+            "agreementsCount": 0
+          },
+          {
+            "id": "8",
+            "name": "Università e AFAM",
+            "agreementsCount": 0
+          },
+          {
+            "id": "9",
+            "name": "Istituti di Ricerca",
+            "agreementsCount": 0
+          },
+          {
+            "id": "10",
+            "name": "Stazioni Appaltanti",
+            "agreementsCount": 0
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -6,7 +6,6 @@ import {
   getPublishedEServicesMetric,
   getPublishedEServicesByMacroCategoriesMetric,
   getTop10MostSubscribedEServicesMetric,
-  getTop10MostSubscribedEServicesPerMacroCategoriesMetric,
   getTop10ProviderWithMostSubscriberMetric,
 } from './services/index.js'
 
@@ -37,13 +36,11 @@ async function main(): Promise<void> {
     publishedEServicesMetric,
     macroCategoriesPublishedEServicesMetric,
     top10MostSubscribedEServicesMetric,
-    top10MostSubscribedEServicesPerMacroCategoryMetric,
     top10ProviderWithMostSubscriberMetric,
   ] = await Promise.all([
     getPublishedEServicesMetric(readModel),
     getPublishedEServicesByMacroCategoriesMetric(readModel),
     getTop10MostSubscribedEServicesMetric(readModel),
-    getTop10MostSubscribedEServicesPerMacroCategoriesMetric(readModel),
     getTop10ProviderWithMostSubscriberMetric(readModel),
   ])
 
@@ -54,7 +51,6 @@ async function main(): Promise<void> {
     publishedEServicesMetric,
     macroCategoriesPublishedEServicesMetric,
     top10MostSubscribedEServicesMetric,
-    top10MostSubscribedEServicesPerMacroCategoryMetric,
     top10ProviderWithMostSubscriberMetric,
   })
 

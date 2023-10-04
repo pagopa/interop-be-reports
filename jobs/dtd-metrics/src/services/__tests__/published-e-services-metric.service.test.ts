@@ -1,6 +1,6 @@
 import { getEServiceMock } from '@interop-be-reports/commons'
 import { getPublishedEServicesMetric } from '../published-e-services-metric.service.js'
-import { readModel, seedCollection } from './metrics-tests.utils.js'
+import { readModelMock, seedCollection } from '../../utils/tests.utils.js'
 
 describe('getPublishedEServicesMetric', () => {
   it('should return the correct metrics', async () => {
@@ -27,7 +27,7 @@ describe('getPublishedEServicesMetric', () => {
       { data: getEServiceMock({ descriptors: [{ state: 'Draft' }] }) },
     ])
 
-    const result = await getPublishedEServicesMetric(readModel)
+    const result = await getPublishedEServicesMetric(readModelMock)
     expect(result.publishedEServicesCount).toStrictEqual(3)
     expect(result.lastMonthPublishedEServicesCount).toStrictEqual(2)
   })

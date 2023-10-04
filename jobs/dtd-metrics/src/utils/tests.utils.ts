@@ -1,9 +1,9 @@
 import { ReadModelClient } from '@interop-be-reports/commons'
 import { MongoMemoryServer } from 'mongodb-memory-server'
-import { MACRO_CATEGORIES } from '../../configs/macro-categories.js'
+import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 
 const DB_NAME = 'read-model'
-let readModel: ReadModelClient
+let readModelMock: ReadModelClient
 let mongoServer: MongoMemoryServer
 
 beforeAll(async () => {
@@ -18,7 +18,7 @@ beforeAll(async () => {
     },
   })
 
-  readModel = await ReadModelClient.connect({
+  readModelMock = await ReadModelClient.connect({
     readModelDbUser: mongoServer.auth?.customRootName as string,
     readModelDbPassword: mongoServer.auth?.customRootPwd as string,
     readModelDbHost: mongoServer.instanceInfo?.ip as string,
@@ -28,15 +28,15 @@ beforeAll(async () => {
 })
 
 afterEach(async () => {
-  await readModel.eservices.deleteMany({})
-  await readModel.agreements.deleteMany({})
-  await readModel.attributes.deleteMany({})
-  await readModel.purposes.deleteMany({})
-  await readModel.tenants.deleteMany({})
+  await readModelMock.eservices.deleteMany({})
+  await readModelMock.agreements.deleteMany({})
+  await readModelMock.attributes.deleteMany({})
+  await readModelMock.purposes.deleteMany({})
+  await readModelMock.tenants.deleteMany({})
 })
 
 afterAll(async () => {
-  await readModel?.close()
+  await readModelMock?.close()
   await mongoServer?.stop()
 })
 
@@ -44,7 +44,7 @@ async function seedCollection(
   collection: 'eservices' | 'agreements' | 'tenants' | 'purposes' | 'attributes',
   data: Array<{ data: unknown }>
 ): Promise<void> {
-  await readModel[collection].insertMany(data as never)
+  await readModelMock[collection].insertMany(data as never)
 }
 
 function repeatObjInArray<T extends Record<'data', unknown>>(item: T, length: number): T[] {
@@ -58,4 +58,4 @@ type MacroCategoryCodeFor<TName extends MacroCategory['name']> = Extract<
   { name: TName }
 >['ipaCodes'][number]
 
-export { readModel, seedCollection, repeatObjInArray, MacroCategory, MacroCategoryName, MacroCategoryCodeFor }
+export { readModelMock, seedCollection, repeatObjInArray, MacroCategory, MacroCategoryName, MacroCategoryCodeFor }

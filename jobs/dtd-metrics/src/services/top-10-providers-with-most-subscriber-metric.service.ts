@@ -1,8 +1,7 @@
 import { AgreementState, ReadModelClient, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
-import { getMacroCategoryAttributesIds } from './macro-categories-attributes-ids.service.js'
 import { Top10ProviderWithMostSubscriberMetric } from '../models/metrics.model.js'
-import { getSixMonthsAgoDate, getOneYearAgoDate } from '../utils/helpers.utils.js'
+import { getSixMonthsAgoDate, getOneYearAgoDate, getAttributesIdsFromIpaCodes } from '../utils/helpers.utils.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3747
@@ -12,7 +11,7 @@ export async function getTop10ProviderWithMostSubscriberMetric(
 ): Promise<Top10ProviderWithMostSubscriberMetric> {
   const macroCategories = await Promise.all(
     MACRO_CATEGORIES.map((macroCategory) =>
-      getMacroCategoryAttributesIds(macroCategory, readModel).then((attributeIds) => ({
+      getAttributesIdsFromIpaCodes(macroCategory.ipaCodes, readModel).then((attributeIds) => ({
         id: macroCategory.id,
         name: macroCategory.name,
         attributeIds,

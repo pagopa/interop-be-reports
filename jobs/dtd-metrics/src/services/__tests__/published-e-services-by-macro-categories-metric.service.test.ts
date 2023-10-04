@@ -1,5 +1,5 @@
 import { getAttributeMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
-import { MacroCategoryCodeFor, MacroCategoryName, readModel, seedCollection } from './metrics-tests.utils.js'
+import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { getPublishedEServicesByMacroCategoriesMetric } from '../published-e-services-by-macro-categories-metric.service.js'
 
 describe('getPublishedEServicesByMacroCategoriesMetric', () => {
@@ -103,7 +103,7 @@ describe('getPublishedEServicesByMacroCategoriesMetric', () => {
       },
     ])
 
-    const result = await getPublishedEServicesByMacroCategoriesMetric(readModel)
+    const result = await getPublishedEServicesByMacroCategoriesMetric(readModelMock)
 
     expect(
       result.find((a) => (a.name as MacroCategoryName) === 'Pubbliche Amministrazioni Centrali')
