@@ -8,7 +8,7 @@ export const PublishedEServicesMetric = z.object({
 
 export const PublishedEServicesByMacroCategoriesMetric = z.array(
   z.object({
-    id: z.number(),
+    id: z.string(),
     name: z.string(),
     publishedEServicesCount: z.number(),
   })
@@ -17,25 +17,25 @@ export const PublishedEServicesByMacroCategoriesMetric = z.array(
 export const Top10MostSubscribedEServices = z.object({
   lastSixMonths: z.array(
     z.object({
-      name: z.string(),
-      producerName: z.string(),
-      agreementsCount: z.number(),
+      eserviceName: z.string(),
+      tenantName: z.string(),
+      count: z.number(),
     })
   ),
 
   lastTwelveMonths: z.array(
     z.object({
-      name: z.string(),
-      producerName: z.string(),
-      agreementsCount: z.number(),
+      eserviceName: z.string(),
+      tenantName: z.string(),
+      count: z.number(),
     })
   ),
 
   fromTheBeginning: z.array(
     z.object({
-      name: z.string(),
-      producerName: z.string(),
-      agreementsCount: z.number(),
+      eserviceName: z.string(),
+      tenantName: z.string(),
+      count: z.number(),
     })
   ),
 })

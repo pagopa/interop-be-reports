@@ -13,7 +13,7 @@ export function getOneYearAgoDate(): Date {
 
 const MacroCategoriesWithAttributes = z.array(
   z.object({
-    id: z.number(),
+    id: z.string(),
     name: z.string(),
     ipaCodes: z.array(z.string()),
     attributes: z.array(

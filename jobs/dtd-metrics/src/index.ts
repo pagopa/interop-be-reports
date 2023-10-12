@@ -1,12 +1,12 @@
 import { ReadPreferenceMode } from 'mongodb'
-import { ReadModelClient, withExecutionTime } from '@interop-be-reports/commons'
+import { AwsS3BucketClient, ReadModelClient, withExecutionTime } from '@interop-be-reports/commons'
 import { env } from './configs/env.js'
-// import { Metrics } from './models/metrics.model.js'
+import { Metrics } from './models/metrics.model.js'
 import {
-  // getPublishedEServicesMetric,
-  // getPublishedEServicesByMacroCategoriesMetric,
-  getTop10MostSubscribedEServicesMetricTest,
-  // getTop10ProviderWithMostSubscriberMetric,
+  getPublishedEServicesMetric,
+  getPublishedEServicesByMacroCategoriesMetric,
+  getTop10MostSubscribedEServicesMetric,
+  getTop10ProviderWithMostSubscriberMetric,
 } from './services/index.js'
 
 const log = console.log
@@ -28,35 +28,34 @@ async function main(): Promise<void> {
     readModelDbName: env.READ_MODEL_DB_NAME,
   })
 
-  // const bucket = new AwsS3BucketClient(env.STORAGE_BUCKET)
+  const bucket = new AwsS3BucketClient(env.STORAGE_BUCKET)
 
   log('Retrieving metrics...')
 
-  const a = await getTop10MostSubscribedEServicesMetricTest(readModel)
-  console.log(a)
+  const [
+    publishedEServicesMetric,
+    macroCategoriesPublishedEServicesMetric,
+    top10MostSubscribedEServicesMetric,
+    top10ProviderWithMostSubscriberMetric,
+  ] = await Promise.all([
+    getPublishedEServicesMetric(readModel),
+    getPublishedEServicesByMacroCategoriesMetric(readModel),
+    getTop10MostSubscribedEServicesMetric(readModel),
+    getTop10ProviderWithMostSubscriberMetric(readModel),
+  ])
 
-  // const [
-  //   publishedEServicesMetric,
-  //   macroCategoriesPublishedEServicesMetric,
-  //   top10MostSubscribedEServicesMetric,
-  //   top10ProviderWithMostSubscriberMetric,
-  // ] = await Promise.all([
-  //   getPublishedEServicesMetric(readModel),
-  //   getPublishedEServicesByMacroCategoriesMetric(readModel),
-  //   getTop10MostSubscribedEServicesMetricTest(readModel),
-  //   getTop10ProviderWithMostSubscriberMetric(readModel),
-  // ])
+  log('Metrics retrieved!\n')
+  log(`Uploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
-  // log('Metrics retrieved!\n')
-  // log(`Uploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
+  const output = Metrics.parse({
+    publishedEServicesMetric,
+    macroCategoriesPublishedEServicesMetric,
+    top10MostSubscribedEServicesMetric,
+    top10ProviderWithMostSubscriberMetric,
+  })
 
-  // const output = Metrics.parse({
-  //   publishedEServicesMetric,
-  //   macroCategoriesPublishedEServicesMetric,
-  //   top10MostSubscribedEServicesMetric,
-  //   top10ProviderWithMostSubscriberMetric,
-  // })
-
+  bucket
+  output
   // await bucket.uploadData(output, env.FILENAME)
   log('Done!\n')
 }

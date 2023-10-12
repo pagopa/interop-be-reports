@@ -7,15 +7,15 @@ import {
   TENANTS_COLLECTION_NAME,
   Tenant,
 } from '@interop-be-reports/commons'
-import { getMacroCategoriesWithAttributes } from '../utils/helpers.utils.js'
-import { writeFileSync } from 'fs'
+import { getMacroCategoriesWithAttributes, getOneYearAgoDate, getSixMonthsAgoDate } from '../utils/helpers.utils.js'
 import { z } from 'zod'
 import orderBy from 'lodash/orderBy.js'
 import uniq from 'lodash/uniq.js'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
+import { Top10MostSubscribedEServicesMetric } from '../models/metrics.model.js'
 
-type TenantEntry = { macrocategoryId: number; name: string }
-type RelevantAgreementInfo = { macrocategoryId: number; consumerName: string; createdAt: Date }
+type ConsumerEntry = { macrocategoryId: string; name: string }
+type RelevantAgreementInfo = { macrocategoryId: string; consumerName: string; createdAt: Date }
 type EServiceMap = Record<
   string,
   {
@@ -33,9 +33,13 @@ type EServiceCollectionItem = {
   agreements: Array<RelevantAgreementInfo>
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function getTop10MostSubscribedEServicesMetricTest(readModel: ReadModelClient): Promise<any> {
-  // Get all the current agreements ["Active", "Suspended"]
+export async function getTop10MostSubscribedEServicesMetric(
+  readModel: ReadModelClient
+): Promise<Top10MostSubscribedEServicesMetric> {
+  /*
+   * We retrieve all the agreement data we need (eserviceId, consumerId, producerId, eserviceName).
+   * The state of the agreement must be Active or Suspended.
+   */
   const agreements = await readModel.agreements
     .aggregate([
       {
@@ -81,25 +85,29 @@ export async function getTop10MostSubscribedEServicesMetricTest(readModel: ReadM
     .toArray()
 
   /**
-   * 1. Prendo agreements { eserviceId, consumerId, producerId, eserviceName }
-   * 2. Prendo i consumers e li metto in una mappa { consumerId: { macrocategoryId, name } }
-   * 3. Tramite le mappa dei consumer, aggiungo il macrocategoryId agli agreements { eserviceId, consumerId, producerId, eserviceName, macrocategoryId }
-   * 4. Dagli agreement creo un'altra mappa { eserviceId: { producerId, eserviceName, macrocategoryIds } } con macrocategoryIds uguale al numero di agreement per quella macrocategory
+   * We retrieve the consumers data from and put it in a map.
+   * { [consumerId]: { macrocategoryId, name } }
    */
+  const consumersIds = uniq(agreements.map((a) => a.consumerId))
+  const consumersMap = await getConsumersMap(readModel, consumersIds)
 
-  const tenantIds = uniq(agreements.map((a) => a.consumerId))
-
-  // Turn them into a map by id, adding the macrocategory the Tenant belongs to, if any
-  const tenantsMap = await getTenantsMap(readModel, tenantIds)
-
-  // Add the macrocategoryId to the agreements
+  /**
+   * With the consumers map, we enrich the agreements with the consumer macrocategory id and the consumer name.
+   * We have now a collection of agreements with the following shape:
+   * { eserviceId, consumerId, producerId, eserviceName, macrocategoryId, consumerName }
+   */
   const enrichedAgreements = agreements.map((a) => ({
     ...a,
-    macrocategoryId: tenantsMap[a.consumerId].macrocategoryId,
-    consumerName: tenantsMap[a.consumerId].name,
+    macrocategoryId: consumersMap[a.consumerId].macrocategoryId,
+    consumerName: consumersMap[a.consumerId].name,
   }))
 
-  // Create a map with the eserviceId as a key
+  /*
+   * From the enriched agreements, we create a map of eservices.
+   * The key is the eservice id, the value is an object with the producer id, the eservice name, the producer name and an array of agreements.
+   * The agreements array contains the macrocategory id and the consumer name of each agreement.
+   * { [eserviceId]: { producerId, eserviceName, producerName, agreements: [ { macrocategoryId, consumerName } ] } }
+   */
   const eservicesMap = enrichedAgreements.reduce<EServiceMap>((acc, next) => {
     // If it's the first time we meet this eservice id, initialize a new array
     if (!acc[next.eserviceId])
@@ -119,7 +127,10 @@ export async function getTop10MostSubscribedEServicesMetricTest(readModel: ReadM
     return acc
   }, {})
 
-  // Convert the map to collection for easier parsing
+  /**
+   * We convert the eservicesMap to an array.
+   * [ { eserviceId, producerId, eserviceName, producerName, agreements: [ { macrocategoryId, consumerName } ] }
+   */
   const eserviceCollection: Array<EServiceCollectionItem> = Object.entries(eservicesMap).map(
     ([eserviceId, eservice]) => {
       return {
@@ -132,28 +143,44 @@ export async function getTop10MostSubscribedEServicesMetricTest(readModel: ReadM
     }
   )
 
-  const result = [{ id: 0, name: 'Totale' }, ...MACRO_CATEGORIES].map((m) => {
-    const countFn = m.id === 0 ? (i: EServiceCollectionItem): number => i.agreements.length : countByIdFn(m.id)
+  /**
+   * We have all the data we need to create the metric.
+   */
+
+  const sixMonthsAgoDate = getSixMonthsAgoDate()
+  const twelveMonthsAgoDate = getOneYearAgoDate()
+  const fromTheBeginningDate = undefined
+
+  const result = [{ id: '0', name: 'Totale' }, ...MACRO_CATEGORIES].map((m) => {
+    const countFn = m.id === '0' ? (i: EServiceCollectionItem): number => i.agreements.length : countByIdFn(m.id)
+
+    const [lastSixMonths, lastTwelveMonths, fromTheBeginning] = [
+      sixMonthsAgoDate,
+      twelveMonthsAgoDate,
+      fromTheBeginningDate,
+    ].map((date) => {
+      const filteredEServiceCollection = eserviceCollection.map((i) => ({
+        ...i,
+        agreements: date ? i.agreements.filter((a) => a.createdAt >= date) : i.agreements,
+      }))
+
+      return getSortedTop10(filteredEServiceCollection, countFn)
+    })
 
     return {
       id: m.id,
       name: m.name,
-      top10MostSubscribedEServices: getSortedTop10(eserviceCollection, countFn),
+      top10MostSubscribedEServices: { lastSixMonths, lastTwelveMonths, fromTheBeginning },
     }
   })
 
-  console.timeEnd()
-
-  writeFileSync('./output.json', JSON.stringify(result, null, 2))
-  return result
+  return Top10MostSubscribedEServicesMetric.parse(result)
 }
 
-// Query some tenants and output a map
-async function getTenantsMap(
+async function getConsumersMap(
   readModel: ReadModelClient,
   consumerIds: Array<string>
-): Promise<Record<string, TenantEntry>> {
-  // Query all the consumers
+): Promise<Record<string, ConsumerEntry>> {
   const consumersQuery = readModel.tenants
     .aggregate([
       {
@@ -200,36 +227,30 @@ async function getTenantsMap(
     )
     .toArray()
 
-  // Run the queries in parallel
-  const [macroCategoriesWithAttributes, tenants] = await Promise.all([
+  const [macroCategoriesWithAttributes, consumers] = await Promise.all([
     getMacroCategoriesWithAttributes(readModel),
     consumersQuery,
   ])
 
-  // Create a map. The key is the tenantId, the value the IPA macrocategory id, if any
-  const tenantsMap = tenants.reduce<Record<string, TenantEntry>>((acc, next) => {
-    // Let's assume the tenant has no macrocategory
-    let macrocategoryId = -1
-
-    // If there is a match (a macrocategory)
-    const macroCategory = macroCategoriesWithAttributes.find((m) =>
-      m.attributes.some((a) => next.attributesIds.includes(a.id))
-    )
-    if (macroCategory) {
-      // Set that id as the macrocategory id
-      macrocategoryId = macroCategory.id
-    }
+  // Create a map. The key is the consumerId, the value the IPA macrocategory id, if any
+  const consumersMap = consumers.reduce<Record<string, ConsumerEntry>>((acc, next) => {
+    const macrocategoryId =
+      macroCategoriesWithAttributes.find((m) => m.attributes.some((a) => next.attributesIds.includes(a.id)))?.id ?? '-1'
 
     return { ...acc, [next.id]: { macrocategoryId, name: next.name } }
   }, {})
 
-  return tenantsMap
+  return consumersMap
 }
 
 function getSortedTop10(
   collection: Array<EServiceCollectionItem>,
   countFn: (i: EServiceCollectionItem) => number
-): Array<unknown> {
+): Array<{
+  eserviceName: string
+  tenantName: string
+  count: number
+}> {
   // Count the occurrences of a particular case, and add it to the entry
   const counted = collection.map((i) => ({
     eserviceName: i.eserviceName,
@@ -240,6 +261,6 @@ function getSortedTop10(
   return orderBy(counted, 'count', 'desc').slice(0, 10)
 }
 
-function countByIdFn(id: number): (i: EServiceCollectionItem) => number {
+function countByIdFn(id: string): (i: EServiceCollectionItem) => number {
   return (i: EServiceCollectionItem) => i.agreements.filter((n) => n.macrocategoryId === id).length
 }
