@@ -1,4 +1,5 @@
 import {
+  ExternalId,
   Purpose as ReadModelPurpose,
   PurposeVersion as ReadModelPurposeVersion,
 } from '@interop-be-reports/commons'
@@ -9,8 +10,9 @@ export const PurposeVersion = ReadModelPurposeVersion.pick({
   state: true,
   dailyCalls: true,
 })
+
 export const Purpose = ReadModelPurpose.pick({ id: true, consumerId: true }).merge(
-  z.object({ versions: z.array(PurposeVersion) })
+  z.object({ versions: z.array(PurposeVersion), consumerName: z.string(), consumerExternalId: ExternalId })
 )
 
 export type PurposeVersion = z.infer<typeof PurposeVersion>
