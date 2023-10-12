@@ -1,7 +1,6 @@
 import { AgreementState, ReadModelClient, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
-import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import { Top10ProviderWithMostSubscriberMetric } from '../models/metrics.model.js'
-import { getSixMonthsAgoDate, getOneYearAgoDate, getAttributesIdsFromIpaCodes } from '../utils/helpers.utils.js'
+import { getSixMonthsAgoDate, getOneYearAgoDate, getMacroCategoriesWithAttributes } from '../utils/helpers.utils.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3747
@@ -9,17 +8,11 @@ import { getSixMonthsAgoDate, getOneYearAgoDate, getAttributesIdsFromIpaCodes } 
 export async function getTop10ProviderWithMostSubscriberMetric(
   readModel: ReadModelClient
 ): Promise<Top10ProviderWithMostSubscriberMetric> {
-  const macroCategories = await Promise.all(
-    MACRO_CATEGORIES.map((macroCategory) =>
-      getAttributesIdsFromIpaCodes(macroCategory.ipaCodes, readModel).then((attributeIds) => ({
-        id: macroCategory.id,
-        name: macroCategory.name,
-        attributeIds,
-      }))
-    )
-  )
+  const macroCategoriesWithAttributes = await getMacroCategoriesWithAttributes(readModel)
 
-  const allMacroCategoriesAttributeIds = macroCategories.map((macro) => macro.attributeIds).flat()
+  const allMacroCategoriesAttributeIds = macroCategoriesWithAttributes
+    .map((macro) => macro.attributes.map((a) => a.id))
+    .flat()
 
   const sixMonthsAgoDate = getSixMonthsAgoDate()
   const twelveYearAgoDate = getOneYearAgoDate()
@@ -69,7 +62,7 @@ export async function getTop10ProviderWithMostSubscriberMetric(
           {
             $project: {
               name: 1,
-              topSubscribers: macroCategories.map((macroCategory) => ({
+              topSubscribers: macroCategoriesWithAttributes.map((macroCategory) => ({
                 id: macroCategory.id,
                 name: macroCategory.name,
                 agreementsCount: {
@@ -81,7 +74,7 @@ export async function getTop10ProviderWithMostSubscriberMetric(
                         input: '$$agreement',
                         as: 'attributeId',
                         cond: {
-                          $in: ['$$attributeId', macroCategory.attributeIds],
+                          $in: ['$$attributeId', macroCategory.attributes.map((a) => a.id)],
                         },
                       },
                     },
