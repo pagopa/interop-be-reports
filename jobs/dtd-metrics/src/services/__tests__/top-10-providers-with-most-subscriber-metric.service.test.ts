@@ -1,62 +1,73 @@
 import { getAgreementMock, getAttributeMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { getTop10ProviderWithMostSubscriberMetric } from '../top-10-providers-with-most-subscriber-metric.service.js'
+import { randomUUID } from 'crypto'
+
+const eservice1Uuid = randomUUID()
+const eservice2Uuid = randomUUID()
+const eservice3Uuid = randomUUID()
+const producer1Uuid = randomUUID()
+const producer2Uuid = randomUUID()
+const comuneConsumerUuid = randomUUID()
+const aziendaOspedalieraConsumerUuid = randomUUID()
+const comuneAttributeUuid = randomUUID()
+const aziendaOspedalieraAttributeUuid = randomUUID()
 
 describe('getTop10ProviderWithMostSubscriberMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('eservices', [
-      { data: getEServiceMock({ name: 'eservice-1', id: 'eservice-1', producerId: 'producer-1' }) },
-      { data: getEServiceMock({ name: 'eservice-2', id: 'eservice-2', producerId: 'producer-1' }) },
-      { data: getEServiceMock({ name: 'eservice-3', id: 'eservice-3', producerId: 'producer-2' }) },
+      { data: getEServiceMock({ name: 'eservice-1', id: eservice1Uuid, producerId: producer1Uuid }) },
+      { data: getEServiceMock({ name: 'eservice-2', id: eservice2Uuid, producerId: producer1Uuid }) },
+      { data: getEServiceMock({ name: 'eservice-3', id: eservice3Uuid, producerId: producer2Uuid }) },
     ])
 
     await seedCollection('agreements', [
       {
         data: getAgreementMock({
-          eserviceId: 'eservice-1',
-          producerId: 'producer-1',
-          consumerId: 'comune',
-          certifiedAttributes: [{ id: 'attribute-comune' }],
+          eserviceId: eservice1Uuid,
+          producerId: producer1Uuid,
+          consumerId: comuneConsumerUuid,
+          certifiedAttributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getAgreementMock({
-          eserviceId: 'eservice-2',
-          producerId: 'producer-1',
-          consumerId: 'comune',
-          certifiedAttributes: [{ id: 'attribute-comune' }],
+          eserviceId: eservice2Uuid,
+          producerId: producer1Uuid,
+          consumerId: comuneConsumerUuid,
+          certifiedAttributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getAgreementMock({
-          eserviceId: 'eservice-3',
-          producerId: 'producer-2',
-          consumerId: 'comune',
-          certifiedAttributes: [{ id: 'attribute-comune' }],
+          eserviceId: eservice3Uuid,
+          producerId: producer2Uuid,
+          consumerId: comuneConsumerUuid,
+          certifiedAttributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getAgreementMock({
-          eserviceId: 'eservice-1',
-          producerId: 'producer-1',
-          consumerId: 'azienda-ospedaliera',
-          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
+          eserviceId: eservice1Uuid,
+          producerId: producer1Uuid,
+          consumerId: aziendaOspedalieraConsumerUuid,
+          certifiedAttributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
       },
       {
         data: getAgreementMock({
-          eserviceId: 'eservice-2',
-          producerId: 'producer-1',
-          consumerId: 'azienda-ospedaliera',
-          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
+          eserviceId: eservice2Uuid,
+          producerId: producer1Uuid,
+          consumerId: aziendaOspedalieraConsumerUuid,
+          certifiedAttributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
       },
       {
         data: getAgreementMock({
-          eserviceId: 'eservice-3',
-          producerId: 'producer-2',
-          consumerId: 'azienda-ospedaliera',
-          certifiedAttributes: [{ id: 'attribute-azienda-ospedaliera' }],
+          eserviceId: eservice3Uuid,
+          producerId: producer2Uuid,
+          consumerId: aziendaOspedalieraConsumerUuid,
+          certifiedAttributes: [{ id: aziendaOspedalieraAttributeUuid }],
           state: 'Pending',
         }),
       },
@@ -65,26 +76,26 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
     await seedCollection('tenants', [
       {
         data: getTenantMock({
-          id: 'producer-1',
+          id: producer1Uuid,
           name: 'Producer 1',
         }),
       },
       {
         data: getTenantMock({
-          id: 'producer-2',
+          id: producer2Uuid,
           name: 'Producer 2',
         }),
       },
       {
         data: getTenantMock({
           id: 'comune',
-          attributes: [{ id: 'attribute-comune', type: 'PersistentCertifiedAttribute' }],
+          attributes: [{ id: comuneAttributeUuid, type: 'PersistentCertifiedAttribute' }],
         }),
       },
       {
         data: getTenantMock({
-          id: 'azienda-ospedaliera',
-          attributes: [{ id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' }],
+          id: aziendaOspedalieraConsumerUuid,
+          attributes: [{ id: aziendaOspedalieraAttributeUuid, type: 'PersistentCertifiedAttribute' }],
         }),
       },
     ])
@@ -92,14 +103,14 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
     await seedCollection('attributes', [
       {
         data: getAttributeMock({
-          id: 'attribute-comune',
+          id: comuneAttributeUuid,
           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
           kind: 'Certified',
         }),
       },
       {
         data: getAttributeMock({
-          id: 'attribute-azienda-ospedaliera',
+          id: aziendaOspedalieraAttributeUuid,
           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
           kind: 'Certified',
         }),
@@ -125,10 +136,10 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
     const producer2 = result.fromTheBeginning[1]
     expect(producer2.name).toStrictEqual('Producer 2')
     const producer2Comuni = producer2.topSubscribers.find(
-      (a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane' //TODO: Fix typing
+      (a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane'
     )
     const producer2AziendeOspedaliere = producer2.topSubscribers.find(
-      (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL' //TODO: Fix typing
+      (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
     )
     expect(producer2Comuni?.agreementsCount).toStrictEqual(1)
     expect(producer2AziendeOspedaliere?.agreementsCount).toStrictEqual(0)
