@@ -216,6 +216,9 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
     devDependencies:
+      '@types/lodash':
+        specifier: 4.14.196
+        version: 4.14.196
       '@types/node':
         specifier: 20.4.9
         version: 20.4.9
