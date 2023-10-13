@@ -54,10 +54,10 @@ async function main(): Promise<void> {
     top10ProviderWithMostSubscriberMetric,
   })
 
-  bucket
-  output
-  // await bucket.uploadData(output, env.FILENAME)
+  await bucket.uploadData(output, env.FILENAME)
   log('Done!\n')
 }
 
-withExecutionTime(main)
+withExecutionTime(main).finally(async () => {
+  if (readModel) await readModel.close()
+})
