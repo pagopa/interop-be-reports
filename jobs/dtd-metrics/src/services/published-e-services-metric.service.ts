@@ -18,9 +18,13 @@ export async function getPublishedEServicesMetric(readModel: ReadModelClient): P
     'data.descriptors.state': {
       $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
     },
-    // QUESTION: Is it correct to assume that the version 1 descriptor of the e-service is always at index 0?
-    'data.descriptors.0.publishedAt': {
-      $gte: oneMonthAgo.toISOString(),
+    'data.descriptors': {
+      $elemMatch: {
+        version: '1',
+        publishedAt: {
+          $gte: oneMonthAgo.toISOString(),
+        },
+      },
     },
   })
 

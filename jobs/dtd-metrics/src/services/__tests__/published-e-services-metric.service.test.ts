@@ -10,17 +10,24 @@ describe('getPublishedEServicesMetric', () => {
     moreThanOneMonthAgo.setDate(moreThanOneMonthAgo.getDate() - 40)
 
     await seedCollection('eservices', [
-      { data: getEServiceMock({ descriptors: [{ state: 'Published', publishedAt: today.toISOString() }] }) },
       {
         data: getEServiceMock({
-          descriptors: [{ state: 'Suspended', publishedAt: today.toISOString() }, { state: 'Draft' }],
+          descriptors: [{ version: '1', state: 'Published', publishedAt: today.toISOString() }],
         }),
       },
       {
         data: getEServiceMock({
           descriptors: [
-            { state: 'Suspended', publishedAt: moreThanOneMonthAgo.toISOString() },
-            { state: 'Deprecated' },
+            { version: '1', state: 'Suspended', publishedAt: today.toISOString() },
+            { version: '2', state: 'Draft' },
+          ],
+        }),
+      },
+      {
+        data: getEServiceMock({
+          descriptors: [
+            { version: '1', state: 'Suspended', publishedAt: moreThanOneMonthAgo.toISOString() },
+            { version: '2', state: 'Deprecated' },
           ],
         }),
       },
