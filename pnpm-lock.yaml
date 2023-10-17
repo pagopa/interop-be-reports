@@ -418,6 +418,61 @@ importers:
         specifier: 0.34.1
         version: 0.34.1
 
+  jobs/voucher-data-exporter-temp-name:
+    dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.387.0
+        version: 3.387.0
+      '@interop-be-reports/commons':
+        specifier: workspace:*
+        version: link:../commons
+      axios:
+        specifier: ^1.4.0
+        version: 1.5.0
+      chalk:
+        specifier: ^5.3.0
+        version: 5.3.0
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      mongodb:
+        specifier: ^5.7.0
+        version: 5.7.0
+      zod:
+        specifier: ^3.21.4
+        version: 3.21.4
+    devDependencies:
+      '@types/lodash':
+        specifier: 4.14.196
+        version: 4.14.196
+      '@types/node':
+        specifier: 20.4.9
+        version: 20.4.9
+      '@typescript-eslint/eslint-plugin':
+        specifier: 6.3.0
+        version: 6.3.0(@typescript-eslint/parser@6.3.0)(eslint@8.46.0)(typescript@5.1.6)
+      '@typescript-eslint/parser':
+        specifier: 6.3.0
+        version: 6.3.0(eslint@8.46.0)(typescript@5.1.6)
+      eslint:
+        specifier: 8.46.0
+        version: 8.46.0
+      prettier:
+        specifier: ^3.0.1
+        version: 3.0.1
+      ts-node:
+        specifier: ^10.9.1
+        version: 10.9.1(@types/node@20.4.9)(typescript@5.1.6)
+      typescript:
+        specifier: 5.1.6
+        version: 5.1.6
+      vitest:
+        specifier: 0.34.1
+        version: 0.34.1
+
 packages:
 
   /@aashutoshrathi/word-wrap@1.2.6:
@@ -651,34 +706,34 @@ packages:
       '@aws-sdk/util-user-agent-browser': 3.387.0
       '@aws-sdk/util-user-agent-node': 3.387.0
       '@aws-sdk/xml-builder': 3.310.0
-      '@smithy/config-resolver': 2.0.2
+      '@smithy/config-resolver': 2.0.5
       '@smithy/eventstream-serde-browser': 2.0.2
       '@smithy/eventstream-serde-config-resolver': 2.0.2
       '@smithy/eventstream-serde-node': 2.0.2
-      '@smithy/fetch-http-handler': 2.0.2
+      '@smithy/fetch-http-handler': 2.0.5
       '@smithy/hash-blob-browser': 2.0.2
-      '@smithy/hash-node': 2.0.2
+      '@smithy/hash-node': 2.0.5
       '@smithy/hash-stream-node': 2.0.2
-      '@smithy/invalid-dependency': 2.0.2
+      '@smithy/invalid-dependency': 2.0.5
       '@smithy/md5-js': 2.0.2
-      '@smithy/middleware-content-length': 2.0.2
-      '@smithy/middleware-endpoint': 2.0.2
-      '@smithy/middleware-retry': 2.0.2
-      '@smithy/middleware-serde': 2.0.2
+      '@smithy/middleware-content-length': 2.0.5
+      '@smithy/middleware-endpoint': 2.0.5
+      '@smithy/middleware-retry': 2.0.5
+      '@smithy/middleware-serde': 2.0.5
       '@smithy/middleware-stack': 2.0.0
-      '@smithy/node-config-provider': 2.0.2
-      '@smithy/node-http-handler': 2.0.2
-      '@smithy/protocol-http': 2.0.2
-      '@smithy/smithy-client': 2.0.2
-      '@smithy/types': 2.1.0
-      '@smithy/url-parser': 2.0.2
+      '@smithy/node-config-provider': 2.0.5
+      '@smithy/node-http-handler': 2.0.5
+      '@smithy/protocol-http': 2.0.5
+      '@smithy/smithy-client': 2.0.5
+      '@smithy/types': 2.2.2
+      '@smithy/url-parser': 2.0.5
       '@smithy/util-base64': 2.0.0
       '@smithy/util-body-length-browser': 2.0.0
-      '@smithy/util-body-length-node': 2.0.0
-      '@smithy/util-defaults-mode-browser': 2.0.2
-      '@smithy/util-defaults-mode-node': 2.0.2
+      '@smithy/util-body-length-node': 2.1.0
+      '@smithy/util-defaults-mode-browser': 2.0.5
+      '@smithy/util-defaults-mode-node': 2.0.5
       '@smithy/util-retry': 2.0.0
-      '@smithy/util-stream': 2.0.2
+      '@smithy/util-stream': 2.0.5
       '@smithy/util-utf8': 2.0.0
       '@smithy/util-waiter': 2.0.2
       fast-xml-parser: 4.2.5
