@@ -8,6 +8,7 @@ import {
   getTop10MostSubscribedEServicesMetric,
   getTop10ProviderWithMostSubscriberMetric,
 } from './services/index.js'
+import { GithubClient } from './services/github-client.service.js'
 
 const log = console.log
 
@@ -28,7 +29,8 @@ async function main(): Promise<void> {
     readModelDbName: env.READ_MODEL_DB_NAME,
   })
 
-  const bucket = new AwsS3BucketClient(env.STORAGE_BUCKET)
+  const githubClient = new GithubClient(env.GITHUB_ACCESS_TOKEN)
+  const awsS3BucketClient = new AwsS3BucketClient(env.STORAGE_BUCKET)
 
   log('Retrieving metrics...')
 
@@ -54,7 +56,9 @@ async function main(): Promise<void> {
     top10ProviderWithMostSubscriberMetric,
   })
 
-  await bucket.uploadData(output, env.FILENAME)
+  await awsS3BucketClient.uploadData(output, env.FILENAME)
+  await githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, env.FILENAME)
+
   log('Done!\n')
 }
 

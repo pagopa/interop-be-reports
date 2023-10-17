@@ -20,6 +20,9 @@ export const Env = z.object({
     .optional(),
 
   STORAGE_BUCKET: z.string(),
+  GITHUB_REPO: z.string(),
+  GITHUB_REPO_OWNER: z.string(),
+  GITHUB_ACCESS_TOKEN: z.string(),
   FILENAME: z.string(),
 })
 
