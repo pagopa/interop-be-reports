@@ -2,10 +2,11 @@ import { z } from 'zod'
 
 export const PublishedEServicesMetric = z.object({
   publishedEServicesCount: z.number(),
-  variation: z.string(),
+  lastMonthPublishedEServicesCount: z.number(),
+  variation: z.number(),
 })
 
-export const MacroCategoriesPublishedEServicesMetric = z.array(
+export const PublishedEServicesByMacroCategoriesMetric = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
@@ -13,54 +14,92 @@ export const MacroCategoriesPublishedEServicesMetric = z.array(
   })
 )
 
-export const Top10MostSubscribedEServicesMetric = z.array(
-  z.object({
-    name: z.string(),
-    producerName: z.string(),
-    agreementsCount: z.number(),
-  })
-)
+export const Top10MostSubscribedEServices = z.object({
+  lastSixMonths: z.array(
+    z.object({
+      eserviceName: z.string(),
+      tenantName: z.string(),
+      count: z.number(),
+    })
+  ),
 
-export const Top10MostSubscribedEServicesPerMacroCategoryMetric = z.array(
+  lastTwelveMonths: z.array(
+    z.object({
+      eserviceName: z.string(),
+      tenantName: z.string(),
+      count: z.number(),
+    })
+  ),
+
+  fromTheBeginning: z.array(
+    z.object({
+      eserviceName: z.string(),
+      tenantName: z.string(),
+      count: z.number(),
+    })
+  ),
+})
+
+export const Top10MostSubscribedEServicesMetric = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
-    top10MostSubscribedEServices: Top10MostSubscribedEServicesMetric,
+    top10MostSubscribedEServices: Top10MostSubscribedEServices,
   })
 )
 
-export const Top10ProviderWithMostSubscriberMetric = z.array(
-  z.object({
-    name: z.string(),
-    topSubscribers: z.array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        agreementsCount: z.number(),
-      })
-    ),
-  })
-)
+export const Top10ProviderWithMostSubscriberMetric = z.object({
+  lastSixMonths: z.array(
+    z.object({
+      name: z.string(),
+      topSubscribers: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          agreementsCount: z.number(),
+        })
+      ),
+    })
+  ),
+
+  lastTwelveMonths: z.array(
+    z.object({
+      name: z.string(),
+      topSubscribers: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          agreementsCount: z.number(),
+        })
+      ),
+    })
+  ),
+
+  fromTheBeginning: z.array(
+    z.object({
+      name: z.string(),
+      topSubscribers: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          agreementsCount: z.number(),
+        })
+      ),
+    })
+  ),
+})
 
 export const Metrics = z.object({
   publishedEServicesMetric: PublishedEServicesMetric,
-  macroCategoriesPublishedEServicesMetric: MacroCategoriesPublishedEServicesMetric,
+  macroCategoriesPublishedEServicesMetric: PublishedEServicesByMacroCategoriesMetric,
   top10MostSubscribedEServicesMetric: Top10MostSubscribedEServicesMetric,
-  top10MostSubscribedEServicesPerMacroCategoryMetric:
-    Top10MostSubscribedEServicesPerMacroCategoryMetric,
   top10ProviderWithMostSubscriberMetric: Top10ProviderWithMostSubscriberMetric,
 })
 
 export type Metrics = z.infer<typeof Metrics>
 
 export type PublishedEServicesMetric = z.infer<typeof PublishedEServicesMetric>
-export type MacroCategoriesPublishedEServicesMetric = z.infer<
-  typeof MacroCategoriesPublishedEServicesMetric
->
+export type PublishedEServicesByMacroCategoriesMetric = z.infer<typeof PublishedEServicesByMacroCategoriesMetric>
+export type Top10MostSubscribedEServices = z.infer<typeof Top10MostSubscribedEServices>
 export type Top10MostSubscribedEServicesMetric = z.infer<typeof Top10MostSubscribedEServicesMetric>
-export type Top10MostSubscribedEServicesPerMacroCategoryMetric = z.infer<
-  typeof Top10MostSubscribedEServicesPerMacroCategoryMetric
->
-export type Top10ProviderWithMostSubscriberMetric = z.infer<
-  typeof Top10ProviderWithMostSubscriberMetric
->
+export type Top10ProviderWithMostSubscriberMetric = z.infer<typeof Top10ProviderWithMostSubscriberMetric>
