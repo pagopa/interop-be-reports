@@ -1,5 +1,5 @@
 {
-  "name": "voucher-data-exporter-temp-name",
+  "name": "dtd-catalog-total-load-exporter",
   "main": "./dist/index.js",
   "type": "module",
   "scripts": {

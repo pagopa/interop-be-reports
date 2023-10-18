@@ -418,7 +418,7 @@ importers:
         specifier: 0.34.1
         version: 0.34.1
 
-  jobs/voucher-data-exporter-temp-name:
+  jobs/dtd-catalog-total-load-exporter:
     dependencies:
       '@aws-sdk/client-s3':
         specifier: ^3.387.0

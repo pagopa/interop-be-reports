@@ -1,16 +1,20 @@
-import { ReadModelClient } from '@interop-be-reports/commons'
-import { EService } from '../models/eservice.model.js'
+import { Attribute, Attributes, ReadModelClient, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
 import { z } from 'zod'
+import { EServiceQueryOutput } from '../models/eservice-result.model.js'
 
-/**
- * Get all the active e-services with the dailyCallsTotal, dailyCallsPerConsumer and voucherLifespan
- * of their actual active descriptor.
- */
-export async function getEServices(readModel: ReadModelClient): Promise<Array<EService>> {
+export async function getEServices(readModel: ReadModelClient): Promise<Array<EServiceQueryOutput>> {
   return await readModel.eservices
     .aggregate([
       {
         $match: { 'data.descriptors.state': { $in: ['Published', 'Suspended'] } },
+      },
+      {
+        $lookup: {
+          from: TENANTS_COLLECTION_NAME,
+          localField: 'data.producerId',
+          foreignField: 'data.id',
+          as: 'producer',
+        },
       },
       {
         $addFields: {
@@ -26,16 +30,30 @@ export async function getEServices(readModel: ReadModelClient): Promise<Array<ES
         },
       },
       {
+        $addFields: {
+          activeDescriptor: { $arrayElemAt: ['$activeDescriptor', 0] },
+        },
+      },
+      {
         $project: {
           id: '$data.id',
           name: '$data.name',
-          dailyCallsTotal: { $arrayElemAt: ['$activeDescriptor.dailyCallsTotal', 0] },
-          dailyCallsPerConsumer: { $arrayElemAt: ['$activeDescriptor.dailyCallsPerConsumer', 0] },
-          voucherLifespan: { $arrayElemAt: ['$activeDescriptor.voucherLifespan', 0] },
+          activeDescriptor: {
+            id: '$activeDescriptor.id',
+            state: '$activeDescriptor.state',
+            version: '$activeDescriptor.version',
+          },
+          technology: '$data.technology',
+          producerName: { $arrayElemAt: ['$producer.data.name', 0] },
+          description: '$data.description',
+          dailyCallsTotal: '$activeDescriptor.dailyCallsTotal',
+          dailyCallsPerConsumer: '$activeDescriptor.dailyCallsPerConsumer',
+          voucherLifespan: '$activeDescriptor.voucherLifespan',
+          attributes: '$activeDescriptor.attributes',
         },
       },
     ])
-    .map((eservice) => EService.parse(eservice))
+    .map((eservice) => EServiceQueryOutput.parse(eservice))
     .toArray()
 }
 
@@ -45,7 +63,7 @@ export async function getEServices(readModel: ReadModelClient): Promise<Array<ES
 export async function getTotalLoadEServices(
   readModel: ReadModelClient,
   eservicesIds: Array<string>
-): Promise<Array<{ id: string; actualLoad: number }>> {
+): Promise<Array<{ eserviceId: string; actualLoad: number }>> {
   return await readModel.purposes
     .aggregate([
       {
@@ -81,11 +99,18 @@ export async function getTotalLoadEServices(
       {
         $project: {
           _id: 0,
-          id: '$_id',
+          eserviceId: '$_id',
           actualLoad: '$actualLoad',
         },
       },
     ])
-    .map((result) => z.object({ id: z.string(), actualLoad: z.number() }).parse(result))
+    .map((result) => z.object({ eserviceId: z.string(), actualLoad: z.number() }).parse(result))
+    .toArray()
+}
+
+export async function getAttributes(readModel: ReadModelClient, attributeIds: Array<string>): Promise<Attributes> {
+  return readModel.attributes
+    .find({ 'data.id': { $in: attributeIds } })
+    .map(({ data }) => Attribute.parse(data))
     .toArray()
 }

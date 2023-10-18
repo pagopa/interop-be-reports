@@ -58,8 +58,8 @@ jobs:
             package_path: ./jobs/anac-certified-attributes-importer
           - image_name: dtd-metrics
             package_path: ./jobs/dtd-metrics
-          - image_name: voucher-data-exporter-temp-name
-            package_path: ./jobs/voucher-data-exporter-temp-name
+          - image_name: dtd-catalog-total-load-exporter
+            package_path: ./jobs/dtd-catalog-total-load-exporter
 
     permissions:
       id-token: write

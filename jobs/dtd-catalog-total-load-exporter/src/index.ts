@@ -1,7 +1,11 @@
-import { AwsS3BucketClient, ReadModelClient } from '@interop-be-reports/commons'
+import { AwsS3BucketClient, ReadModelClient, SafeMap } from '@interop-be-reports/commons'
 import { env } from './configs/env.js'
 import { ReadPreferenceMode } from 'mongodb'
-import { getEServices, getTotalLoadEServices } from './services/read-model-queries.service.js'
+import { getAttributes, getEServices, getTotalLoadEServices } from './services/read-model-queries.service.js'
+import {
+  getAllAttributesIdsInEServicesActiveDescriptors,
+  remapDescriptorAttributesToEServiceResultAttributes,
+} from './utils/helpers.utils.js'
 
 const log = console.log
 
@@ -29,20 +33,27 @@ log('Getting e-service load data...')
 const eserviceIds = eservices.map((eservice) => eservice.id)
 const purposes = await getTotalLoadEServices(readModelClient, eserviceIds)
 
-// Map purposes to a map of id -> actualLoad
-const actualLoadMap = new Map<string, number>(purposes.map((purpose) => [purpose.id, purpose.actualLoad]))
+log('Getting attributes data...')
+const attributesIds = getAllAttributesIdsInEServicesActiveDescriptors(eservices)
+const attributes = await getAttributes(readModelClient, attributesIds)
 
-// Enrich e-services with actual load
+// Map purposes to a map of eserviceId -> actualLoad
+const actualLoadMap = new Map(purposes.map((purpose) => [purpose.eserviceId, purpose.actualLoad]))
+// Map attributes to a map of attributeId -> attribute
+const attributesMap = new SafeMap(attributes.map((attribute) => [attribute.id, attribute]))
+
+// Enrich e-services with actual load and remapped attributes and sort them by actual load
 const result = eservices
   .map((eservice) => ({
     ...eservice,
     actualLoad: actualLoadMap.get(eservice.id) ?? 0, // If no purpose is found, set actual load to 0
+    attributes: remapDescriptorAttributesToEServiceResultAttributes(eservice.attributes, attributesMap),
   }))
   .sort((a, b) => b.actualLoad - a.actualLoad)
 
 log(`Uploading data to ${env.STORAGE_BUCKET}...`)
-await awsS3BucketClient.uploadData(result, env.FILENAME)
 
+await awsS3BucketClient.uploadData(result, env.FILENAME)
 await readModelClient.close()
 
 log('Done.')

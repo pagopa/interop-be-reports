@@ -9,7 +9,7 @@ RUN apk update
 WORKDIR /app
 RUN corepack enable
 COPY . .
-RUN pnpm --package=turbo dlx turbo prune --scope=voucher-data-exporter-temp-name --docker
+RUN pnpm --package=turbo dlx turbo prune --scope=dtd-catalog-total-load-exporter --docker
 
 # remove all empty node_modules folder structure
 RUN rm -rf /app/out/full/*/*/node_modules
@@ -29,6 +29,6 @@ RUN pnpm install --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN pnpm dlx turbo run build --filter=voucher-data-exporter-temp-name
+RUN pnpm dlx turbo run build --filter=dtd-catalog-total-load-exporter
 
-CMD node ./jobs/voucher-data-exporter-temp-name/dist
+CMD node ./jobs/dtd-catalog-total-load-exporter/dist
