@@ -5,13 +5,7 @@ import {
   PublicEServiceAttributes,
   Tenant,
 } from '../models/index.js'
-import {
-  SafeMap,
-  EService,
-  EServiceDescriptor,
-  EServices,
-  DescriptorAttributes,
-} from '@interop-be-reports/commons'
+import { SafeMap, EService, EServiceDescriptor, EServices, DescriptorAttributes } from '@interop-be-reports/commons'
 
 /**
  * Remaps an e-service to a public e-service
@@ -33,10 +27,7 @@ export function remapEServiceToPublicEService(
     description: eservice.description,
     technology: eservice.technology.toUpperCase() as 'REST' | 'SOAP',
     producerName: producersMap.get(eservice.producerId).name,
-    attributes: remapDescriptorAttributesToPublicAttributes(
-      activeDescriptor.attributes,
-      attributesMap
-    ),
+    attributes: remapDescriptorAttributesToPublicAttributes(activeDescriptor.attributes, attributesMap),
     activeDescriptor: {
       id: activeDescriptor.id,
       state: activeDescriptor.state.toUpperCase() as 'PUBLISHED' | 'SUSPENDED',
@@ -95,12 +86,18 @@ function remapDescriptorAttributesToPublicAttributes(
  * @returns The active descriptor
  */
 export function getEServiceActiveDescriptor(eservice: EService): EServiceDescriptor {
-  const activeDescriptor = eservice.descriptors.find(
-    ({ state }) => state === 'Published' || state === 'Suspended'
-  )
+  let activeDescriptor: EServiceDescriptor | undefined
+
+  // Filter out all descriptors that are not published or suspended
+  const descriptors = eservice.descriptors.filter(({ state }) => state === 'Suspended' || state === 'Published')
+
+  // If there are more than one descriptor, get the one with the higher version
+  if (descriptors.length > 1) {
+    activeDescriptor = descriptors.sort((a, b) => Number(b.version) - Number(a.version))[0]
+  } else activeDescriptor = descriptors[0]
 
   if (!activeDescriptor) {
-    throw new Error(`No active descriptor found for e-service ${eservice.id}`)
+    throw new Error(`EService ${eservice.name} - ${eservice.id} has no active descriptor`)
   }
 
   return activeDescriptor
@@ -111,9 +108,7 @@ export function getEServiceActiveDescriptor(eservice: EService): EServiceDescrip
  * @param eservices - The array of eservices
  * @returns The array of attributes ids
  */
-export function getAllAttributesIdsInEServicesActiveDescriptors(
-  eservices: EServices
-): Array<string> {
+export function getAllAttributesIdsInEServicesActiveDescriptors(eservices: EServices): Array<string> {
   const attributesIds: Set<string> = new Set()
 
   eservices.forEach((eservice) => {

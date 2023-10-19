@@ -1,21 +1,18 @@
 import { EServiceDescriptor, EService } from '@interop-be-reports/commons'
 import { z } from 'zod'
 
-const EServiceCommon = EService.pick({
+const EServiceCommonData = EService.pick({
   id: true,
   name: true,
   description: true,
   technology: true,
-})
-  .and(
-    z.object({
-      activeDescriptor: EServiceDescriptor.pick({ id: true, state: true, version: true }),
-      producerName: z.string(),
-    })
-  )
-  .and(EServiceDescriptor.pick({ dailyCallsTotal: true, dailyCallsPerConsumer: true, voucherLifespan: true }))
+}).and(
+  z.object({
+    producerName: z.string(),
+  })
+)
 
-export const EServiceQueryOutput = EServiceCommon.and(EService.pick({ attributes: true }))
+export const EServiceQueryOutput = EServiceCommonData.and(EService.pick({ attributes: true, descriptors: true }))
 
 export const EServiceResultAttribute = z.object({
   name: z.string(),
@@ -36,8 +33,19 @@ export const EServiceResultAttributes = z.object({
   declared: z.array(z.union([EServiceResultAttributeSingle, EServiceResultAttributesGroup])),
 })
 
-export const EServiceResult = EServiceCommon.and(
-  z.object({ attributes: EServiceResultAttributes, totalLoad: z.number() })
+export const EServiceResult = EServiceCommonData.and(
+  z.object({
+    attributes: EServiceResultAttributes,
+    activeDescriptor: EServiceDescriptor.pick({
+      id: true,
+      state: true,
+      version: true,
+    }),
+    dailyCallsTotal: z.number(),
+    dailyCallsPerConsumer: z.number(),
+    voucherLifespan: z.number(),
+    actualLoad: z.number(),
+  })
 )
 
 export type EServiceQueryOutput = z.infer<typeof EServiceQueryOutput>

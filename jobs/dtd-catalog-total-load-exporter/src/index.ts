@@ -4,8 +4,10 @@ import { ReadPreferenceMode } from 'mongodb'
 import { getAttributes, getEServices, getTotalLoadEServices } from './services/read-model-queries.service.js'
 import {
   getAllAttributesIdsInEServicesActiveDescriptors,
+  getEServiceActiveDescriptor,
   remapDescriptorAttributesToEServiceResultAttributes,
 } from './utils/helpers.utils.js'
+import { EServiceResult } from './models/eservice-result.model.js'
 
 const log = console.log
 
@@ -43,12 +45,23 @@ const actualLoadMap = new Map(purposes.map((purpose) => [purpose.eserviceId, pur
 const attributesMap = new SafeMap(attributes.map((attribute) => [attribute.id, attribute]))
 
 // Enrich e-services with actual load and remapped attributes and sort them by actual load
-const result = eservices
-  .map((eservice) => ({
-    ...eservice,
-    actualLoad: actualLoadMap.get(eservice.id) ?? 0, // If no purpose is found, set actual load to 0
-    attributes: remapDescriptorAttributesToEServiceResultAttributes(eservice.attributes, attributesMap),
-  }))
+const result: Array<EServiceResult> = eservices
+  .map((eservice) => {
+    const activeDescriptor = getEServiceActiveDescriptor(eservice)
+    return EServiceResult.parse({
+      ...eservice,
+      attributes: remapDescriptorAttributesToEServiceResultAttributes(eservice.attributes, attributesMap),
+      activeDescriptor: {
+        id: activeDescriptor.id,
+        state: activeDescriptor.state,
+        version: activeDescriptor.version,
+      },
+      dailyCallsTotal: activeDescriptor.dailyCallsTotal,
+      dailyCallsPerConsumer: activeDescriptor.dailyCallsPerConsumer,
+      voucherLifespan: activeDescriptor.voucherLifespan,
+      actualLoad: actualLoadMap.get(eservice.id) ?? 0, // If no purpose is found, set actual load to 0
+    })
+  })
   .sort((a, b) => b.actualLoad - a.actualLoad)
 
 log(`Uploading data to ${env.STORAGE_BUCKET}...`)

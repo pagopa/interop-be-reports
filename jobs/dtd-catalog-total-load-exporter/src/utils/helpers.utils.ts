@@ -1,4 +1,4 @@
-import { Attribute, DescriptorAttributes, SafeMap } from '@interop-be-reports/commons'
+import { Attribute, DescriptorAttributes, EServiceDescriptor, SafeMap } from '@interop-be-reports/commons'
 import {
   EServiceQueryOutput,
   EServiceResultAttribute,
@@ -61,4 +61,22 @@ export function getAllAttributesIdsInEServicesActiveDescriptors(eservices: Array
   })
 
   return Array.from(attributesIds)
+}
+
+export function getEServiceActiveDescriptor(eservice: EServiceQueryOutput): EServiceDescriptor {
+  let activeDescriptor: EServiceDescriptor | undefined
+
+  // Filter out all descriptors that are not published or suspended
+  const descriptors = eservice.descriptors.filter(({ state }) => state === 'Suspended' || state === 'Published')
+
+  // If there are more than one descriptor, get the one with the higher version
+  if (descriptors.length > 1) {
+    activeDescriptor = descriptors.sort((a, b) => Number(b.version) - Number(a.version))[0]
+  } else activeDescriptor = descriptors[0]
+
+  if (!activeDescriptor) {
+    throw new Error(`EService ${eservice.name} - ${eservice.id} has no active descriptor`)
+  }
+
+  return activeDescriptor
 }

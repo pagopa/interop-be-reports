@@ -17,39 +17,13 @@ export async function getEServices(readModel: ReadModelClient): Promise<Array<ES
         },
       },
       {
-        $addFields: {
-          activeDescriptor: {
-            $filter: {
-              input: '$data.descriptors',
-              as: 'descriptor',
-              cond: {
-                $or: [{ $eq: ['$$descriptor.state', 'Published'] }, { $eq: ['$$descriptor.state', 'Suspended'] }],
-              },
-            },
-          },
-        },
-      },
-      {
-        $addFields: {
-          activeDescriptor: { $arrayElemAt: ['$activeDescriptor', 0] },
-        },
-      },
-      {
         $project: {
           id: '$data.id',
           name: '$data.name',
-          activeDescriptor: {
-            id: '$activeDescriptor.id',
-            state: '$activeDescriptor.state',
-            version: '$activeDescriptor.version',
-          },
+          description: '$data.description',
           technology: '$data.technology',
           producerName: { $arrayElemAt: ['$producer.data.name', 0] },
-          description: '$data.description',
-          dailyCallsTotal: '$activeDescriptor.dailyCallsTotal',
-          dailyCallsPerConsumer: '$activeDescriptor.dailyCallsPerConsumer',
-          voucherLifespan: '$activeDescriptor.voucherLifespan',
-          attributes: '$activeDescriptor.attributes',
+          descriptors: '$data.descriptors',
         },
       },
     ])
