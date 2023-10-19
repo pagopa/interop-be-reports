@@ -56,8 +56,8 @@ async function main(): Promise<void> {
     top10ProviderWithMostSubscriberMetric,
   })
 
+  await githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${env.FILENAME}`)
   await awsS3BucketClient.uploadData(output, env.FILENAME)
-  await githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, env.FILENAME)
 
   log('Done!\n')
 }
