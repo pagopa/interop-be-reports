@@ -3,12 +3,8 @@ import { sub } from 'date-fns'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import { z } from 'zod'
 
-export function getSixMonthsAgoDate(): Date {
-  return sub(new Date(), { months: 6 })
-}
-
-export function getOneYearAgoDate(): Date {
-  return sub(new Date(), { years: 1 })
+export function getMonthsAgoDate(numMonths: number): Date {
+  return sub(new Date(), { months: numMonths })
 }
 
 const MacroCategoriesWithAttributes = z.array(

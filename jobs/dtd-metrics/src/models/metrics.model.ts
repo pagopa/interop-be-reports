@@ -89,11 +89,18 @@ export const Top10ProviderWithMostSubscriberMetric = z.object({
   ),
 })
 
+export const TotalTenantsCountMetric = z.object({
+  totalTenantsCount: z.number(),
+  lastMonthTenantsCount: z.number(),
+  variation: z.number(),
+})
+
 export const Metrics = z.object({
   publishedEServicesMetric: PublishedEServicesMetric,
   macroCategoriesPublishedEServicesMetric: PublishedEServicesByMacroCategoriesMetric,
   top10MostSubscribedEServicesMetric: Top10MostSubscribedEServicesMetric,
   top10ProviderWithMostSubscriberMetric: Top10ProviderWithMostSubscriberMetric,
+  totalTenantsCountMetric: TotalTenantsCountMetric,
 })
 
 export type Metrics = z.infer<typeof Metrics>
@@ -103,3 +110,4 @@ export type PublishedEServicesByMacroCategoriesMetric = z.infer<typeof Published
 export type Top10MostSubscribedEServices = z.infer<typeof Top10MostSubscribedEServices>
 export type Top10MostSubscribedEServicesMetric = z.infer<typeof Top10MostSubscribedEServicesMetric>
 export type Top10ProviderWithMostSubscriberMetric = z.infer<typeof Top10ProviderWithMostSubscriberMetric>
+export type TotalTenantsCountMetric = z.infer<typeof TotalTenantsCountMetric>
