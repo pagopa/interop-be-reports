@@ -31,9 +31,10 @@ export async function getTotalTenantsCountMetric(readModel: ReadModelClient): Pr
     twoMonthsAgoTenantsCountPromise,
   ])
 
-  const variation = Number(
-    (((lastMonthTenantsCount - twoMonthsAgoTenantsCount) / lastMonthTenantsCount) * 100).toFixed(1)
-  )
+  const variation =
+    lastMonthTenantsCount > 0
+      ? Number((((lastMonthTenantsCount - twoMonthsAgoTenantsCount) / lastMonthTenantsCount) * 100).toFixed(1))
+      : 0
 
   return { totalTenantsCount, lastMonthTenantsCount, variation }
 }
