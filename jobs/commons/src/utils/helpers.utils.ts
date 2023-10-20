@@ -88,15 +88,13 @@ export function zipBy<A, B, K>(a: A[], b: B[], getValueA: (a: A) => K, getValueB
 export function getActiveDescriptor<TDescriptor extends { version: string; state: DescriptorState }>(
   descriptors: Array<TDescriptor>
 ): TDescriptor | undefined {
-  let activeDescriptor: TDescriptor | undefined
-
   // Filter out all descriptors that are not published or suspended
   const activeDescriptors = descriptors.filter(({ state }) => state === 'Suspended' || state === 'Published')
 
   // If there are more than one descriptor, get the one with the higher version
   if (activeDescriptors.length > 1) {
-    activeDescriptor = activeDescriptors.sort((a, b) => Number(b.version) - Number(a.version))[0]
-  } else activeDescriptor = activeDescriptors[0]
+    return activeDescriptors.sort((a, b) => Number(b.version) - Number(a.version))[0]
+  }
 
-  return activeDescriptor
+  return activeDescriptors[0]
 }
