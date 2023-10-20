@@ -1,10 +1,9 @@
-import { AwsS3BucketClient, ReadModelClient, SafeMap } from '@interop-be-reports/commons'
+import { AwsS3BucketClient, ReadModelClient, SafeMap, getActiveDescriptor } from '@interop-be-reports/commons'
 import { env } from './configs/env.js'
 import { ReadPreferenceMode } from 'mongodb'
 import { getAttributes, getEServices, getTotalLoadEServices } from './services/read-model-queries.service.js'
 import {
   getAllAttributesIdsInEServicesActiveDescriptors,
-  getEServiceActiveDescriptor,
   remapDescriptorAttributesToEServiceResultAttributes,
 } from './utils/helpers.utils.js'
 import { EServiceResult } from './models/eservice-result.model.js'
@@ -47,7 +46,12 @@ const attributesMap = new SafeMap(attributes.map((attribute) => [attribute.id, a
 // Enrich e-services with actual load and remapped attributes and sort them by actual load
 const result: Array<EServiceResult> = eservices
   .map((eservice) => {
-    const activeDescriptor = getEServiceActiveDescriptor(eservice)
+    const activeDescriptor = getActiveDescriptor(eservice.descriptors)
+
+    if (!activeDescriptor) {
+      throw new Error(`EService ${eservice.name} - ${eservice.id} has no active descriptor`)
+    }
+
     return EServiceResult.parse({
       ...eservice,
       attributes: remapDescriptorAttributesToEServiceResultAttributes(eservice.attributes, attributesMap),

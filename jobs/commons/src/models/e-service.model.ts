@@ -61,6 +61,7 @@ export type EService = z.infer<typeof EService>
 export type EServiceDescriptor = z.infer<typeof EServiceDescriptor>
 export type DescriptorAttribute = z.infer<typeof DescriptorAttribute>
 export type DescriptorAttributes = z.infer<typeof DescriptorAttributes>
+export type DescriptorState = z.infer<typeof DescriptorState>
 
 export const EServices = z.array(EService)
 export type EServices = z.infer<typeof EServices>

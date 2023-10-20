@@ -1,3 +1,5 @@
+import { DescriptorState } from '../index.js'
+
 /**
  * Converts an array of objects to CSV format.
  * If the array is empty, an empty string is returned.
@@ -55,27 +57,46 @@ export const b64ByteUrlEncode = (b: Uint8Array): string => bufferB64UrlEncode(Bu
 export const b64UrlEncode = (str: string): string => bufferB64UrlEncode(Buffer.from(str, 'binary'))
 
 const bufferB64UrlEncode = (b: Buffer): string =>
-  b.toString('base64')
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
+  b.toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
 
 /**
  * Zip two arrays based on a matching key
  * Non-matching values are discarded.
  * Note: the key value must be unique in array b
- * @param a 
- * @param b 
+ * @param a
+ * @param b
  * @param getValueA Function that extracts the key for array a
  * @param getValueB Function that extracts the key for array b
- * @returns 
+ * @returns
  */
 export function zipBy<A, B, K>(a: A[], b: B[], getValueA: (a: A) => K, getValueB: (b: B) => K): [A, B][] {
   const mapB = new Map<K, B>()
 
-  b.forEach(bv => mapB.set(getValueB(bv), bv))
+  b.forEach((bv) => mapB.set(getValueB(bv), bv))
 
-  return a
-    .map(av => [av, mapB.get(getValueA(av))])
-    .filter(([_, bv]) => bv !== undefined) as [A, B][]
+  return a.map((av) => [av, mapB.get(getValueA(av))]).filter(([_, bv]) => bv !== undefined) as [A, B][]
+}
+
+/**
+ * Gets the e-service active descriptor from an array of descriptors.
+ * To get the active descriptor, we look for the first descriptor with state "Published" or "Suspended".
+ * If there are more than one descriptor with the same state, we get the one with the higher version.
+ * If there are no descriptors we return undefined.
+ * @param descriptors - Array of descriptors
+ * @returns The active descriptor or undefined in case it is not present
+ */
+export function getActiveDescriptor<TDescriptor extends { version: string; state: DescriptorState }>(
+  descriptors: Array<TDescriptor>
+): TDescriptor | undefined {
+  let activeDescriptor: TDescriptor | undefined
+
+  // Filter out all descriptors that are not published or suspended
+  const activeDescriptors = descriptors.filter(({ state }) => state === 'Suspended' || state === 'Published')
+
+  // If there are more than one descriptor, get the one with the higher version
+  if (activeDescriptors.length > 1) {
+    activeDescriptor = activeDescriptors.sort((a, b) => Number(b.version) - Number(a.version))[0]
+  } else activeDescriptor = activeDescriptors[0]
+
+  return activeDescriptor
 }
