@@ -10,15 +10,15 @@ export async function getTotalTenantsCountMetric(readModel: ReadModelClient): Pr
 
   const totalTenantsCountPromise = readModel.tenants.countDocuments(isTenantOnboardedFilter)
   const lastMonthTenantsCountPromise = readModel.tenants.countDocuments({
+    // TODO this should be 'onboardedAt', for now we use 'createdAt'
     'data.createdAt': {
-      // TODO this should be 'onboardedAt', for now we use 'createdAt'
       $gte: getMonthsAgoDate(1).toISOString(),
     },
     ...isTenantOnboardedFilter,
   })
   const twoMonthsAgoTenantsCountPromise = readModel.tenants.countDocuments({
+    // TODO this should be 'onboardedAt', for now we use 'createdAt'
     'data.createdAt': {
-      // TODO this should be 'onboardedAt', for now we use 'createdAt'
       $lte: getMonthsAgoDate(1).toISOString(),
       $gte: getMonthsAgoDate(2).toISOString(),
     },
@@ -32,9 +32,9 @@ export async function getTotalTenantsCountMetric(readModel: ReadModelClient): Pr
   ])
 
   const variation =
-    lastMonthTenantsCount > 0
-      ? Number((((lastMonthTenantsCount - twoMonthsAgoTenantsCount) / lastMonthTenantsCount) * 100).toFixed(1))
-      : 0
+    lastMonthTenantsCount === 0
+      ? 0
+      : Number((((lastMonthTenantsCount - twoMonthsAgoTenantsCount) / lastMonthTenantsCount) * 100).toFixed(1))
 
   return { totalTenantsCount, lastMonthTenantsCount, variation }
 }
