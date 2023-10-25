@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 export async function getTenantDistributionMetric(readModel: ReadModelClient): Promise<TenantDistributionMetric> {
   const onBoardedTenantIdsQueryPromise = readModel.tenants
+    // TODO This doesn't tell us if the tenant is actually onboarded or not, we need to wait for the availability of the onboardedAt field from selfcare
     .find({ 'data.selfcareId': { $exists: true } }, { projection: { _id: 0, 'data.id': 1 } })
     .map(({ data }) => z.string().parse(data.id))
     .toArray()
