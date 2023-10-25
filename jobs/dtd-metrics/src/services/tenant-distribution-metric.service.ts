@@ -1,6 +1,5 @@
 import { AgreementState, ReadModelClient } from '@interop-be-reports/commons'
 import { TenantDistributionMetric } from '../models/metrics.model.js'
-import uniq from 'lodash/uniq.js'
 import { z } from 'zod'
 
 export async function getTenantDistributionMetric(readModel: ReadModelClient): Promise<TenantDistributionMetric> {
@@ -35,15 +34,15 @@ export async function getTenantDistributionMetric(readModel: ReadModelClient): P
     activeAgreementsQueryPromise,
   ])
 
-  const agreementsConsumersIds = uniq(activeAgreements.map((agreement) => agreement.consumerId))
-  const agreementsProducersIds = uniq(activeAgreements.map((agreement) => agreement.producerId))
+  const agreementsConsumersIds = new Set(activeAgreements.map((agreement) => agreement.consumerId))
+  const agreementsProducersIds = new Set(activeAgreements.map((agreement) => agreement.producerId))
 
   function checkIsConsumer(tenantId: string): boolean {
-    return agreementsConsumersIds.includes(tenantId)
+    return agreementsConsumersIds.has(tenantId)
   }
 
   function checkIsProducer(tenantId: string): boolean {
-    return agreementsProducersIds.includes(tenantId)
+    return agreementsProducersIds.has(tenantId)
   }
 
   type TenantDistributionItem = TenantDistributionMetric[number]
