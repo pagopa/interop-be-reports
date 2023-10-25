@@ -2,9 +2,10 @@ import { ReadModelClient, Tenant } from '@interop-be-reports/commons'
 import { getMacroCategoriesWithAttributes, getOneYearAgoDate, getSixMonthsAgoDate } from '../utils/helpers.utils.js'
 import { add } from 'date-fns'
 import { TenantSignupsTrendMetric } from '../models/metrics.model.js'
+import { z } from 'zod'
 
-type MacroCategory = Awaited<ReturnType<typeof getMacroCategoriesWithAttributes>>[number]
-type EnrichedMacroCategory = MacroCategory & { tenantsCreatedAtDates: Array<Date> }
+type MacroCategoryWithAttributes = Awaited<ReturnType<typeof getMacroCategoriesWithAttributes>>[number]
+type EnrichedMacroCategory = MacroCategoryWithAttributes & { tenantsCreatedAtDates: Array<Date> }
 
 export async function getTenantSignupsTrendMetric(readModel: ReadModelClient): Promise<TenantSignupsTrendMetric> {
   // Get all onboarded tenants
@@ -12,9 +13,13 @@ export async function getTenantSignupsTrendMetric(readModel: ReadModelClient): P
     .find(
       { 'data.selfcareId': { $exists: true } },
       // TODO eventually createdAt must be replaced with onboarded at
-      { projection: { _id: 0, 'data.createdAt': 1, 'data.attributes': 1 }, sort: { 'data.createdAt': 1 } }
+      { projection: { _id: 0, 'data.createdAt': 1, 'data.attributes.id': 1 }, sort: { 'data.createdAt': 1 } }
     )
-    .map(({ data }) => Tenant.pick({ createdAt: true, attributes: true }).parse(data))
+    .map(({ data }) =>
+      Tenant.pick({ createdAt: true })
+        .and(z.object({ attributes: z.array(z.object({ id: z.string() })) }))
+        .parse(data)
+    )
     .toArray()
 
   const macroCategories = await getMacroCategoriesWithAttributes(readModel)
@@ -23,7 +28,9 @@ export async function getTenantSignupsTrendMetric(readModel: ReadModelClient): P
   const oldestTenantDate = onboardedTenants[0].createdAt // TODO to be replaced with onboardedAt
 
   // In each macro category put the tenants that belong to it in an array that contains the dates of their onboardings
-  function enrichMacroCategoryWithTenantCreatedAtDatesArray(macroCategory: MacroCategory): EnrichedMacroCategory {
+  function enrichMacroCategoryWithTenantCreatedAtDatesArray(
+    macroCategory: MacroCategoryWithAttributes
+  ): EnrichedMacroCategory {
     const macroCategoryAttributeIds = macroCategory.attributes.map((attribute) => attribute.id)
     return {
       ...macroCategory,
@@ -51,7 +58,7 @@ export async function getTenantSignupsTrendMetric(readModel: ReadModelClient): P
 
   const fromTheBeginningData = macroCategoriesWithTenants
 
-  return TenantSignupsTrendMetric.parse({
+  const result = TenantSignupsTrendMetric.parse({
     lastSixMonths: sixMonthsAgoData.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
@@ -71,6 +78,8 @@ export async function getTenantSignupsTrendMetric(readModel: ReadModelClient): P
       startingDate: oldestTenantDate,
     })),
   })
+
+  return result
 }
 
 function toTimeseriesSequenceData(
@@ -83,7 +92,7 @@ function toTimeseriesSequenceData(
   let count = 0
   while (currentDate < new Date()) {
     const newDate = add(currentDate, jump)
-    count += data.filter((date) => date < newDate && date > currentDate).length
+    count += data.filter((date) => date < newDate && date >= currentDate).length
     timeseriesData.push({ date: currentDate, count })
     currentDate = newDate
   }
