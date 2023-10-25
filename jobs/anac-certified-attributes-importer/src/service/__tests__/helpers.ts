@@ -1,11 +1,11 @@
-import { ANAC_ABILITATO_CODE, ANAC_INCARICATO_CODE, ANAC_IN_CONVALIDA_CODE } from '../../config/index.js'
+import { ANAC_ABILITATO_CODE, ANAC_INCARICATO_CODE, ANAC_IN_CONVALIDA_CODE, SftpConfig } from '../../config/index.js'
 import { InteropContext, PersistentAttribute, PersistentTenant, PersistentTenantAttribute } from '../../model/index.js'
 
-export const sftpConfigTest = {
+export const sftpConfigTest: SftpConfig = {
   host: 'host',
   port: 1,
   username: 'user',
-  privateKey: 'key',
+  password: 'password',
   filePath: '/',
 }
 

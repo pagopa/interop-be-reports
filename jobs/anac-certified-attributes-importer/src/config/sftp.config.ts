@@ -2,6 +2,6 @@ export type SftpConfig = {
   host: string
   port: number
   username: string
-  privateKey: string
+  password: string
   filePath: string
 }

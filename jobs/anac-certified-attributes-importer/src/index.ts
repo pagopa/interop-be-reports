@@ -27,7 +27,7 @@ const sftpConfig: SftpConfig = {
   host: env.SFTP_HOST,
   port: env.SFTP_PORT,
   username: env.SFTP_USERNAME,
-  privateKey: env.SFTP_PRIVATE_KEY,
+  password: env.SFTP_PASSWORD,
   filePath: env.SFTP_PATH + csvFileName,
 }
 
