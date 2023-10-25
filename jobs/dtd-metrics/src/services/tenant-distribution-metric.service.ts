@@ -4,7 +4,6 @@ import { z } from 'zod'
 
 export async function getTenantDistributionMetric(readModel: ReadModelClient): Promise<TenantDistributionMetric> {
   const onBoardedTenantIdsQueryPromise = readModel.tenants
-    // TODO This doesn't tell us if the tenant is actually onboarded or not, we need to wait for the availability of the onboardedAt field from selfcare
     .find({ 'data.selfcareId': { $exists: true } }, { projection: { _id: 0, 'data.id': 1 } })
     .map(({ data }) => z.string().parse(data.id))
     .toArray()
@@ -63,7 +62,8 @@ export async function getTenantDistributionMetric(readModel: ReadModelClient): P
     count: 0,
   }
 
-  const onlyFirstAccess: TenantDistributionItem = {
+  // The label is misleading, this is actually the number of onboarded tenants that are neither consumers nor producers
+  const onlyFirstAccess: TenantDistributionItem = { 
     label: 'Solo primo accesso',
     count: 0,
   }
