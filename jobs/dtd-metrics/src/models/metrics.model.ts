@@ -14,7 +14,7 @@ export const PublishedEServicesByMacroCategoriesMetric = z.array(
   })
 )
 
-function timedObject<T extends z.ZodSchema>(
+function timedMetricObject<T extends z.ZodSchema>(
   schema: T
 ): z.ZodObject<{ lastSixMonths: T; lastTwelveMonths: T; fromTheBeginning: T }> {
   return z.object({
@@ -24,7 +24,7 @@ function timedObject<T extends z.ZodSchema>(
   })
 }
 
-export const Top10MostSubscribedEServices = timedObject(
+export const Top10MostSubscribedEServices = timedMetricObject(
   z.array(
     z.object({
       eserviceName: z.string(),
@@ -42,7 +42,7 @@ export const Top10MostSubscribedEServicesMetric = z.array(
   })
 )
 
-export const Top10ProviderWithMostSubscriberMetric = timedObject(
+export const Top10ProviderWithMostSubscriberMetric = timedMetricObject(
   z.array(
     z.object({
       name: z.string(),
@@ -57,7 +57,7 @@ export const Top10ProviderWithMostSubscriberMetric = timedObject(
   )
 )
 
-export const TenantSignupsTrendMetric = timedObject(
+export const TenantSignupsTrendMetric = timedMetricObject(
   z.array(
     z.object({
       id: z.string(),
