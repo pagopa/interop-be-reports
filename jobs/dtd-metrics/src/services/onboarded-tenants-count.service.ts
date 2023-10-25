@@ -1,9 +1,9 @@
 import { ReadModelClient } from '@interop-be-reports/commons'
-import { TotalTenantsCountMetric } from '../models/metrics.model.js'
+import { OnboardedTenantsCountMetric } from '../models/metrics.model.js'
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { Document } from 'mongodb'
 
-export async function getTotalTenantsCountMetric(readModel: ReadModelClient): Promise<TotalTenantsCountMetric> {
+export async function getOnboardedTenantsCountMetric(readModel: ReadModelClient): Promise<OnboardedTenantsCountMetric> {
   const isTenantOnboardedFilter: Document = {
     'data.selfcareId': { $exists: true },
   }

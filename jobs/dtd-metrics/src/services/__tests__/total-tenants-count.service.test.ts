@@ -1,9 +1,9 @@
 import { Tenant, getTenantMock } from '@interop-be-reports/commons'
 import { readModelMock, repeatObjInArray, seedCollection } from '../../utils/tests.utils.js'
 import { randomUUID } from 'crypto'
-import { getTotalTenantsCountMetric } from '../total-tenants-count.service.js'
+import { getOnboardedTenantsCountMetric } from '../onboarded-tenants-count.service.js'
 
-describe('getTotalTenantsCountMetric', () => {
+describe('getOnboardedTenantsCountMetric', () => {
   it('should return the correct metrics', async () => {
     const onboardedTenant = getTenantMock({ selfcareId: randomUUID() })
     const onboardedTenants = repeatObjInArray({ data: onboardedTenant }, 20)
@@ -21,7 +21,7 @@ describe('getTotalTenantsCountMetric', () => {
       seedCollection('tenants', onboardedLastMonthTenants),
     ])
 
-    const result = await getTotalTenantsCountMetric(readModelMock)
+    const result = await getOnboardedTenantsCountMetric(readModelMock)
 
     expect(result.totalTenantsCount).toBe(onboardedTenants.length + onboardedLastMonthTenants.length)
     expect(result.lastMonthTenantsCount).toBe(onboardedLastMonthTenants.length)

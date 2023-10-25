@@ -7,7 +7,7 @@ import {
   getPublishedEServicesByMacroCategoriesMetric,
   getTop10MostSubscribedEServicesMetric,
   getTop10ProviderWithMostSubscriberMetric,
-  getTotalTenantsCountMetric,
+  getOnboardedTenantsCountMetric,
 } from './services/index.js'
 import { GithubClient } from './services/github-client.service.js'
 
@@ -40,13 +40,13 @@ async function main(): Promise<void> {
     macroCategoriesPublishedEServicesMetric,
     top10MostSubscribedEServicesMetric,
     top10ProviderWithMostSubscriberMetric,
-    totalTenantsCountMetric,
+    onboardedTenantsCountMetric,
   ] = await Promise.all([
     getPublishedEServicesMetric(readModel),
     getPublishedEServicesByMacroCategoriesMetric(readModel),
     getTop10MostSubscribedEServicesMetric(readModel),
     getTop10ProviderWithMostSubscriberMetric(readModel),
-    getTotalTenantsCountMetric(readModel),
+    getOnboardedTenantsCountMetric(readModel),
   ])
 
   log('Metrics retrieved!\n')
@@ -57,7 +57,7 @@ async function main(): Promise<void> {
     macroCategoriesPublishedEServicesMetric,
     top10MostSubscribedEServicesMetric,
     top10ProviderWithMostSubscriberMetric,
-    totalTenantsCountMetric,
+    onboardedTenantsCountMetric,
   })
 
   await githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${env.FILENAME}`)
