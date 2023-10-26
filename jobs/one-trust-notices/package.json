@@ -31,7 +31,7 @@
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
     "lodash": "^4.17.21",
-    "zod": "^3.21.4",
+    "zod": "^3.22.3",
     "@interop-be-reports/commons": "workspace:*"
   }
 }
