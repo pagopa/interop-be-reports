@@ -1,5 +1,5 @@
 import { ReadModelClient, Tenant } from '@interop-be-reports/commons'
-import { getMacroCategoriesWithAttributes, getOneYearAgoDate, getSixMonthsAgoDate } from '../utils/helpers.utils.js'
+import { getMacroCategoriesWithAttributes, getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { add } from 'date-fns'
 import { TenantSignupsTrendMetric } from '../models/metrics.model.js'
 import { z } from 'zod'
@@ -42,8 +42,8 @@ export async function getTenantSignupsTrendMetric(readModel: ReadModelClient): P
 
   const macroCategoriesWithTenants = macroCategories.map(enrichMacroCategoryWithTenantCreatedAtDatesArray)
 
-  const sixMonthsAgoDate = getSixMonthsAgoDate()
-  const twelveMonthsAgoDate = getOneYearAgoDate()
+  const sixMonthsAgoDate = getMonthsAgoDate(6)
+  const twelveMonthsAgoDate = getMonthsAgoDate(12)
 
   // Filter out tenants that are older than 6 months
   const sixMonthsAgoData = macroCategoriesWithTenants.map((macroCategory) => ({
