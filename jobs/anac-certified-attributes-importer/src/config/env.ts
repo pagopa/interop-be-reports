@@ -5,7 +5,7 @@ const Env = z.object({
   SFTP_HOST: z.string(),
   SFTP_PORT: z.string().transform((v, _) => parseInt(v)),
   SFTP_USERNAME: z.string(),
-  SFTP_PRIVATE_KEY: z.string(),
+  SFTP_PASSWORD: z.string(),
   SFTP_PATH: z.string().transform(value => value.endsWith('/') ? value : value + '/'),
   SFTP_FILENAME_PREFIX: z.string(),
 

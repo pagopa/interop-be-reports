@@ -13,7 +13,7 @@ export class SftpClient {
       host: this.config.host,
       port: this.config.port,
       username: this.config.username,
-      privateKey: this.config.privateKey,
+      password: this.config.password,
     })
 
     const file = await sftpClient.get(this.config.filePath)
