@@ -1,6 +1,6 @@
 import { AgreementState, ReadModelClient, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
 import { Top10ProviderWithMostSubscriberMetric } from '../models/metrics.model.js'
-import { getSixMonthsAgoDate, getOneYearAgoDate, getMacroCategoriesWithAttributes } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate, getMacroCategoriesWithAttributes } from '../utils/helpers.utils.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3747
@@ -14,12 +14,12 @@ export async function getTop10ProviderWithMostSubscriberMetric(
     .map((macro) => macro.attributes.map((a) => a.id))
     .flat()
 
-  const sixMonthsAgoDate = getSixMonthsAgoDate()
-  const twelveYearAgoDate = getOneYearAgoDate()
+  const sixMonthsAgoDate = getMonthsAgoDate(6)
+  const twelveMonthsAgoDate = getMonthsAgoDate(12)
   const fromTheBeginningDate = undefined
 
   const [lastSixMonths, lastTwelveMonths, fromTheBeginning] = await Promise.all(
-    [sixMonthsAgoDate, twelveYearAgoDate, fromTheBeginningDate].map((date) =>
+    [sixMonthsAgoDate, twelveMonthsAgoDate, fromTheBeginningDate].map((date) =>
       readModel.agreements
         .aggregate([
           {

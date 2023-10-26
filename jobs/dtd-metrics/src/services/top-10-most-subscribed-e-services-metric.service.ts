@@ -7,7 +7,7 @@ import {
   TENANTS_COLLECTION_NAME,
   Tenant,
 } from '@interop-be-reports/commons'
-import { getMacroCategoriesWithAttributes, getOneYearAgoDate, getSixMonthsAgoDate } from '../utils/helpers.utils.js'
+import { getMacroCategoriesWithAttributes, getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { z } from 'zod'
 import orderBy from 'lodash/orderBy.js'
 import uniq from 'lodash/uniq.js'
@@ -147,8 +147,8 @@ export async function getTop10MostSubscribedEServicesMetric(
    * We have all the data we need to create the metric.
    */
 
-  const sixMonthsAgoDate = getSixMonthsAgoDate()
-  const twelveMonthsAgoDate = getOneYearAgoDate()
+  const sixMonthsAgoDate = getMonthsAgoDate(6)
+  const twelveMonthsAgoDate = getMonthsAgoDate(12)
   const fromTheBeginningDate = undefined
 
   const result = [{ id: '0', name: 'Totale' }, ...MACRO_CATEGORIES].map((m) => {
