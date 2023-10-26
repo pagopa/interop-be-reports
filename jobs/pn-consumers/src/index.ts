@@ -14,7 +14,6 @@ async function main(): Promise<void> {
     mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
     mongodbReadPreference: env.MONGODB_READ_PREFERENCE,
     mongodbRetryWrites: env.MONGODB_RETRY_WRITES,
-
     readModelDbUser: env.READ_MODEL_DB_USER,
     readModelDbPassword: env.READ_MODEL_DB_PASSWORD,
     readModelDbHost: env.READ_MODEL_DB_HOST,

@@ -5,13 +5,7 @@ import {
   PublicEServiceAttributes,
   Tenant,
 } from '../models/index.js'
-import {
-  SafeMap,
-  EService,
-  EServiceDescriptor,
-  EServices,
-  DescriptorAttributes,
-} from '@interop-be-reports/commons'
+import { SafeMap, EService, EServices, DescriptorAttributes, getActiveDescriptor } from '@interop-be-reports/commons'
 
 /**
  * Remaps an e-service to a public e-service
@@ -25,7 +19,11 @@ export function remapEServiceToPublicEService(
   attributesMap: SafeMap<string, Attribute>,
   producersMap: SafeMap<string, Tenant>
 ): PublicEService {
-  const activeDescriptor = getEServiceActiveDescriptor(eservice)
+  const activeDescriptor = getActiveDescriptor(eservice.descriptors)
+
+  if (!activeDescriptor) {
+    throw new Error(`EService ${eservice.name} - ${eservice.id} has no active descriptor`)
+  }
 
   return {
     id: eservice.id,
@@ -33,10 +31,7 @@ export function remapEServiceToPublicEService(
     description: eservice.description,
     technology: eservice.technology.toUpperCase() as 'REST' | 'SOAP',
     producerName: producersMap.get(eservice.producerId).name,
-    attributes: remapDescriptorAttributesToPublicAttributes(
-      activeDescriptor.attributes,
-      attributesMap
-    ),
+    attributes: remapDescriptorAttributesToPublicAttributes(activeDescriptor.attributes, attributesMap),
     activeDescriptor: {
       id: activeDescriptor.id,
       state: activeDescriptor.state.toUpperCase() as 'PUBLISHED' | 'SUSPENDED',
@@ -88,36 +83,20 @@ function remapDescriptorAttributesToPublicAttributes(
 }
 
 /**
- * Gets the active descriptor of an e-service.
- * To get the active descriptor, we look for the first descriptor with state "Published" or "Suspended".
- * If no descriptor is found, an error is thrown.
- * @param eservice - The e-service
- * @returns The active descriptor
- */
-export function getEServiceActiveDescriptor(eservice: EService): EServiceDescriptor {
-  const activeDescriptor = eservice.descriptors.find(
-    ({ state }) => state === 'Published' || state === 'Suspended'
-  )
-
-  if (!activeDescriptor) {
-    throw new Error(`No active descriptor found for e-service ${eservice.id}`)
-  }
-
-  return activeDescriptor
-}
-
-/**
  * Gets the active descriptor from each eservice and returns all attributes ids inside them
  * @param eservices - The array of eservices
  * @returns The array of attributes ids
  */
-export function getAllAttributesIdsInEServicesActiveDescriptors(
-  eservices: EServices
-): Array<string> {
+export function getAllAttributesIdsInEServicesActiveDescriptors(eservices: EServices): Array<string> {
   const attributesIds: Set<string> = new Set()
 
   eservices.forEach((eservice) => {
-    const activeDescriptor = getEServiceActiveDescriptor(eservice)
+    const activeDescriptor = getActiveDescriptor(eservice.descriptors)
+
+    if (!activeDescriptor) {
+      throw new Error(`EService ${eservice.name} - ${eservice.id} has no active descriptor`)
+    }
+
     const { certified, verified, declared } = activeDescriptor.attributes
     ;[...certified, ...verified, ...declared].forEach((attributesGroup) => {
       attributesGroup.forEach(({ id }) => attributesIds.add(id))
