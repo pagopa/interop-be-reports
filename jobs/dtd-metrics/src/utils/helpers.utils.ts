@@ -20,7 +20,7 @@ const MacroCategoriesWithAttributes = z.array(
     ),
   })
 )
-type MacroCategoriesWithAttributes = z.infer<typeof MacroCategoriesWithAttributes>
+export type MacroCategoriesWithAttributes = z.infer<typeof MacroCategoriesWithAttributes>
 
 let cache: MacroCategoriesWithAttributes
 

@@ -81,6 +81,33 @@ export const TenantDistributionMetric = z.array(
   })
 )
 
+export const OnboardedTenantsCountByMacroCategoriesMetric = z.object({
+  lastSixMonths: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      oboardedCount: z.number(),
+      totalCount: z.number(),
+    })
+  ),
+  lastTwelveMonths: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      oboardedCount: z.number(),
+      totalCount: z.number(),
+    })
+  ),
+  fromTheBeginning: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      oboardedCount: z.number(),
+      totalCount: z.number(),
+    })
+  ),
+})
+
 export const Metrics = z.object({
   publishedEServicesMetric: PublishedEServicesMetric,
   macroCategoriesPublishedEServicesMetric: PublishedEServicesByMacroCategoriesMetric,
@@ -101,3 +128,4 @@ export type Top10ProviderWithMostSubscriberMetric = z.infer<typeof Top10Provider
 export type OnboardedTenantsCountMetric = z.infer<typeof OnboardedTenantsCountMetric>
 export type TenantDistributionMetric = z.infer<typeof TenantDistributionMetric>
 export type TenantSignupsTrendMetric = z.infer<typeof TenantSignupsTrendMetric>
+export type OnboardedTenantsCountByMacroCategoriesMetric = z.infer<typeof OnboardedTenantsCountByMacroCategoriesMetric>
