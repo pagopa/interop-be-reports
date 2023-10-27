@@ -1,71 +1,75 @@
-import { ReadModelClient } from '@interop-be-reports/commons'
-import { Document } from 'mongodb'
+import { ReadModelClient, Tenant } from '@interop-be-reports/commons'
+import { OnboardedTenantsCountByMacroCategoriesMetric } from '../models/metrics.model.js'
 import {
   MacroCategoriesWithAttributes,
   getMacroCategoriesWithAttributes,
   getMonthsAgoDate,
 } from '../utils/helpers.utils.js'
-import { OnboardedTenantsCountByMacroCategoriesMetric } from '../models/metrics.model.js'
+import { z } from 'zod'
+
+const MetricTenant = Tenant.pick({ selfcareId: true, createdAt: true })
+type MetricTenant = z.infer<typeof MetricTenant>
+type OnboardedTenantsCountByMacroCategoriesMetricItem = OnboardedTenantsCountByMacroCategoriesMetric[
+  | 'fromTheBeginning'
+  | 'lastSixMonths'
+  | 'lastTwelveMonths'][number]
+type MacroCategoriesWithAttributesAndTenants = MacroCategoriesWithAttributes[number] & { tenants: Array<MetricTenant> }
 
 export async function getOnboardedTenantsCountByMacroCategoriesMetric(
   readModel: ReadModelClient
 ): Promise<OnboardedTenantsCountByMacroCategoriesMetric> {
   const macroCategories = await getMacroCategoriesWithAttributes(readModel)
 
-  const dates = [getMonthsAgoDate(6), getMonthsAgoDate(12), undefined]
-
-  const [lastSixMonths, lastTwelveMonths, fromTheBeginning] = await Promise.all(
-    dates.map((date) => getMacroCategoriesOnboardedAndTotalTenantsCountArray(readModel, macroCategories, date))
+  // Enrich macro categories with their tenants
+  const macroCategoriesWithTenants = await Promise.all(
+    macroCategories.map((m) => enrichMacroCategoryWithTenants(m, readModel))
   )
 
-  return OnboardedTenantsCountByMacroCategoriesMetric.parse({ lastSixMonths, lastTwelveMonths, fromTheBeginning })
-}
+  // Get the onboarded and total tenants count for each macro category
+  function getTotalAndOnboardedTenantsCountFromMacroCategory(
+    macroCategory: MacroCategoriesWithAttributesAndTenants,
+    date: Date | undefined
+  ): OnboardedTenantsCountByMacroCategoriesMetricItem {
+    //TODO eventually the createdAt field will be substituted by the onboardedAt field once it will be available
+    const tenants = date ? macroCategory.tenants.filter((t) => t.createdAt >= date) : macroCategory.tenants
 
-async function getMacroCategoriesOnboardedAndTotalTenantsCountArray(
-  readModel: ReadModelClient,
-  macroCategories: MacroCategoriesWithAttributes,
-  date: Date | undefined
-): Promise<OnboardedTenantsCountByMacroCategoriesMetric['fromTheBeginning' | 'lastSixMonths' | 'lastTwelveMonths']> {
-  return await Promise.all(
-    macroCategories.map((m) => getMacroCategoryOnboardedAndTotalTenantsCount(readModel, m, date))
-  )
-}
+    // We count as onboarded the tenants that have a selfcareId
+    const oboardedCount = tenants.filter((t) => !!t.selfcareId).length
+    const totalCount = tenants.length
 
-async function getMacroCategoryOnboardedAndTotalTenantsCount(
-  readModel: ReadModelClient,
-  macroCategory: MacroCategoriesWithAttributes[number],
-  date: Date | undefined
-): Promise<
-  OnboardedTenantsCountByMacroCategoriesMetric['fromTheBeginning' | 'lastSixMonths' | 'lastTwelveMonths'][number]
-> {
-  const attributesIds = macroCategory.attributes.map((a) => a.id)
-
-  const onboardedTenantsCountPromise = readModel.tenants.countDocuments(
-    getTenantsCountDocumentsCountFilter('onboarded', attributesIds, date)
-  )
-
-  const totalTenantsCountPromise = readModel.tenants.countDocuments(
-    getTenantsCountDocumentsCountFilter('total', attributesIds, date)
-  )
-
-  const [oboardedCount, totalCount] = await Promise.all([onboardedTenantsCountPromise, totalTenantsCountPromise])
-
-  return { id: macroCategory.id, name: macroCategory.name, oboardedCount, totalCount }
-}
-
-function getTenantsCountDocumentsCountFilter(
-  queryType: 'onboarded' | 'total',
-  attributesIds: Array<string>,
-  startingDate?: Date
-): Document {
-  const oboardedFilter: Document = queryType === 'onboarded' ? { 'data.selfcareId': { $exists: true } } : {}
-  const createAtFilter: Document = startingDate ? { 'data.createdAt': { $gte: startingDate.toISOString() } } : {}
-
-  return {
-    ...oboardedFilter,
-    ...createAtFilter,
-    'data.attributes': {
-      $elemMatch: { id: { $in: attributesIds } },
-    },
+    return { id: macroCategory.id, name: macroCategory.name, oboardedCount, totalCount }
   }
+
+  const result = OnboardedTenantsCountByMacroCategoriesMetric.parse({
+    lastSixMonths: macroCategoriesWithTenants.map((m) =>
+      getTotalAndOnboardedTenantsCountFromMacroCategory(m, getMonthsAgoDate(6))
+    ),
+    lastTwelveMonths: macroCategoriesWithTenants.map((m) =>
+      getTotalAndOnboardedTenantsCountFromMacroCategory(m, getMonthsAgoDate(12))
+    ),
+    fromTheBeginning: macroCategoriesWithTenants.map((m) =>
+      getTotalAndOnboardedTenantsCountFromMacroCategory(m, undefined)
+    ),
+  })
+
+  return result
+}
+
+async function enrichMacroCategoryWithTenants(
+  macroCategory: MacroCategoriesWithAttributes[number],
+  readModel: ReadModelClient
+): Promise<MacroCategoriesWithAttributesAndTenants> {
+  const tenants = await readModel.tenants
+    .find(
+      {
+        'data.attributes': {
+          $elemMatch: { id: { $in: macroCategory.attributes.map((a) => a.id) } },
+        },
+      },
+      { projection: { _id: 0, 'data.selfcareId': 1, 'data.createdAt': 1 } } // TODO createdAt will be substituted by onboardedAt once it will be available
+    )
+    .map(({ data }) => MetricTenant.parse(data))
+    .toArray()
+
+  return { ...macroCategory, tenants }
 }
