@@ -39,6 +39,10 @@ async function main(): Promise<void> {
 
   log('Retrieving metrics...')
 
+  /**
+   * Preload macro categories with attributes, so we don't have to query the database for each metric that needs them.
+   * The result is cached.
+   */
   await getMacroCategoriesWithAttributes(readModel)
 
   const [
