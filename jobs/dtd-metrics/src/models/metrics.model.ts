@@ -14,31 +14,25 @@ export const PublishedEServicesByMacroCategoriesMetric = z.array(
   })
 )
 
-export const Top10MostSubscribedEServices = z.object({
-  lastSixMonths: z.array(
-    z.object({
-      eserviceName: z.string(),
-      tenantName: z.string(),
-      count: z.number(),
-    })
-  ),
+function timedMetricObject<T extends z.ZodSchema>(
+  schema: T
+): z.ZodObject<{ lastSixMonths: T; lastTwelveMonths: T; fromTheBeginning: T }> {
+  return z.object({
+    lastSixMonths: schema,
+    lastTwelveMonths: schema,
+    fromTheBeginning: schema,
+  })
+}
 
-  lastTwelveMonths: z.array(
+export const Top10MostSubscribedEServices = timedMetricObject(
+  z.array(
     z.object({
       eserviceName: z.string(),
       tenantName: z.string(),
       count: z.number(),
     })
-  ),
-
-  fromTheBeginning: z.array(
-    z.object({
-      eserviceName: z.string(),
-      tenantName: z.string(),
-      count: z.number(),
-    })
-  ),
-})
+  )
+)
 
 export const Top10MostSubscribedEServicesMetric = z.array(
   z.object({
@@ -48,8 +42,8 @@ export const Top10MostSubscribedEServicesMetric = z.array(
   })
 )
 
-export const Top10ProviderWithMostSubscriberMetric = z.object({
-  lastSixMonths: z.array(
+export const Top10ProviderWithMostSubscriberMetric = timedMetricObject(
+  z.array(
     z.object({
       name: z.string(),
       topSubscribers: z.array(
@@ -60,34 +54,19 @@ export const Top10ProviderWithMostSubscriberMetric = z.object({
         })
       ),
     })
-  ),
+  )
+)
 
-  lastTwelveMonths: z.array(
+export const TenantSignupsTrendMetric = timedMetricObject(
+  z.array(
     z.object({
+      id: z.string(),
       name: z.string(),
-      topSubscribers: z.array(
-        z.object({
-          id: z.string(),
-          name: z.string(),
-          agreementsCount: z.number(),
-        })
-      ),
+      data: z.array(z.object({ date: z.date(), count: z.number() })),
+      startingDate: z.date(),
     })
-  ),
-
-  fromTheBeginning: z.array(
-    z.object({
-      name: z.string(),
-      topSubscribers: z.array(
-        z.object({
-          id: z.string(),
-          name: z.string(),
-          agreementsCount: z.number(),
-        })
-      ),
-    })
-  ),
-})
+  )
+)
 
 export const OnboardedTenantsCountMetric = z.object({
   totalTenantsCount: z.number(),
@@ -109,6 +88,7 @@ export const Metrics = z.object({
   top10ProviderWithMostSubscriberMetric: Top10ProviderWithMostSubscriberMetric,
   onboardedTenantsCountMetric: OnboardedTenantsCountMetric,
   tenantDistributionMetric: TenantDistributionMetric,
+  tenantSignupsTrendMetric: TenantSignupsTrendMetric,
 })
 
 export type Metrics = z.infer<typeof Metrics>
@@ -120,3 +100,4 @@ export type Top10MostSubscribedEServicesMetric = z.infer<typeof Top10MostSubscri
 export type Top10ProviderWithMostSubscriberMetric = z.infer<typeof Top10ProviderWithMostSubscriberMetric>
 export type OnboardedTenantsCountMetric = z.infer<typeof OnboardedTenantsCountMetric>
 export type TenantDistributionMetric = z.infer<typeof TenantDistributionMetric>
+export type TenantSignupsTrendMetric = z.infer<typeof TenantSignupsTrendMetric>
