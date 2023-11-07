@@ -1,5 +1,8 @@
 import { EServiceDescriptor, ReadModelClient, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
-import { Top10ProvidersWithMostPublishedEServicesMetric } from '../models/metrics.model.js'
+import {
+  Top10ProvidersWithMostPublishedEServicesItem,
+  Top10ProvidersWithMostPublishedEServicesMetric,
+} from '../models/metrics.model.js'
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 
 /**
@@ -24,7 +27,7 @@ export async function getTop10ProvidersWithMostPublishedEServicesMetric(
 export async function getTop10ProvidersWithMostPublishedEServicesFromDate(
   readModel: ReadModelClient,
   date: Date | undefined
-): Promise<unknown> {
+): Promise<Array<Top10ProvidersWithMostPublishedEServicesItem>> {
   const publishedDateFilter = date
     ? {
         'data.descriptors': {
@@ -72,5 +75,6 @@ export async function getTop10ProvidersWithMostPublishedEServicesFromDate(
         },
       },
     ])
+    .map((data) => Top10ProvidersWithMostPublishedEServicesItem.parse(data))
     .toArray()
 }
