@@ -81,32 +81,16 @@ export const TenantDistributionMetric = z.array(
   })
 )
 
-export const OnboardedTenantsCountByMacroCategoriesMetric = z.object({
-  lastSixMonths: z.array(
+export const OnboardedTenantsCountByMacroCategoriesMetric = timedMetricObject(
+  z.array(
     z.object({
       id: z.string(),
       name: z.string(),
       oboardedCount: z.number(),
       totalCount: z.number(),
     })
-  ),
-  lastTwelveMonths: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      oboardedCount: z.number(),
-      totalCount: z.number(),
-    })
-  ),
-  fromTheBeginning: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      oboardedCount: z.number(),
-      totalCount: z.number(),
-    })
-  ),
-})
+  )
+)
 
 export const Metrics = z.object({
   publishedEServicesMetric: PublishedEServicesMetric,
