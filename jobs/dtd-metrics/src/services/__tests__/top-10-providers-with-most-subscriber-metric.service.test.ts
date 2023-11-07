@@ -1,11 +1,8 @@
-import { getAgreementMock, getAttributeMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
+import { getAgreementMock, getAttributeMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { getTop10ProviderWithMostSubscriberMetric } from '../top-10-providers-with-most-subscriber-metric.service.js'
 import { randomUUID } from 'crypto'
 
-const eservice1Uuid = randomUUID()
-const eservice2Uuid = randomUUID()
-const eservice3Uuid = randomUUID()
 const producer1Uuid = randomUUID()
 const producer2Uuid = randomUUID()
 const comuneConsumerUuid = randomUUID()
@@ -15,16 +12,9 @@ const aziendaOspedalieraAttributeUuid = randomUUID()
 
 describe('getTop10ProviderWithMostSubscriberMetric', () => {
   it('should return the correct metrics', async () => {
-    await seedCollection('eservices', [
-      { data: getEServiceMock({ name: 'eservice-1', id: eservice1Uuid, producerId: producer1Uuid }) },
-      { data: getEServiceMock({ name: 'eservice-2', id: eservice2Uuid, producerId: producer1Uuid }) },
-      { data: getEServiceMock({ name: 'eservice-3', id: eservice3Uuid, producerId: producer2Uuid }) },
-    ])
-
     await seedCollection('agreements', [
       {
         data: getAgreementMock({
-          eserviceId: eservice1Uuid,
           producerId: producer1Uuid,
           consumerId: comuneConsumerUuid,
           certifiedAttributes: [{ id: comuneAttributeUuid }],
@@ -32,7 +22,6 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
       },
       {
         data: getAgreementMock({
-          eserviceId: eservice2Uuid,
           producerId: producer1Uuid,
           consumerId: comuneConsumerUuid,
           certifiedAttributes: [{ id: comuneAttributeUuid }],
@@ -40,7 +29,6 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
       },
       {
         data: getAgreementMock({
-          eserviceId: eservice3Uuid,
           producerId: producer2Uuid,
           consumerId: comuneConsumerUuid,
           certifiedAttributes: [{ id: comuneAttributeUuid }],
@@ -48,7 +36,6 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
       },
       {
         data: getAgreementMock({
-          eserviceId: eservice1Uuid,
           producerId: producer1Uuid,
           consumerId: aziendaOspedalieraConsumerUuid,
           certifiedAttributes: [{ id: aziendaOspedalieraAttributeUuid }],
@@ -56,7 +43,6 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
       },
       {
         data: getAgreementMock({
-          eserviceId: eservice2Uuid,
           producerId: producer1Uuid,
           consumerId: aziendaOspedalieraConsumerUuid,
           certifiedAttributes: [{ id: aziendaOspedalieraAttributeUuid }],
@@ -64,7 +50,6 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
       },
       {
         data: getAgreementMock({
-          eserviceId: eservice3Uuid,
           producerId: producer2Uuid,
           consumerId: aziendaOspedalieraConsumerUuid,
           certifiedAttributes: [{ id: aziendaOspedalieraAttributeUuid }],
@@ -88,7 +73,7 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
       },
       {
         data: getTenantMock({
-          id: 'comune',
+          id: comuneAttributeUuid,
           attributes: [{ id: comuneAttributeUuid, type: 'PersistentCertifiedAttribute' }],
         }),
       },
@@ -130,8 +115,8 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
     )
 
-    expect(producer1Comuni?.agreementsCount).toStrictEqual(2)
-    expect(producer1AziendeOspedaliere?.agreementsCount).toStrictEqual(2)
+    expect(producer1Comuni?.agreementsCount).toStrictEqual(1)
+    expect(producer1AziendeOspedaliere?.agreementsCount).toStrictEqual(1)
 
     const producer2 = result.fromTheBeginning[1]
     expect(producer2.name).toStrictEqual('Producer 2')
