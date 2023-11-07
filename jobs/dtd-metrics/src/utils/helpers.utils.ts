@@ -7,6 +7,22 @@ export function getMonthsAgoDate(numMonths: number): Date {
   return sub(new Date(), { months: numMonths })
 }
 
+export async function wrapPromiseWithLogs<T>(promise: Promise<T>, name: string): Promise<T> {
+  console.log(`> Starting ${name}...`)
+
+  const timeLog = `> Done! ${name} finished executing in`
+  console.time(timeLog)
+
+  try {
+    const result = await promise
+    console.timeEnd(timeLog)
+    return result
+  } catch (e) {
+    console.error(`Error while executing ${name}`)
+    throw e
+  }
+}
+
 const MacroCategoriesWithAttributes = z.array(
   z.object({
     id: z.string(),
@@ -20,7 +36,7 @@ const MacroCategoriesWithAttributes = z.array(
     ),
   })
 )
-type MacroCategoriesWithAttributes = z.infer<typeof MacroCategoriesWithAttributes>
+export type MacroCategoriesWithAttributes = z.infer<typeof MacroCategoriesWithAttributes>
 
 let cache: MacroCategoriesWithAttributes
 
@@ -33,7 +49,6 @@ export async function getMacroCategoriesWithAttributes(
   readModel: ReadModelClient
 ): Promise<MacroCategoriesWithAttributes> {
   if (cache) return cache
-
   const ipaCodes = MACRO_CATEGORIES.flatMap((macroCategory) => macroCategory.ipaCodes)
 
   const attributes = await readModel.attributes

@@ -10,8 +10,10 @@ import {
   getOnboardedTenantsCountMetric,
   getTenantDistributionMetric,
   getTenantSignupsTrendMetric,
+  getOnboardedTenantsCountByMacroCategoriesMetric,
 } from './services/index.js'
 import { GithubClient } from './services/github-client.service.js'
+import { getMacroCategoriesWithAttributes, wrapPromiseWithLogs } from './utils/helpers.utils.js'
 
 const log = console.log
 
@@ -37,6 +39,12 @@ async function main(): Promise<void> {
 
   log('Retrieving metrics...')
 
+  /**
+   * Preload macro categories with attributes, so we don't have to query the database for each metric that needs them.
+   * The result is cached.
+   */
+  await getMacroCategoriesWithAttributes(readModel)
+
   const [
     publishedEServicesMetric,
     macroCategoriesPublishedEServicesMetric,
@@ -45,18 +53,25 @@ async function main(): Promise<void> {
     onboardedTenantsCountMetric,
     tenantDistributionMetric,
     tenantSignupsTrendMetric,
+    onboardedTenantsCountByMacroCategoriesMetric,
   ] = await Promise.all([
-    getPublishedEServicesMetric(readModel),
-    getPublishedEServicesByMacroCategoriesMetric(readModel),
-    getTop10MostSubscribedEServicesMetric(readModel),
-    getTop10ProviderWithMostSubscriberMetric(readModel),
-    getOnboardedTenantsCountMetric(readModel),
-    getTenantDistributionMetric(readModel),
-    getTenantSignupsTrendMetric(readModel),
+    wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServicesMetric'),
+    wrapPromiseWithLogs(
+      getPublishedEServicesByMacroCategoriesMetric(readModel),
+      'macroCategoriesPublishedEServicesMetric'
+    ),
+    wrapPromiseWithLogs(getTop10MostSubscribedEServicesMetric(readModel), 'top10MostSubscribedEServicesMetric'),
+    wrapPromiseWithLogs(getTop10ProviderWithMostSubscriberMetric(readModel), 'top10ProviderWithMostSubscriberMetric'),
+    wrapPromiseWithLogs(getOnboardedTenantsCountMetric(readModel), 'onboardedTenantsCountMetric'),
+    wrapPromiseWithLogs(getTenantDistributionMetric(readModel), 'tenantDistributionMetric'),
+    wrapPromiseWithLogs(getTenantSignupsTrendMetric(readModel), 'tenantSignupsTrendMetric'),
+    wrapPromiseWithLogs(
+      getOnboardedTenantsCountByMacroCategoriesMetric(readModel),
+      'onboardedTenantsCountByMacroCategoriesMetric'
+    ),
   ])
 
-  log('Metrics retrieved!\n')
-  log(`Uploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
+  log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
   const output = Metrics.parse({
     publishedEServicesMetric,
@@ -66,10 +81,13 @@ async function main(): Promise<void> {
     onboardedTenantsCountMetric,
     tenantDistributionMetric,
     tenantSignupsTrendMetric,
+    onboardedTenantsCountByMacroCategoriesMetric,
   })
 
-  await githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${env.FILENAME}`)
-  await awsS3BucketClient.uploadData(output, env.FILENAME)
+  await Promise.all([
+    githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${env.FILENAME}`),
+    awsS3BucketClient.uploadData(output, env.FILENAME),
+  ])
 
   log('Done!\n')
 }
