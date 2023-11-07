@@ -1,7 +1,7 @@
 import { getAttributeMock } from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES } from '../../configs/macro-categories.js'
 import { readModelMock, seedCollection } from '../tests.utils.js'
-import { getMacroCategoriesWithAttributes } from '../helpers.utils.js'
+import { getMacroCategoriesWithAttributes, getVariationPercentage } from '../helpers.utils.js'
 import { randomUUID } from 'crypto'
 
 const macroCategory = MACRO_CATEGORIES[1]
@@ -47,5 +47,14 @@ describe('getMacroCategoriesWithAttributes', () => {
 
     const areSameReferences = result1 === result2
     expect(areSameReferences).toBe(true)
+  })
+})
+
+describe('getVariationPercentage', () => {
+  it('should return the correct variation', () => {
+    expect(getVariationPercentage(10, 5)).toBe(100)
+    expect(getVariationPercentage(10, 0)).toBe(0)
+    expect(getVariationPercentage(10, 10)).toBe(0)
+    expect(getVariationPercentage(10, 15)).toBe(-33.3)
   })
 })

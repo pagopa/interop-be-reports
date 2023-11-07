@@ -1,6 +1,6 @@
 import { ReadModelClient } from '@interop-be-reports/commons'
 import { OnboardedTenantsCountMetric } from '../models/metrics.model.js'
-import { getMonthsAgoDate } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
 import { Document } from 'mongodb'
 
 export async function getOnboardedTenantsCountMetric(readModel: ReadModelClient): Promise<OnboardedTenantsCountMetric> {
@@ -31,10 +31,7 @@ export async function getOnboardedTenantsCountMetric(readModel: ReadModelClient)
     twoMonthsAgoTenantsCountPromise,
   ])
 
-  const variation =
-    lastMonthTenantsCount === 0
-      ? 0
-      : Number((((lastMonthTenantsCount - twoMonthsAgoTenantsCount) / lastMonthTenantsCount) * 100).toFixed(1))
+  const variation = getVariationPercentage(lastMonthTenantsCount, twoMonthsAgoTenantsCount)
 
   return { totalTenantsCount, lastMonthTenantsCount, variation }
 }
