@@ -15,7 +15,7 @@ import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import { Top10MostSubscribedEServicesMetric } from '../models/metrics.model.js'
 
 type ConsumerEntry = { macrocategoryId: string; name: string }
-type RelevantAgreementInfo = { macrocategoryId: string; consumerName: string; createdAt: Date }
+type RelevantAgreementInfo = { macrocategoryId: string; consumerName: string; consumerId: string; createdAt: Date }
 type EServiceMap = Record<
   string,
   {
@@ -110,17 +110,19 @@ export async function getTop10MostSubscribedEServicesMetric(
    */
   const eservicesMap = enrichedAgreements.reduce<EServiceMap>((acc, next) => {
     // If it's the first time we meet this eservice id, initialize a new array
-    if (!acc[next.eserviceId])
+    if (!acc[next.eserviceId]) {
       acc[next.eserviceId] = {
         producerId: next.producerId,
         eserviceName: next.eserviceName,
         producerName: next.producerName,
         agreements: [],
       }
+    }
     // Add to the array the macrocategory this tenant belongs to
     acc[next.eserviceId].agreements.push({
       macrocategoryId: next.macrocategoryId,
       consumerName: next.consumerName,
+      consumerId: next.consumerId,
       createdAt: next.createdAt,
     })
     // Return the updated map
@@ -152,19 +154,39 @@ export async function getTop10MostSubscribedEServicesMetric(
   const fromTheBeginningDate = undefined
 
   const result = [{ id: '0', name: 'Totale' }, ...MACRO_CATEGORIES].map((m) => {
-    const countFn = m.id === '0' ? (i: EServiceCollectionItem): number => i.agreements.length : countByIdFn(m.id)
+    const handleCountActiveSubscribers = (eservice: EServiceCollectionItem, date: Date | undefined): number => {
+      const agreements = date ? eservice.agreements.filter((a) => a.createdAt >= date) : eservice.agreements
+
+      // Removed duplicates
+      const activeSubscribers = agreements.reduce<Array<RelevantAgreementInfo>>((acc, next) => {
+        if (!acc.some((a) => a.consumerId === next.consumerId)) {
+          acc.push(next)
+        }
+        return acc
+      }, [])
+
+      // If the macrocategory id is 0, we count all the active subscribers
+      if (m.id === '0') {
+        return activeSubscribers.length
+      }
+
+      // Otherwise, we count the active subscribers that belong to the macrocategory
+      return activeSubscribers.filter((a) => a.macrocategoryId === m.id).length
+    }
 
     const [lastSixMonths, lastTwelveMonths, fromTheBeginning] = [
       sixMonthsAgoDate,
       twelveMonthsAgoDate,
       fromTheBeginningDate,
     ].map((date) => {
-      const filteredEServiceCollection = eserviceCollection.map((i) => ({
-        ...i,
-        agreements: date ? i.agreements.filter((a) => a.createdAt >= date) : i.agreements,
+      const counted = eserviceCollection.map((e) => ({
+        eserviceName: e.eserviceName,
+        tenantName: e.producerName,
+        count: handleCountActiveSubscribers(e, date),
       }))
 
-      return getSortedTop10(filteredEServiceCollection, countFn)
+      // Sort the entries by count, and extract the first 10 results (top 10)
+      return orderBy(counted, 'count', 'desc').slice(0, 10)
     })
 
     return {
@@ -241,26 +263,4 @@ async function getConsumersMap(
   }, {})
 
   return consumersMap
-}
-
-function getSortedTop10(
-  collection: Array<EServiceCollectionItem>,
-  countFn: (i: EServiceCollectionItem) => number
-): Array<{
-  eserviceName: string
-  tenantName: string
-  count: number
-}> {
-  // Count the occurrences of a particular case, and add it to the entry
-  const counted = collection.map((i) => ({
-    eserviceName: i.eserviceName,
-    tenantName: i.producerName,
-    count: countFn(i),
-  }))
-  // Sort the entries by count, and extract the first 10 results (top 10)
-  return orderBy(counted, 'count', 'desc').slice(0, 10)
-}
-
-function countByIdFn(id: string): (i: EServiceCollectionItem) => number {
-  return (i: EServiceCollectionItem) => i.agreements.filter((n) => n.macrocategoryId === id).length
 }

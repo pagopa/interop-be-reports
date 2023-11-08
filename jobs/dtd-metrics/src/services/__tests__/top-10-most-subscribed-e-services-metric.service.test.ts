@@ -6,6 +6,7 @@ import { randomUUID } from 'crypto'
 const eservice1Uuid = randomUUID()
 const eservice2Uuid = randomUUID()
 const eservice3Uuid = randomUUID()
+const eservice4Uuid = randomUUID()
 const producerUuid = randomUUID()
 const comune1Uuid = randomUUID()
 const comune2Uuid = randomUUID()
@@ -22,12 +23,22 @@ describe('getTop10MostSubscribedEServicesMetric', () => {
       { data: getEServiceMock({ name: 'eservice-1', id: eservice1Uuid, producerId: producerUuid }) },
       { data: getEServiceMock({ name: 'eservice-2', id: eservice2Uuid, producerId: producerUuid }) },
       { data: getEServiceMock({ name: 'eservice-3', id: eservice3Uuid, producerId: producerUuid }) },
+      { data: getEServiceMock({ name: 'eservice-4', id: eservice4Uuid, producerId: producerUuid }) },
     ])
 
     await seedCollection('agreements', [
       {
         data: getAgreementMock({
           eserviceId: eservice1Uuid,
+          consumerId: comune1Uuid,
+          producerId: producerUuid,
+          certifiedAttributes: [{ id: comuneAttributeUuid }],
+          createdAt: new Date().toISOString(),
+        }),
+      },
+      {
+        data: getAgreementMock({
+          eserviceId: eservice4Uuid,
           consumerId: comune1Uuid,
           producerId: producerUuid,
           certifiedAttributes: [{ id: comuneAttributeUuid }],
