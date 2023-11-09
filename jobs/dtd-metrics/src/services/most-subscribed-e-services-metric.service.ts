@@ -12,7 +12,7 @@ import { z } from 'zod'
 import orderBy from 'lodash/orderBy.js'
 import uniq from 'lodash/uniq.js'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
-import { Top10MostSubscribedEServicesMetric } from '../models/metrics.model.js'
+import { MostSubscribedEServicesMetric } from '../models/metrics.model.js'
 
 type ConsumerEntry = { macrocategoryId: string; name: string }
 type RelevantAgreementInfo = { macrocategoryId: string; consumerName: string; consumerId: string; createdAt: Date }
@@ -33,9 +33,9 @@ type EServiceCollectionItem = {
   agreements: Array<RelevantAgreementInfo>
 }
 
-export async function getTop10MostSubscribedEServicesMetric(
+export async function getMostSubscribedEServicesMetric(
   readModel: ReadModelClient
-): Promise<Top10MostSubscribedEServicesMetric> {
+): Promise<MostSubscribedEServicesMetric> {
   /*
    * We retrieve all the agreement data we need (eserviceId, consumerId, producerId, eserviceName).
    * The state of the agreement must be Active or Suspended.
@@ -153,11 +153,11 @@ export async function getTop10MostSubscribedEServicesMetric(
   const twelveMonthsAgoDate = getMonthsAgoDate(12)
   const fromTheBeginningDate = undefined
 
-  const result = [{ id: '0', name: 'Totale' }, ...MACRO_CATEGORIES].map((m) => {
-    const handleCountActiveSubscribers = (eservice: EServiceCollectionItem, date: Date | undefined): number => {
+  const result = [{ id: '0', name: 'Tutte' }, ...MACRO_CATEGORIES].map((m) => {
+    const getSubscribersCount = (eservice: EServiceCollectionItem, date: Date | undefined): number => {
       const agreements = date ? eservice.agreements.filter((a) => a.createdAt >= date) : eservice.agreements
 
-      // Removed duplicates
+      // Some subscribers can have more than one agreement, we want to count them only once
       const activeSubscribers = agreements.reduce<Array<RelevantAgreementInfo>>((acc, next) => {
         if (!acc.some((a) => a.consumerId === next.consumerId)) {
           acc.push(next)
@@ -181,22 +181,22 @@ export async function getTop10MostSubscribedEServicesMetric(
     ].map((date) => {
       const counted = eserviceCollection.map((e) => ({
         eserviceName: e.eserviceName,
-        tenantName: e.producerName,
-        count: handleCountActiveSubscribers(e, date),
+        producerName: e.producerName,
+        subscribersCount: getSubscribersCount(e, date),
       }))
 
       // Sort the entries by count, and extract the first 10 results (top 10)
-      return orderBy(counted, 'count', 'desc').slice(0, 10)
+      return orderBy(counted, 'subscribersCount', 'desc').slice(0, 10)
     })
 
     return {
       id: m.id,
       name: m.name,
-      top10MostSubscribedEServices: { lastSixMonths, lastTwelveMonths, fromTheBeginning },
+      mostSubscribedEServices: { lastSixMonths, lastTwelveMonths, fromTheBeginning },
     }
   })
 
-  return Top10MostSubscribedEServicesMetric.parse(result)
+  return MostSubscribedEServicesMetric.parse(result)
 }
 
 async function getConsumersMap(

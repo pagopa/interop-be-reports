@@ -1,6 +1,6 @@
 import { getAgreementMock, getAttributeMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
-import { getTop10MostSubscribedEServicesMetric } from '../top-10-most-subscribed-e-services-metric.service.js'
+import { getMostSubscribedEServicesMetric } from '../most-subscribed-e-services-metric.service.js'
 import { randomUUID } from 'crypto'
 
 const eservice1Uuid = randomUUID()
@@ -17,7 +17,7 @@ const aziendaOspedaliera3Uuid = randomUUID()
 const comuneAttributeUuid = randomUUID()
 const aziendaOspedalieraAttributeUuid = randomUUID()
 
-describe('getTop10MostSubscribedEServicesMetric', () => {
+describe('getMostSubscribedEServicesMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('eservices', [
       { data: getEServiceMock({ name: 'eservice-1', id: eservice1Uuid, producerId: producerUuid }) },
@@ -187,23 +187,23 @@ describe('getTop10MostSubscribedEServicesMetric', () => {
       },
     ])
 
-    const result = await getTop10MostSubscribedEServicesMetric(readModelMock)
+    const result = await getMostSubscribedEServicesMetric(readModelMock)
     const comuniTop10 = result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')
-      ?.top10MostSubscribedEServices
+      ?.mostSubscribedEServices
 
     expect(comuniTop10?.fromTheBeginning?.[0].eserviceName).toStrictEqual('eservice-3')
-    expect(comuniTop10?.fromTheBeginning?.[0].tenantName).toStrictEqual('Producer')
-    expect(comuniTop10?.fromTheBeginning?.[0].count).toStrictEqual(3)
+    expect(comuniTop10?.fromTheBeginning?.[0].producerName).toStrictEqual('Producer')
+    expect(comuniTop10?.fromTheBeginning?.[0].subscribersCount).toStrictEqual(3)
 
     expect(comuniTop10?.fromTheBeginning?.[1].eserviceName).toStrictEqual('eservice-1')
-    expect(comuniTop10?.fromTheBeginning?.[1].tenantName).toStrictEqual('Producer')
-    expect(comuniTop10?.fromTheBeginning?.[1].count).toStrictEqual(1)
+    expect(comuniTop10?.fromTheBeginning?.[1].producerName).toStrictEqual('Producer')
+    expect(comuniTop10?.fromTheBeginning?.[1].subscribersCount).toStrictEqual(1)
 
     const aziendeOspedaliereTop10 = result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')
-      ?.top10MostSubscribedEServices
+      ?.mostSubscribedEServices
 
     expect(aziendeOspedaliereTop10?.fromTheBeginning?.[0].eserviceName).toStrictEqual('eservice-3')
-    expect(aziendeOspedaliereTop10?.fromTheBeginning?.[0].tenantName).toStrictEqual('Producer')
-    expect(aziendeOspedaliereTop10?.fromTheBeginning?.[0].count).toStrictEqual(3)
+    expect(aziendeOspedaliereTop10?.fromTheBeginning?.[0].producerName).toStrictEqual('Producer')
+    expect(aziendeOspedaliereTop10?.fromTheBeginning?.[0].subscribersCount).toStrictEqual(3)
   })
 })

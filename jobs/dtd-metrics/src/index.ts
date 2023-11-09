@@ -5,8 +5,8 @@ import { Metrics } from './models/metrics.model.js'
 import {
   getPublishedEServicesMetric,
   getPublishedEServicesByMacroCategoriesMetric,
-  getTop10MostSubscribedEServicesMetric,
   getTopProducersBySubscribersMetric,
+  getMostSubscribedEServicesMetric,
   getOnboardedTenantsCountMetric,
   getTenantDistributionMetric,
   getTenantSignupsTrendMetric,
@@ -49,7 +49,7 @@ async function main(): Promise<void> {
   const [
     publishedEServices,
     macroCategoriesPublishedEServicesMetric,
-    top10MostSubscribedEServicesMetric,
+    mostSubscribedEServices,
     topProducersBySubscribers,
     onboardedTenantsCountMetric,
     tenantDistributionMetric,
@@ -62,7 +62,7 @@ async function main(): Promise<void> {
       getPublishedEServicesByMacroCategoriesMetric(readModel),
       'macroCategoriesPublishedEServicesMetric'
     ),
-    wrapPromiseWithLogs(getTop10MostSubscribedEServicesMetric(readModel), 'top10MostSubscribedEServicesMetric'),
+    wrapPromiseWithLogs(getMostSubscribedEServicesMetric(readModel), 'mostSubscribedEServicesMetric'),
     wrapPromiseWithLogs(getTopProducersBySubscribersMetric(readModel), 'topProducersBySubscribers'),
     wrapPromiseWithLogs(getOnboardedTenantsCountMetric(readModel), 'onboardedTenantsCountMetric'),
     wrapPromiseWithLogs(getTenantDistributionMetric(readModel), 'tenantDistributionMetric'),
@@ -79,7 +79,7 @@ async function main(): Promise<void> {
   const output = Metrics.parse({
     publishedEServices,
     macroCategoriesPublishedEServicesMetric,
-    top10MostSubscribedEServicesMetric,
+    mostSubscribedEServices,
     topProducersBySubscribers,
     onboardedTenantsCountMetric,
     tenantDistributionMetric,

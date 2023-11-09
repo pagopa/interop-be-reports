@@ -24,21 +24,21 @@ function timedMetricObject<T extends z.ZodSchema>(
   })
 }
 
-export const Top10MostSubscribedEServices = timedMetricObject(
+export const MostSubscribedEServices = timedMetricObject(
   z.array(
     z.object({
       eserviceName: z.string(),
-      tenantName: z.string(),
-      count: z.number(),
+      producerName: z.string(),
+      subscribersCount: z.number(),
     })
   )
 )
 
-export const Top10MostSubscribedEServicesMetric = z.array(
+export const MostSubscribedEServicesMetric = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
-    top10MostSubscribedEServices: Top10MostSubscribedEServices,
+    mostSubscribedEServices: MostSubscribedEServices,
   })
 )
 
@@ -106,7 +106,7 @@ export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 export const Metrics = z.object({
   publishedEServicesMetric: PublishedEServicesMetric,
   macroCategoriesPublishedEServicesMetric: PublishedEServicesByMacroCategoriesMetric,
-  top10MostSubscribedEServicesMetric: Top10MostSubscribedEServicesMetric,
+  top10MostSubscribedEServicesMetric: MostSubscribedEServicesMetric,
   topProducersBySubscribers: TopProducersBySubscribersMetric,
   onboardedTenantsCountMetric: OnboardedTenantsCountMetric,
   tenantDistributionMetric: TenantDistributionMetric,
@@ -119,8 +119,8 @@ export type Metrics = z.infer<typeof Metrics>
 
 export type PublishedEServicesMetric = z.infer<typeof PublishedEServicesMetric>
 export type PublishedEServicesByMacroCategoriesMetric = z.infer<typeof PublishedEServicesByMacroCategoriesMetric>
-export type Top10MostSubscribedEServices = z.infer<typeof Top10MostSubscribedEServices>
-export type Top10MostSubscribedEServicesMetric = z.infer<typeof Top10MostSubscribedEServicesMetric>
+export type MostSubscribedEServices = z.infer<typeof MostSubscribedEServices>
+export type MostSubscribedEServicesMetric = z.infer<typeof MostSubscribedEServicesMetric>
 export type TopProducersBySubscribersMetric = z.infer<typeof TopProducersBySubscribersMetric>
 export type OnboardedTenantsCountMetric = z.infer<typeof OnboardedTenantsCountMetric>
 export type TenantDistributionMetric = z.infer<typeof TenantDistributionMetric>
