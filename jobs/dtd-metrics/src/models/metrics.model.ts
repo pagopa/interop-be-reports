@@ -50,7 +50,7 @@ export const TopProducersBySubscribersMetric = timedMetricObject(
         z.object({
           id: z.string(),
           name: z.string(),
-          agreementsCount: z.number(),
+          subscribersCount: z.number(),
         })
       ),
     })

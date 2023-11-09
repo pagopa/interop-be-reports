@@ -92,22 +92,21 @@ export async function getTopProducersBySubscribersMetric(
               const macroCategoryAgreements = producer.agreements.filter((agreement) => {
                 const macroCategoryAttributesIds = macroCategory.attributes.map((a) => a.id)
 
-                const doesBelongToMacroCategory = agreement.certifiedAttributes.some((a) =>
+                const isInMacroCategory = agreement.certifiedAttributes.some((a) =>
                   macroCategoryAttributesIds.includes(a)
                 )
 
                 const isCreatedAfterDate = date ? agreement.createdAt > date : true
 
-                return doesBelongToMacroCategory && isCreatedAfterDate
+                return isInMacroCategory && isCreatedAfterDate
               })
 
               /**
-               * Count the number of unique consumerIds, meaning that if a consumer has more
-               * than one agreement for the same producer, it will be counted only once
+               * Count the number of subscribers
                * */
-              const agreementsCount = Array.from(new Set(macroCategoryAgreements.map((a) => a.consumerId))).length
+              const subscribersCount = new Set(macroCategoryAgreements.map((a) => a.consumerId)).size
 
-              return { id: macroCategory.id, name: macroCategory.name, agreementsCount }
+              return { id: macroCategory.id, name: macroCategory.name, subscribersCount }
             }),
           }
         })
@@ -116,8 +115,8 @@ export async function getTopProducersBySubscribersMetric(
          */
         .sort(
           (a, b) =>
-            b.macroCategories.reduce((curr, prev) => curr + prev.agreementsCount, 0) -
-            a.macroCategories.reduce((curr, prev) => curr + prev.agreementsCount, 0)
+            b.macroCategories.reduce((curr, prev) => curr + prev.subscribersCount, 0) -
+            a.macroCategories.reduce((curr, prev) => curr + prev.subscribersCount, 0)
         )
     )
   }

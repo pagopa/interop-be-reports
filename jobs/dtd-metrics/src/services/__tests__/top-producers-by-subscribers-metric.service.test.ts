@@ -115,8 +115,8 @@ describe('getTopProducersBySubscribersMetric', () => {
       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
     )
 
-    expect(producer1Comuni?.agreementsCount).toStrictEqual(1)
-    expect(producer1AziendeOspedaliere?.agreementsCount).toStrictEqual(1)
+    expect(producer1Comuni?.subscribersCount).toStrictEqual(1)
+    expect(producer1AziendeOspedaliere?.subscribersCount).toStrictEqual(1)
 
     const producer2 = result.fromTheBeginning[1]
     expect(producer2.producerName).toStrictEqual('Producer 2')
@@ -126,7 +126,7 @@ describe('getTopProducersBySubscribersMetric', () => {
     const producer2AziendeOspedaliere = producer2.macroCategories.find(
       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
     )
-    expect(producer2Comuni?.agreementsCount).toStrictEqual(1)
-    expect(producer2AziendeOspedaliere?.agreementsCount).toStrictEqual(0)
+    expect(producer2Comuni?.subscribersCount).toStrictEqual(1)
+    expect(producer2AziendeOspedaliere?.subscribersCount).toStrictEqual(0)
   })
 })
