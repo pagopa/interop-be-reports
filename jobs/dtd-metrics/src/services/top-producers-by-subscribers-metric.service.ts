@@ -1,5 +1,5 @@
 import { AgreementState, ReadModelClient, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
-import { Top10ProviderWithMostSubscriberMetric } from '../models/metrics.model.js'
+import { TopProducersBySubscribersMetric } from '../models/metrics.model.js'
 import { getMacroCategoriesWithAttributes, getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { z } from 'zod'
 
@@ -17,9 +17,9 @@ const ProducerAgreements = z.object({
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3747
  */
-export async function getTop10ProviderWithMostSubscriberMetric(
+export async function getTopProducersBySubscribersMetric(
   readModel: ReadModelClient
-): Promise<Top10ProviderWithMostSubscriberMetric> {
+): Promise<TopProducersBySubscribersMetric> {
   const macroCategoriesWithAttributes = await getMacroCategoriesWithAttributes(readModel)
 
   const allMacroCategoriesAttributeIds = macroCategoriesWithAttributes
@@ -78,13 +78,13 @@ export async function getTop10ProviderWithMostSubscriberMetric(
 
   const produceMetricByDate = (
     date: Date | undefined
-  ): Top10ProviderWithMostSubscriberMetric['fromTheBeginning' | 'lastSixMonths' | 'lastTwelveMonths'] => {
+  ): TopProducersBySubscribersMetric['fromTheBeginning' | 'lastSixMonths' | 'lastTwelveMonths'] => {
     return (
       agreementsGroupedByProducers
         .map((producer) => {
           return {
-            name: producer.name,
-            topSubscribers: macroCategoriesWithAttributes.map((macroCategory) => {
+            producerName: producer.name,
+            macroCategories: macroCategoriesWithAttributes.map((macroCategory) => {
               /**
                * Filter out agreements that not belong to the macro category or that are not
                * created after the given date
@@ -116,13 +116,13 @@ export async function getTop10ProviderWithMostSubscriberMetric(
          */
         .sort(
           (a, b) =>
-            b.topSubscribers.reduce((curr, prev) => curr + prev.agreementsCount, 0) -
-            a.topSubscribers.reduce((curr, prev) => curr + prev.agreementsCount, 0)
+            b.macroCategories.reduce((curr, prev) => curr + prev.agreementsCount, 0) -
+            a.macroCategories.reduce((curr, prev) => curr + prev.agreementsCount, 0)
         )
     )
   }
 
-  return Top10ProviderWithMostSubscriberMetric.parse({
+  return TopProducersBySubscribersMetric.parse({
     lastSixMonths: produceMetricByDate(sixMonthsAgoDate),
     lastTwelveMonths: produceMetricByDate(twelveMonthsAgoDate),
     fromTheBeginning: produceMetricByDate(fromTheBeginningDate),

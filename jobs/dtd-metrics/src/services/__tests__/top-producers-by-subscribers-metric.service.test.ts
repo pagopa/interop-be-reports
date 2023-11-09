@@ -1,6 +1,6 @@
 import { getAgreementMock, getAttributeMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
-import { getTop10ProviderWithMostSubscriberMetric } from '../top-10-providers-with-most-subscriber-metric.service.js'
+import { getTopProducersBySubscribersMetric } from '../top-producers-by-subscribers-metric.service.js'
 import { randomUUID } from 'crypto'
 
 const producer1Uuid = randomUUID()
@@ -10,7 +10,7 @@ const aziendaOspedalieraConsumerUuid = randomUUID()
 const comuneAttributeUuid = randomUUID()
 const aziendaOspedalieraAttributeUuid = randomUUID()
 
-describe('getTop10ProviderWithMostSubscriberMetric', () => {
+describe('getTopProducersBySubscribersMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('agreements', [
       {
@@ -102,16 +102,16 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
       },
     ])
 
-    const result = await getTop10ProviderWithMostSubscriberMetric(readModelMock)
+    const result = await getTopProducersBySubscribersMetric(readModelMock)
 
     const producer1 = result.fromTheBeginning[0]
-    expect(producer1.name).toStrictEqual('Producer 1')
+    expect(producer1.producerName).toStrictEqual('Producer 1')
 
-    const producer1Comuni = producer1.topSubscribers.find(
+    const producer1Comuni = producer1.macroCategories.find(
       (a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane'
     )
 
-    const producer1AziendeOspedaliere = producer1.topSubscribers.find(
+    const producer1AziendeOspedaliere = producer1.macroCategories.find(
       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
     )
 
@@ -119,11 +119,11 @@ describe('getTop10ProviderWithMostSubscriberMetric', () => {
     expect(producer1AziendeOspedaliere?.agreementsCount).toStrictEqual(1)
 
     const producer2 = result.fromTheBeginning[1]
-    expect(producer2.name).toStrictEqual('Producer 2')
-    const producer2Comuni = producer2.topSubscribers.find(
+    expect(producer2.producerName).toStrictEqual('Producer 2')
+    const producer2Comuni = producer2.macroCategories.find(
       (a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane'
     )
-    const producer2AziendeOspedaliere = producer2.topSubscribers.find(
+    const producer2AziendeOspedaliere = producer2.macroCategories.find(
       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
     )
     expect(producer2Comuni?.agreementsCount).toStrictEqual(1)
