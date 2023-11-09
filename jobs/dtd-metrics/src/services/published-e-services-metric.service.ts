@@ -43,18 +43,13 @@ export async function getPublishedEServicesMetric(readModel: ReadModelClient): P
     },
   })
 
-  const [publishedEServicesCount, lastMonthPublishedEServicesCount, twoMonthsAgoPublishedEServicesCount] =
-    await Promise.all([
-      publishedEServicesCountPromise,
-      lastMonthPublishedEServicesCountPromise,
-      twoMonthsAgoPublishedEServicesCountPromise,
-    ])
+  const [count, lastMonthCount, twoMonthsAgoPublishedEServicesCount] = await Promise.all([
+    publishedEServicesCountPromise,
+    lastMonthPublishedEServicesCountPromise,
+    twoMonthsAgoPublishedEServicesCountPromise,
+  ])
 
-  const variation = getVariationPercentage(lastMonthPublishedEServicesCount, twoMonthsAgoPublishedEServicesCount)
+  const variation = getVariationPercentage(lastMonthCount, twoMonthsAgoPublishedEServicesCount)
 
-  return PublishedEServicesMetric.parse({
-    publishedEServicesCount,
-    lastMonthPublishedEServicesCount,
-    variation,
-  })
+  return PublishedEServicesMetric.parse({ count, lastMonthCount, variation })
 }
