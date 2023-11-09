@@ -1,13 +1,13 @@
 import { getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
 import { readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { randomUUID } from 'crypto'
-import { getTop10ProvidersWithMostPublishedEServicesMetric } from '../top-10-providers-with-most-published-eservices-metric.service.js'
+import { getTopProducersMetric } from '../top-producers-metric.service.js'
 import { getMonthsAgoDate } from '../../utils/helpers.utils.js'
 
 const producer1Uuid = randomUUID()
 const producer2Uuid = randomUUID()
 
-describe('getTop10ProvidersWithMostPublishedEServicesMetric', () => {
+describe('getTopProducersMetric', () => {
   it('should return the correct metrics', async () => {
     const threeMonthsAgoDate = getMonthsAgoDate(3)
     const nineMonthsAgoDate = getMonthsAgoDate(9)
@@ -48,7 +48,7 @@ describe('getTop10ProvidersWithMostPublishedEServicesMetric', () => {
       },
     ])
 
-    const result = await getTop10ProvidersWithMostPublishedEServicesMetric(readModelMock)
+    const result = await getTopProducersMetric(readModelMock)
 
     expect(result.lastSixMonths[0]).toEqual({ producerName: 'Producer 2', count: 1 })
 

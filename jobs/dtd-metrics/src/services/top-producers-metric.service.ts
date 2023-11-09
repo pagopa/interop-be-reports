@@ -1,33 +1,28 @@
 import { EServiceDescriptor, ReadModelClient, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
-import {
-  Top10ProvidersWithMostPublishedEServicesItem,
-  Top10ProvidersWithMostPublishedEServicesMetric,
-} from '../models/metrics.model.js'
+import { TopProducersMetricItem, TopProducersMetric } from '../models/metrics.model.js'
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-4215
  */
-export async function getTop10ProvidersWithMostPublishedEServicesMetric(
-  readModel: ReadModelClient
-): Promise<Top10ProvidersWithMostPublishedEServicesMetric> {
+export async function getTopProducersMetric(readModel: ReadModelClient): Promise<TopProducersMetric> {
   const sixMonthsAgoDate = getMonthsAgoDate(6)
   const twelveMonthsAgoDate = getMonthsAgoDate(12)
   const fromTheBeginningDate = undefined
 
   const [lastSixMonths, lastTwelveMonths, fromTheBeginning] = await Promise.all(
     [sixMonthsAgoDate, twelveMonthsAgoDate, fromTheBeginningDate].map((date) =>
-      getTop10ProvidersWithMostPublishedEServicesFromDate(readModel, date)
+      getTopProducersMetricFromDate(readModel, date)
     )
   )
 
-  return Top10ProvidersWithMostPublishedEServicesMetric.parse({ lastSixMonths, lastTwelveMonths, fromTheBeginning })
+  return TopProducersMetric.parse({ lastSixMonths, lastTwelveMonths, fromTheBeginning })
 }
 
-export async function getTop10ProvidersWithMostPublishedEServicesFromDate(
+export async function getTopProducersMetricFromDate(
   readModel: ReadModelClient,
   date: Date | undefined
-): Promise<Array<Top10ProvidersWithMostPublishedEServicesItem>> {
+): Promise<Array<TopProducersMetricItem>> {
   const publishedDateFilter = date
     ? {
         'data.descriptors': {
@@ -75,6 +70,6 @@ export async function getTop10ProvidersWithMostPublishedEServicesFromDate(
         },
       },
     ])
-    .map((data) => Top10ProvidersWithMostPublishedEServicesItem.parse(data))
+    .map((data) => TopProducersMetricItem.parse(data))
     .toArray()
 }
