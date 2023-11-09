@@ -106,6 +106,7 @@ export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 export const Metrics = z.object({
   publishedEServicesMetric: PublishedEServicesMetric,
   macroCategoriesPublishedEServicesMetric: PublishedEServicesByMacroCategoriesMetric,
+  eservicesByMacroCategories: EServicesByMacroCategoriesMetric,
   mostSubscribedEServices: MostSubscribedEServicesMetric,
   topProducersBySubscribers: TopProducersBySubscribersMetric,
   onboardedTenantsCountMetric: OnboardedTenantsCountMetric,
