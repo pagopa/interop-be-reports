@@ -6,11 +6,11 @@ export const PublishedEServicesMetric = z.object({
   variation: z.number(),
 })
 
-export const PublishedEServicesByMacroCategoriesMetric = z.array(
+export const EServicesByMacroCategoriesMetric = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
-    publishedEServicesCount: z.number(),
+    count: z.number(),
   })
 )
 
@@ -106,7 +106,7 @@ export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 export const Metrics = z.object({
   publishedEServicesMetric: PublishedEServicesMetric,
   macroCategoriesPublishedEServicesMetric: PublishedEServicesByMacroCategoriesMetric,
-  top10MostSubscribedEServicesMetric: MostSubscribedEServicesMetric,
+  mostSubscribedEServices: MostSubscribedEServicesMetric,
   topProducersBySubscribers: TopProducersBySubscribersMetric,
   onboardedTenantsCountMetric: OnboardedTenantsCountMetric,
   tenantDistributionMetric: TenantDistributionMetric,
@@ -118,7 +118,7 @@ export const Metrics = z.object({
 export type Metrics = z.infer<typeof Metrics>
 
 export type PublishedEServicesMetric = z.infer<typeof PublishedEServicesMetric>
-export type PublishedEServicesByMacroCategoriesMetric = z.infer<typeof PublishedEServicesByMacroCategoriesMetric>
+export type EServicesByMacroCategoriesMetric = z.infer<typeof EServicesByMacroCategoriesMetric>
 export type MostSubscribedEServices = z.infer<typeof MostSubscribedEServices>
 export type MostSubscribedEServicesMetric = z.infer<typeof MostSubscribedEServicesMetric>
 export type TopProducersBySubscribersMetric = z.infer<typeof TopProducersBySubscribersMetric>

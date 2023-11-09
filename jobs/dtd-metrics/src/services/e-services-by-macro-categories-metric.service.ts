@@ -5,17 +5,17 @@ import {
   TENANTS_COLLECTION_NAME,
 } from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
-import { PublishedEServicesByMacroCategoriesMetric } from '../models/metrics.model.js'
+import { EServicesByMacroCategoriesMetric } from '../models/metrics.model.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3745
  */
-export async function getPublishedEServicesByMacroCategoriesMetric(
+export async function getEServicesByMacroCategoriesMetric(
   readModel: ReadModelClient
-): Promise<PublishedEServicesByMacroCategoriesMetric> {
+): Promise<EServicesByMacroCategoriesMetric> {
   async function getMacroCategoryPublishedEServiceCount(
     macroCategory: (typeof MACRO_CATEGORIES)[number]
-  ): Promise<PublishedEServicesByMacroCategoriesMetric[number]> {
+  ): Promise<EServicesByMacroCategoriesMetric[number]> {
     const result = await readModel.eservices
       .aggregate([
         {
@@ -90,7 +90,7 @@ export async function getPublishedEServicesByMacroCategoriesMetric(
     return {
       id: macroCategory.id,
       name: macroCategory.name,
-      publishedEServicesCount: result[0]?.result ?? 0,
+      count: result[0]?.result ?? 0,
     }
   }
 
@@ -98,5 +98,5 @@ export async function getPublishedEServicesByMacroCategoriesMetric(
     MACRO_CATEGORIES.map((macroCategory) => getMacroCategoryPublishedEServiceCount(macroCategory))
   )
 
-  return PublishedEServicesByMacroCategoriesMetric.parse(result)
+  return EServicesByMacroCategoriesMetric.parse(result)
 }

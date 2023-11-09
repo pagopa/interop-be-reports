@@ -5,7 +5,7 @@ import { Metrics } from './models/metrics.model.js'
 import {
   getPublishedEServicesMetric,
   getPublishedEServicesByMacroCategoriesMetric,
-  getTopProducersBySubscribersMetric,
+  getEServicesByMacroCategoriesMetric,
   getMostSubscribedEServicesMetric,
   getOnboardedTenantsCountMetric,
   getTenantDistributionMetric,
@@ -58,10 +58,7 @@ async function main(): Promise<void> {
     topProducers,
   ] = await Promise.all([
     wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServicesMetric'),
-    wrapPromiseWithLogs(
-      getPublishedEServicesByMacroCategoriesMetric(readModel),
-      'macroCategoriesPublishedEServicesMetric'
-    ),
+    wrapPromiseWithLogs(getEServicesByMacroCategoriesMetric(readModel), 'eServicesByMacroCategories'),
     wrapPromiseWithLogs(getMostSubscribedEServicesMetric(readModel), 'mostSubscribedEServicesMetric'),
     wrapPromiseWithLogs(getTopProducersBySubscribersMetric(readModel), 'topProducersBySubscribers'),
     wrapPromiseWithLogs(getOnboardedTenantsCountMetric(readModel), 'onboardedTenantsCountMetric'),
