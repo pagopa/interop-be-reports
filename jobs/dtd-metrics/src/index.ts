@@ -14,7 +14,8 @@ import {
   getTopProducersMetric,
 } from './services/index.js'
 import { GithubClient } from './services/github-client.service.js'
-import { getMacroCategoriesWithAttributes, wrapPromiseWithLogs } from './utils/helpers.utils.js'
+import { wrapPromiseWithLogs } from './utils/helpers.utils.js'
+import { GlobalStoreService } from './services/global-store.service.js'
 
 const log = console.log
 
@@ -40,22 +41,20 @@ async function main(): Promise<void> {
 
   log('Retrieving metrics...')
 
-  /**
-   * Preload macro categories with attributes, so we don't have to query the database for each metric that needs them.
-   * The result is cached.
-   */
-  await getMacroCategoriesWithAttributes(readModel)
+  log('Initializing global store...')
+  const globalStore = await GlobalStoreService.init(readModel)
+  log('Global store initialized!\n')
 
   const queriesResult: MetricsQueriesResult = await Promise.all([
     wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServices'),
     wrapPromiseWithLogs(getEServicesByMacroCategoriesMetric(readModel), 'eservicesByMacroCategories'),
-    wrapPromiseWithLogs(getMostSubscribedEServicesMetric(readModel), 'mostSubscribedEServices'),
-    wrapPromiseWithLogs(getTopProducersBySubscribersMetric(readModel), 'topProducersBySubscribers'),
-    wrapPromiseWithLogs(getOnboardedTenantsCountMetric(readModel), 'onboardedTenantsCount'),
-    wrapPromiseWithLogs(getTenantDistributionMetric(readModel), 'tenantDistribution'),
-    wrapPromiseWithLogs(getTenantSignupsTrendMetric(readModel), 'tenantSignupsTrend'),
+    wrapPromiseWithLogs(getMostSubscribedEServicesMetric(readModel, globalStore), 'mostSubscribedEServices'),
+    wrapPromiseWithLogs(getTopProducersBySubscribersMetric(readModel, globalStore), 'topProducersBySubscribers'),
+    wrapPromiseWithLogs(getOnboardedTenantsCountMetric(globalStore), 'onboardedTenantsCount'),
+    wrapPromiseWithLogs(getTenantDistributionMetric(readModel, globalStore), 'tenantDistribution'),
+    wrapPromiseWithLogs(getTenantSignupsTrendMetric(globalStore), 'tenantSignupsTrend'),
     wrapPromiseWithLogs(
-      getOnboardedTenantsCountByMacroCategoriesMetric(readModel),
+      getOnboardedTenantsCountByMacroCategoriesMetric(readModel, globalStore),
       'onboardedTenantsCountByMacroCategories'
     ),
     wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducers'),

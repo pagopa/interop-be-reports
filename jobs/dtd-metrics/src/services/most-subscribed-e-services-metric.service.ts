@@ -1,20 +1,17 @@
 import {
-  ATTRIBUTES_COLLECTION_NAME,
   Agreement,
   AgreementState,
   ESERVICES_COLLECTION_NAME,
   ReadModelClient,
   TENANTS_COLLECTION_NAME,
-  Tenant,
 } from '@interop-be-reports/commons'
-import { getMacroCategoriesWithAttributes, getMonthsAgoDate } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { z } from 'zod'
 import orderBy from 'lodash/orderBy.js'
-import uniq from 'lodash/uniq.js'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import { MostSubscribedEServicesMetric } from '../models/metrics.model.js'
+import { GlobalStoreService } from './global-store.service.js'
 
-type ConsumerEntry = { macrocategoryId: string; name: string }
 type RelevantAgreementInfo = { macrocategoryId: string; consumerName: string; consumerId: string; createdAt: Date }
 type EServiceMap = Record<
   string,
@@ -34,7 +31,8 @@ type EServiceCollectionItem = {
 }
 
 export async function getMostSubscribedEServicesMetric(
-  readModel: ReadModelClient
+  readModel: ReadModelClient,
+  globalStore: GlobalStoreService
 ): Promise<MostSubscribedEServicesMetric> {
   /*
    * We retrieve all the agreement data we need (eserviceId, consumerId, producerId, eserviceName).
@@ -84,31 +82,13 @@ export async function getMostSubscribedEServicesMetric(
     )
     .toArray()
 
-  /**
-   * We retrieve the consumers data from and put it in a map.
-   * { [consumerId]: { macrocategoryId, name } }
-   */
-  const consumersIds = uniq(agreements.map((a) => a.consumerId))
-  const consumersMap = await getConsumersMap(readModel, consumersIds)
-
-  /**
-   * With the consumers map, we enrich the agreements with the consumer macrocategory id and the consumer name.
-   * We have now a collection of agreements with the following shape:
-   * { eserviceId, consumerId, producerId, eserviceName, macrocategoryId, consumerName }
-   */
-  const enrichedAgreements = agreements.map((a) => ({
-    ...a,
-    macrocategoryId: consumersMap[a.consumerId].macrocategoryId,
-    consumerName: consumersMap[a.consumerId].name,
-  }))
-
   /*
-   * From the enriched agreements, we create a map of eservices.
+   * From the agreements, we create a map of eservices.
    * The key is the eservice id, the value is an object with the producer id, the eservice name, the producer name and an array of agreements.
    * The agreements array contains the macrocategory id and the consumer name of each agreement.
    * { [eserviceId]: { producerId, eserviceName, producerName, agreements: [ { macrocategoryId, consumerName } ] } }
    */
-  const eservicesMap = enrichedAgreements.reduce<EServiceMap>((acc, next) => {
+  const eservicesMap = agreements.reduce<EServiceMap>((acc, next) => {
     // If it's the first time we meet this eservice id, initialize a new array
     if (!acc[next.eserviceId]) {
       acc[next.eserviceId] = {
@@ -118,13 +98,18 @@ export async function getMostSubscribedEServicesMetric(
         agreements: [],
       }
     }
+
+    const consumer = globalStore.getTenantFromId(next.consumerId)
+    const macrocategoryId = globalStore.getMacroCategoryFromTenantId(next.consumerId)?.id
+
     // Add to the array the macrocategory this tenant belongs to
     acc[next.eserviceId].agreements.push({
-      macrocategoryId: next.macrocategoryId,
-      consumerName: next.consumerName,
-      consumerId: next.consumerId,
+      macrocategoryId: macrocategoryId ?? '-1',
+      consumerName: consumer.name,
+      consumerId: consumer.id,
       createdAt: next.createdAt,
     })
+
     // Return the updated map
     return acc
   }, {})
@@ -197,70 +182,4 @@ export async function getMostSubscribedEServicesMetric(
   })
 
   return MostSubscribedEServicesMetric.parse(result)
-}
-
-async function getConsumersMap(
-  readModel: ReadModelClient,
-  consumerIds: Array<string>
-): Promise<Record<string, ConsumerEntry>> {
-  const consumersQuery = readModel.tenants
-    .aggregate([
-      {
-        $match: {
-          'data.id': {
-            $in: consumerIds,
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: ATTRIBUTES_COLLECTION_NAME,
-          localField: 'data.attributes.id',
-          foreignField: 'data.id',
-          as: 'attributes',
-        },
-      },
-      {
-        $addFields: {
-          attributes: {
-            $filter: {
-              input: '$attributes',
-              as: 'attribute',
-              cond: {
-                $eq: ['$$attribute.data.kind', 'Certified'],
-              },
-            },
-          },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          id: '$data.id',
-          name: '$data.name',
-          attributesIds: '$attributes.data.id',
-        },
-      },
-    ])
-    .map((t) =>
-      Tenant.pick({ id: true, name: true })
-        .merge(z.object({ attributesIds: z.array(z.string()) }))
-        .parse(t)
-    )
-    .toArray()
-
-  const [macroCategoriesWithAttributes, consumers] = await Promise.all([
-    getMacroCategoriesWithAttributes(readModel),
-    consumersQuery,
-  ])
-
-  // Create a map. The key is the consumerId, the value the IPA macrocategory id, if any
-  const consumersMap = consumers.reduce<Record<string, ConsumerEntry>>((acc, next) => {
-    const macrocategoryId =
-      macroCategoriesWithAttributes.find((m) => m.attributes.some((a) => next.attributesIds.includes(a.id)))?.id ?? '-1'
-
-    return { ...acc, [next.id]: { macrocategoryId, name: next.name } }
-  }, {})
-
-  return consumersMap
 }

@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { sub } from 'date-fns'
 import { getTenantSignupsTrendMetric } from '../tenant-signups-trend-metric.service.js'
+import { GlobalStoreService } from '../global-store.service.js'
 
 const comuneAttributeUuid = randomUUID()
 const aziendaOspedalieraAttributeUuid = randomUUID()
@@ -10,48 +11,41 @@ const aziendaOspedalieraAttributeUuid = randomUUID()
 const oneMonthAgoDate = sub(new Date(), { months: 1 }).toISOString()
 const sixMonthsAgoDate = sub(new Date(), { months: 6 }).toISOString()
 const oneYearAgoDate = sub(new Date(), { years: 1 }).toISOString()
-
 describe('getTenantSignupsTrendMetric', () => {
   it('should return the correct metrics', async () => {
     const oboardedTenants = [
       {
         data: getTenantMock({
-          selfcareId: 'selfcareId',
           createdAt: oneMonthAgoDate,
           attributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
-          selfcareId: 'selfcareId',
           createdAt: oneMonthAgoDate,
           attributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
-          selfcareId: 'selfcareId',
           createdAt: sixMonthsAgoDate,
           attributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
-          selfcareId: 'selfcareId',
           createdAt: sixMonthsAgoDate,
           attributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
-          selfcareId: 'selfcareId',
           createdAt: oneYearAgoDate,
           attributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
-          selfcareId: 'selfcareId',
           createdAt: oneYearAgoDate,
           attributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
@@ -71,7 +65,8 @@ describe('getTenantSignupsTrendMetric', () => {
     await seedCollection('tenants', oboardedTenants)
     await seedCollection('attributes', attributes)
 
-    const result = await getTenantSignupsTrendMetric(readModelMock)
+    const globalStore = await GlobalStoreService.init(readModelMock)
+    const result = await getTenantSignupsTrendMetric(globalStore)
 
     const comuniMetric = result.fromTheBeginning.find(
       (metric) => metric.name === ('Comuni' satisfies MacroCategoryName)

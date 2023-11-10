@@ -86,7 +86,7 @@ export const OnboardedTenantsCountByMacroCategoriesMetric = timedMetricObject(
     z.object({
       id: z.string(),
       name: z.string(),
-      oboardedCount: z.number(),
+      onboardedCount: z.number(),
       totalCount: z.number(),
     })
   )
