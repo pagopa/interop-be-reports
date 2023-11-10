@@ -57,18 +57,18 @@ async function main(): Promise<void> {
     onboardedTenantsCountByMacroCategories,
     topProducers,
   ] = await Promise.all([
-    wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServicesMetric'),
+    wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServices'),
     wrapPromiseWithLogs(getEServicesByMacroCategoriesMetric(readModel), 'eservicesByMacroCategories'),
-    wrapPromiseWithLogs(getMostSubscribedEServicesMetric(readModel), 'mostSubscribedEServicesMetric'),
+    wrapPromiseWithLogs(getMostSubscribedEServicesMetric(readModel), 'mostSubscribedEServices'),
     wrapPromiseWithLogs(getTopProducersBySubscribersMetric(readModel), 'topProducersBySubscribers'),
-    wrapPromiseWithLogs(getOnboardedTenantsCountMetric(readModel), 'onboardedTenantsCountMetric'),
-    wrapPromiseWithLogs(getTenantDistributionMetric(readModel), 'tenantDistributionMetric'),
-    wrapPromiseWithLogs(getTenantSignupsTrendMetric(readModel), 'tenantSignupsTrendMetric'),
+    wrapPromiseWithLogs(getOnboardedTenantsCountMetric(readModel), 'onboardedTenantsCount'),
+    wrapPromiseWithLogs(getTenantDistributionMetric(readModel), 'tenantDistribution'),
+    wrapPromiseWithLogs(getTenantSignupsTrendMetric(readModel), 'tenantSignupsTrend'),
     wrapPromiseWithLogs(
       getOnboardedTenantsCountByMacroCategoriesMetric(readModel),
-      'onboardedTenantsCountByMacroCategoriesMetric'
+      'onboardedTenantsCountByMacroCategories'
     ),
-    wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducersMetric'),
+    wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducers'),
   ])
 
   log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
