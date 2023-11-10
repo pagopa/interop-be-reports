@@ -1,8 +1,8 @@
 import { getAttributeMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
-import { getPublishedEServicesByMacroCategoriesMetric } from '../published-e-services-by-macro-categories-metric.service.js'
+import { getEServicesByMacroCategoriesMetric } from '../e-services-by-macro-categories-metric.service.js'
 
-describe('getPublishedEServicesByMacroCategoriesMetric', () => {
+describe('getEServicesByMacroCategoriesMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('eservices', [
       {
@@ -103,18 +103,13 @@ describe('getPublishedEServicesByMacroCategoriesMetric', () => {
       },
     ])
 
-    const result = await getPublishedEServicesByMacroCategoriesMetric(readModelMock)
+    const result = await getEServicesByMacroCategoriesMetric(readModelMock)
 
     expect(
-      result.find((a) => (a.name as MacroCategoryName) === 'Pubbliche Amministrazioni Centrali')
-        ?.publishedEServicesCount
+      result.find((a) => (a.name as MacroCategoryName) === 'Pubbliche Amministrazioni Centrali')?.count
     ).toStrictEqual(2)
 
-    expect(
-      result.find((a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane')?.publishedEServicesCount
-    ).toStrictEqual(2)
-    expect(
-      result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')?.publishedEServicesCount
-    ).toStrictEqual(1)
+    expect(result.find((a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane')?.count).toStrictEqual(2)
+    expect(result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')?.count).toStrictEqual(1)
   })
 })

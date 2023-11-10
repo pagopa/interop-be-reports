@@ -6,11 +6,11 @@ export const PublishedEServicesMetric = z.object({
   variation: z.number(),
 })
 
-export const PublishedEServicesByMacroCategoriesMetric = z.array(
+export const EServicesByMacroCategoriesMetric = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
-    publishedEServicesCount: z.number(),
+    count: z.number(),
   })
 )
 
@@ -24,21 +24,21 @@ function timedMetricObject<T extends z.ZodSchema>(
   })
 }
 
-export const Top10MostSubscribedEServices = timedMetricObject(
+export const MostSubscribedEServices = timedMetricObject(
   z.array(
     z.object({
       eserviceName: z.string(),
-      tenantName: z.string(),
-      count: z.number(),
+      producerName: z.string(),
+      subscribersCount: z.number(),
     })
   )
 )
 
-export const Top10MostSubscribedEServicesMetric = z.array(
+export const MostSubscribedEServicesMetric = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
-    top10MostSubscribedEServices: Top10MostSubscribedEServices,
+    mostSubscribedEServices: MostSubscribedEServices,
   })
 )
 
@@ -103,24 +103,37 @@ export const TopProducersMetric = timedMetricObject(z.array(TopProducersMetricIt
 
 export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 
-export const Metrics = z.object({
-  publishedEServicesMetric: PublishedEServicesMetric,
-  macroCategoriesPublishedEServicesMetric: PublishedEServicesByMacroCategoriesMetric,
-  top10MostSubscribedEServicesMetric: Top10MostSubscribedEServicesMetric,
-  topProducersBySubscribers: TopProducersBySubscribersMetric,
-  onboardedTenantsCountMetric: OnboardedTenantsCountMetric,
-  tenantDistributionMetric: TenantDistributionMetric,
-  tenantSignupsTrendMetric: TenantSignupsTrendMetric,
-  onboardedTenantsCountByMacroCategoriesMetric: OnboardedTenantsCountByMacroCategoriesMetric,
-  topProducers: TopProducersMetric,
-})
+export const MetricsQueriesResult = z.tuple([
+  PublishedEServicesMetric,
+  EServicesByMacroCategoriesMetric,
+  MostSubscribedEServicesMetric,
+  TopProducersBySubscribersMetric,
+  OnboardedTenantsCountMetric,
+  TenantDistributionMetric,
+  TenantSignupsTrendMetric,
+  OnboardedTenantsCountByMacroCategoriesMetric,
+  TopProducersMetric,
+])
 
-export type Metrics = z.infer<typeof Metrics>
+export const MetricsOutput = MetricsQueriesResult.transform((metrics) => ({
+  publishedEServices: metrics[0],
+  eservicesByMacroCategories: metrics[1],
+  mostSubscribedEServices: metrics[2],
+  topProducersBySubscribers: metrics[3],
+  onboardedTenantsCount: metrics[4],
+  tenantDistribution: metrics[5],
+  tenantSignupsTrend: metrics[6],
+  onboardedTenantsCountByMacroCategories: metrics[7],
+  topProducers: metrics[8],
+}))
+
+export type MetricsQueriesResult = z.infer<typeof MetricsQueriesResult>
+export type MetricsOutput = z.infer<typeof MetricsOutput>
 
 export type PublishedEServicesMetric = z.infer<typeof PublishedEServicesMetric>
-export type PublishedEServicesByMacroCategoriesMetric = z.infer<typeof PublishedEServicesByMacroCategoriesMetric>
-export type Top10MostSubscribedEServices = z.infer<typeof Top10MostSubscribedEServices>
-export type Top10MostSubscribedEServicesMetric = z.infer<typeof Top10MostSubscribedEServicesMetric>
+export type EServicesByMacroCategoriesMetric = z.infer<typeof EServicesByMacroCategoriesMetric>
+export type MostSubscribedEServices = z.infer<typeof MostSubscribedEServices>
+export type MostSubscribedEServicesMetric = z.infer<typeof MostSubscribedEServicesMetric>
 export type TopProducersBySubscribersMetric = z.infer<typeof TopProducersBySubscribersMetric>
 export type OnboardedTenantsCountMetric = z.infer<typeof OnboardedTenantsCountMetric>
 export type TenantDistributionMetric = z.infer<typeof TenantDistributionMetric>

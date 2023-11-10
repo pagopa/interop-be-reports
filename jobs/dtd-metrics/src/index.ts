@@ -1,11 +1,11 @@
 import { ReadPreferenceMode } from 'mongodb'
 import { AwsS3BucketClient, ReadModelClient, withExecutionTime } from '@interop-be-reports/commons'
 import { env } from './configs/env.js'
-import { Metrics } from './models/metrics.model.js'
+import { MetricsOutput, MetricsQueriesResult } from './models/metrics.model.js'
 import {
   getPublishedEServicesMetric,
-  getPublishedEServicesByMacroCategoriesMetric,
-  getTop10MostSubscribedEServicesMetric,
+  getEServicesByMacroCategoriesMetric,
+  getMostSubscribedEServicesMetric,
   getTopProducersBySubscribersMetric,
   getOnboardedTenantsCountMetric,
   getTenantDistributionMetric,
@@ -46,47 +46,24 @@ async function main(): Promise<void> {
    */
   await getMacroCategoriesWithAttributes(readModel)
 
-  const [
-    publishedEServices,
-    macroCategoriesPublishedEServicesMetric,
-    top10MostSubscribedEServicesMetric,
-    topProducersBySubscribers,
-    onboardedTenantsCountMetric,
-    tenantDistributionMetric,
-    tenantSignupsTrendMetric,
-    onboardedTenantsCountByMacroCategoriesMetric,
-    topProducers,
-  ] = await Promise.all([
-    wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServicesMetric'),
-    wrapPromiseWithLogs(
-      getPublishedEServicesByMacroCategoriesMetric(readModel),
-      'macroCategoriesPublishedEServicesMetric'
-    ),
-    wrapPromiseWithLogs(getTop10MostSubscribedEServicesMetric(readModel), 'top10MostSubscribedEServicesMetric'),
+  const queriesResult: MetricsQueriesResult = await Promise.all([
+    wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServices'),
+    wrapPromiseWithLogs(getEServicesByMacroCategoriesMetric(readModel), 'eservicesByMacroCategories'),
+    wrapPromiseWithLogs(getMostSubscribedEServicesMetric(readModel), 'mostSubscribedEServices'),
     wrapPromiseWithLogs(getTopProducersBySubscribersMetric(readModel), 'topProducersBySubscribers'),
-    wrapPromiseWithLogs(getOnboardedTenantsCountMetric(readModel), 'onboardedTenantsCountMetric'),
-    wrapPromiseWithLogs(getTenantDistributionMetric(readModel), 'tenantDistributionMetric'),
-    wrapPromiseWithLogs(getTenantSignupsTrendMetric(readModel), 'tenantSignupsTrendMetric'),
+    wrapPromiseWithLogs(getOnboardedTenantsCountMetric(readModel), 'onboardedTenantsCount'),
+    wrapPromiseWithLogs(getTenantDistributionMetric(readModel), 'tenantDistribution'),
+    wrapPromiseWithLogs(getTenantSignupsTrendMetric(readModel), 'tenantSignupsTrend'),
     wrapPromiseWithLogs(
       getOnboardedTenantsCountByMacroCategoriesMetric(readModel),
-      'onboardedTenantsCountByMacroCategoriesMetric'
+      'onboardedTenantsCountByMacroCategories'
     ),
-    wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducersMetric'),
+    wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducers'),
   ])
 
-  log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
+  const output = MetricsOutput.parse(queriesResult)
 
-  const output = Metrics.parse({
-    publishedEServices,
-    macroCategoriesPublishedEServicesMetric,
-    top10MostSubscribedEServicesMetric,
-    topProducersBySubscribers,
-    onboardedTenantsCountMetric,
-    tenantDistributionMetric,
-    tenantSignupsTrendMetric,
-    onboardedTenantsCountByMacroCategoriesMetric,
-    topProducers,
-  })
+  log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
   await Promise.all([
     githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${env.FILENAME}`),
