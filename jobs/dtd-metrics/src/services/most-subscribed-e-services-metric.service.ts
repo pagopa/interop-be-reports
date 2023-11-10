@@ -1,10 +1,4 @@
-import {
-  Agreement,
-  AgreementState,
-  ESERVICES_COLLECTION_NAME,
-  ReadModelClient,
-  TENANTS_COLLECTION_NAME,
-} from '@interop-be-reports/commons'
+import { Agreement, AgreementState, ESERVICES_COLLECTION_NAME, ReadModelClient } from '@interop-be-reports/commons'
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { z } from 'zod'
 import orderBy from 'lodash/orderBy.js'
@@ -56,28 +50,19 @@ export async function getMostSubscribedEServicesMetric(
         },
       },
       {
-        $lookup: {
-          from: TENANTS_COLLECTION_NAME,
-          localField: 'data.producerId',
-          foreignField: 'data.id',
-          as: 'producer',
-        },
-      },
-      {
         $project: {
           _id: 0,
           eserviceId: '$data.eserviceId',
           consumerId: '$data.consumerId',
           producerId: '$data.producerId',
           eserviceName: { $arrayElemAt: ['$eservice.data.name', 0] },
-          producerName: { $arrayElemAt: ['$producer.data.name', 0] },
           createdAt: '$data.createdAt',
         },
       },
     ])
     .map((a) =>
       Agreement.pick({ eserviceId: true, consumerId: true, producerId: true, createdAt: true })
-        .merge(z.object({ eserviceName: z.string(), producerName: z.string() }))
+        .merge(z.object({ eserviceName: z.string() }))
         .parse(a)
     )
     .toArray()
@@ -94,7 +79,7 @@ export async function getMostSubscribedEServicesMetric(
       acc[next.eserviceId] = {
         producerId: next.producerId,
         eserviceName: next.eserviceName,
-        producerName: next.producerName,
+        producerName: globalStore.getTenantFromId(next.producerId).name,
         agreements: [],
       }
     }

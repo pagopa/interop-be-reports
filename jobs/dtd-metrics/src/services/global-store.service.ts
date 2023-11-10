@@ -1,6 +1,6 @@
-import { Attribute, ReadModelClient, SafeMap, Tenant } from '@interop-be-reports/commons'
+import { Attribute, ReadModelClient, SafeMap } from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
-import { MacroCategories, MacroCategory, MacroCategoryTenant } from '../models/macro-categories.model.js'
+import { MacroCategories, MacroCategory } from '../models/macro-categories.model.js'
 import { z } from 'zod'
 
 const GlobalStoreTenant = z.object({
@@ -8,12 +8,14 @@ const GlobalStoreTenant = z.object({
   name: z.string(),
   createdAt: z.coerce.date(),
   selfcareId: z.string().optional(),
+  macroCategoryId: z.string(),
 })
 type GlobalStoreTenant = z.infer<typeof GlobalStoreTenant>
 
 export class GlobalStoreService {
+  tenants: Array<GlobalStoreTenant>
   onboardedTenants: Array<GlobalStoreTenant>
-  onboardedTenantsMap: SafeMap<string, GlobalStoreTenant>
+  tenantsMap: SafeMap<string, GlobalStoreTenant>
   macroCategories: MacroCategories
 
   public getMacroCategoryFromTenantId(tenantId: string): MacroCategory | undefined {
@@ -21,36 +23,18 @@ export class GlobalStoreService {
   }
 
   public getTenantFromId(tenantId: string): GlobalStoreTenant {
-    return this.onboardedTenantsMap.get(tenantId)
+    return this.tenantsMap.get(tenantId)
   }
 
-  private constructor(onboardedTenants: Array<GlobalStoreTenant>, macroCategories: MacroCategories) {
-    this.onboardedTenants = onboardedTenants
-    this.onboardedTenantsMap = new SafeMap(onboardedTenants.map((tenant) => [tenant.id, tenant]))
+  private constructor(tenants: Array<GlobalStoreTenant>, macroCategories: MacroCategories) {
+    this.tenants = tenants
+    this.tenantsMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant]))
+    this.onboardedTenants = tenants.filter(({ selfcareId }) => !!selfcareId)
     this.macroCategories = macroCategories
   }
 
   static async init(readModel: ReadModelClient): Promise<GlobalStoreService> {
-    const onboardedTenantsPromise = await readModel.tenants
-      .find({
-        'data.selfcareId': { $exists: true },
-      })
-      .project({
-        _id: 0,
-        'data.id': 1,
-        'data.name': 1,
-        'data.selfcareId': 1,
-        'data.createdAt': 1,
-        'data.attributes.id': 1,
-      })
-      .map(({ data }) =>
-        Tenant.pick({ id: true, name: true, createdAt: true, selfcareId: true })
-          .and(z.object({ attributes: z.array(z.object({ id: z.string() })) }))
-          .parse(data)
-      )
-      .toArray()
-
-    const attributesPromise = await readModel.attributes
+    const attributes = await readModel.attributes
       .find({
         'data.code': {
           $in: MACRO_CATEGORIES.flatMap((macroCategory) => macroCategory.ipaCodes),
@@ -64,24 +48,30 @@ export class GlobalStoreService {
       .map(({ data }) => Attribute.pick({ id: true, code: true }).parse(data))
       .toArray()
 
-    const [onboardedTenants, attributes] = await Promise.all([onboardedTenantsPromise, attributesPromise])
-
     const enrichMacroCategory = async (macroCategory: (typeof MACRO_CATEGORIES)[number]): Promise<MacroCategory> => {
       const macroCategoryAttributes = attributes
         .filter(({ code }) => (macroCategory.ipaCodes as ReadonlyArray<string | undefined>).includes(code))
         .map((attribute) => ({ ...attribute, macroCategoryId: macroCategory.id }))
 
-      const macroCategoryTenants: MacroCategoryTenant[] = onboardedTenants
-        .filter(({ attributes }) =>
-          attributes.some(({ id }) => macroCategoryAttributes.some(({ id: attributeId }) => attributeId === id))
+      const macroCategoryTenants = await readModel.tenants
+        .find(
+          {
+            'data.attributes': {
+              $elemMatch: { id: { $in: macroCategoryAttributes.map((a) => a.id) } },
+            },
+          },
+          {
+            projection: {
+              _id: 0,
+              'data.id': 1,
+              'data.name': 1,
+              'data.createdAt': 1,
+              'data.selfcareId': 1,
+            },
+          }
         )
-        .map((t) => ({
-          id: t.id,
-          name: t.name,
-          createdAt: t.createdAt,
-          selfcareId: t.selfcareId,
-          macroCategoryId: macroCategory.id,
-        }))
+        .map(({ data }) => GlobalStoreTenant.parse({ ...data, macroCategoryId: macroCategory.id }))
+        .toArray()
 
       return MacroCategory.parse({
         id: macroCategory.id,
@@ -94,8 +84,8 @@ export class GlobalStoreService {
     }
 
     const macroCategories = MacroCategories.parse(await Promise.all(MACRO_CATEGORIES.map(enrichMacroCategory)))
-    const onboardedTenantsData = onboardedTenants.map(({ id, name, createdAt }) => ({ id, name, createdAt }))
+    const tenants = macroCategories.flatMap(({ tenants }) => tenants)
 
-    return new GlobalStoreService(onboardedTenantsData, macroCategories)
+    return new GlobalStoreService(tenants, macroCategories)
   }
 }
