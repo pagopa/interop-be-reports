@@ -1,7 +1,7 @@
 import { ReadPreferenceMode } from 'mongodb'
 import { AwsS3BucketClient, ReadModelClient, withExecutionTime } from '@interop-be-reports/commons'
 import { env } from './configs/env.js'
-import { Metrics } from './models/metrics.model.js'
+import { Metrics, MetricsQueriesResult } from './models/metrics.model.js'
 import {
   getPublishedEServicesMetric,
   getEServicesByMacroCategoriesMetric,
@@ -46,17 +46,7 @@ async function main(): Promise<void> {
    */
   await getMacroCategoriesWithAttributes(readModel)
 
-  const [
-    publishedEServices,
-    eservicesByMacroCategories,
-    mostSubscribedEServices,
-    topProducersBySubscribers,
-    onboardedTenantsCount,
-    tenantDistribution,
-    tenantSignupsTrend,
-    onboardedTenantsCountByMacroCategories,
-    topProducers,
-  ] = await Promise.all([
+  const queriesResult: MetricsQueriesResult = await Promise.all([
     wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServices'),
     wrapPromiseWithLogs(getEServicesByMacroCategoriesMetric(readModel), 'eservicesByMacroCategories'),
     wrapPromiseWithLogs(getMostSubscribedEServicesMetric(readModel), 'mostSubscribedEServices'),
@@ -71,19 +61,9 @@ async function main(): Promise<void> {
     wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducers'),
   ])
 
-  log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
+  const output = Metrics.parse(queriesResult)
 
-  const output = Metrics.parse({
-    publishedEServices,
-    eservicesByMacroCategories,
-    mostSubscribedEServices,
-    topProducersBySubscribers,
-    onboardedTenantsCount,
-    tenantDistribution,
-    tenantSignupsTrend,
-    onboardedTenantsCountByMacroCategories,
-    topProducers,
-  } satisfies Metrics)
+  log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
   await Promise.all([
     githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${env.FILENAME}`),
