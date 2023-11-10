@@ -67,7 +67,7 @@ describe('getOnboardedTenantsCountByMacroCategoriesMetric', () => {
     await seedCollection('attributes', attributes)
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await getOnboardedTenantsCountByMacroCategoriesMetric(readModelMock, globalStore)
+    const result = await getOnboardedTenantsCountByMacroCategoriesMetric(globalStore)
 
     const comuniMetric = result.fromTheBeginning.find(
       (metric) => metric.name === ('Comuni' satisfies MacroCategoryName)

@@ -2,7 +2,6 @@ import { OnboardedTenantsCountByMacroCategoriesMetric } from '../models/metrics.
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { GlobalStoreService } from './global-store.service.js'
 import { MacroCategory } from '../models/macro-categories.model.js'
-import { ReadModelClient } from '@interop-be-reports/commons'
 
 type OnboardedTenantsCountByMacroCategoriesMetricItem = OnboardedTenantsCountByMacroCategoriesMetric[
   | 'fromTheBeginning'
@@ -10,7 +9,6 @@ type OnboardedTenantsCountByMacroCategoriesMetricItem = OnboardedTenantsCountByM
   | 'lastTwelveMonths'][number]
 
 export async function getOnboardedTenantsCountByMacroCategoriesMetric(
-  readModel: ReadModelClient,
   globalStore: GlobalStoreService
 ): Promise<OnboardedTenantsCountByMacroCategoriesMetric> {
   // Get the onboarded and total tenants count for each macro category
@@ -21,15 +19,8 @@ export async function getOnboardedTenantsCountByMacroCategoriesMetric(
     //TODO eventually the createdAt field will be substituted by the onboardedAt field once it will be available
     const tenants = date ? macroCategory.tenants.filter((t) => t.createdAt >= date) : macroCategory.tenants
 
-    const onboardedCount = tenants.length
-    const totalCount = await readModel.tenants.countDocuments({
-      'data.attributes': {
-        $elemMatch: {
-          id: { $in: macroCategory.attributes.map((a) => a.id) },
-        },
-      },
-      ...(date ? { 'data.createdAt': { $gte: date.toISOString() } } : {}),
-    })
+    const onboardedCount = tenants.filter((t) => !!t.selfcareId).length
+    const totalCount = tenants.length
 
     return { id: macroCategory.id, name: macroCategory.name, onboardedCount, totalCount }
   }

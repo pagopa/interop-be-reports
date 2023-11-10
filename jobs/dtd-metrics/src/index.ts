@@ -54,7 +54,7 @@ async function main(): Promise<void> {
     wrapPromiseWithLogs(getTenantDistributionMetric(readModel, globalStore), 'tenantDistribution'),
     wrapPromiseWithLogs(getTenantSignupsTrendMetric(globalStore), 'tenantSignupsTrend'),
     wrapPromiseWithLogs(
-      getOnboardedTenantsCountByMacroCategoriesMetric(readModel, globalStore),
+      getOnboardedTenantsCountByMacroCategoriesMetric(globalStore),
       'onboardedTenantsCountByMacroCategories'
     ),
     wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducers'),
