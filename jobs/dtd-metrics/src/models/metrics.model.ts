@@ -115,7 +115,7 @@ export const MetricsQueriesResult = z.tuple([
   TopProducersMetric,
 ])
 
-export const Metrics = MetricsQueriesResult.transform((metrics) => ({
+export const MetricsOutput = MetricsQueriesResult.transform((metrics) => ({
   publishedEServices: metrics[0],
   eservicesByMacroCategories: metrics[1],
   mostSubscribedEServices: metrics[2],
@@ -128,7 +128,7 @@ export const Metrics = MetricsQueriesResult.transform((metrics) => ({
 }))
 
 export type MetricsQueriesResult = z.infer<typeof MetricsQueriesResult>
-export type Metrics = z.infer<typeof Metrics>
+export type MetricsOutput = z.infer<typeof MetricsOutput>
 
 export type PublishedEServicesMetric = z.infer<typeof PublishedEServicesMetric>
 export type EServicesByMacroCategoriesMetric = z.infer<typeof EServicesByMacroCategoriesMetric>

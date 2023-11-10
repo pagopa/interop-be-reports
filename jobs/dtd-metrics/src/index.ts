@@ -1,7 +1,7 @@
 import { ReadPreferenceMode } from 'mongodb'
 import { AwsS3BucketClient, ReadModelClient, withExecutionTime } from '@interop-be-reports/commons'
 import { env } from './configs/env.js'
-import { Metrics, MetricsQueriesResult } from './models/metrics.model.js'
+import { MetricsOutput, MetricsQueriesResult } from './models/metrics.model.js'
 import {
   getPublishedEServicesMetric,
   getEServicesByMacroCategoriesMetric,
@@ -61,7 +61,7 @@ async function main(): Promise<void> {
     wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducers'),
   ])
 
-  const output = Metrics.parse(queriesResult)
+  const output = MetricsOutput.parse(queriesResult)
 
   log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
