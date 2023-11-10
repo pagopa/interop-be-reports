@@ -92,6 +92,17 @@ export const OnboardedTenantsCountByMacroCategoriesMetric = timedMetricObject(
   )
 )
 
+export const TopProducersMetricItem = z.object({
+  producerName: z.string(),
+  count: z.number(),
+})
+
+export type TopProducersMetricItem = z.infer<typeof TopProducersMetricItem>
+
+export const TopProducersMetric = timedMetricObject(z.array(TopProducersMetricItem))
+
+export type TopProducersMetric = z.infer<typeof TopProducersMetric>
+
 export const Metrics = z.object({
   publishedEServicesMetric: PublishedEServicesMetric,
   macroCategoriesPublishedEServicesMetric: PublishedEServicesByMacroCategoriesMetric,
@@ -100,6 +111,8 @@ export const Metrics = z.object({
   onboardedTenantsCountMetric: OnboardedTenantsCountMetric,
   tenantDistributionMetric: TenantDistributionMetric,
   tenantSignupsTrendMetric: TenantSignupsTrendMetric,
+  onboardedTenantsCountByMacroCategoriesMetric: OnboardedTenantsCountByMacroCategoriesMetric,
+  topProducers: TopProducersMetric,
 })
 
 export type Metrics = z.infer<typeof Metrics>

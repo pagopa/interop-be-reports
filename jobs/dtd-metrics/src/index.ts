@@ -11,6 +11,7 @@ import {
   getTenantDistributionMetric,
   getTenantSignupsTrendMetric,
   getOnboardedTenantsCountByMacroCategoriesMetric,
+  getTopProducersMetric,
 } from './services/index.js'
 import { GithubClient } from './services/github-client.service.js'
 import { getMacroCategoriesWithAttributes, wrapPromiseWithLogs } from './utils/helpers.utils.js'
@@ -54,6 +55,7 @@ async function main(): Promise<void> {
     tenantDistributionMetric,
     tenantSignupsTrendMetric,
     onboardedTenantsCountByMacroCategoriesMetric,
+    topProducers,
   ] = await Promise.all([
     wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServicesMetric'),
     wrapPromiseWithLogs(
@@ -69,6 +71,7 @@ async function main(): Promise<void> {
       getOnboardedTenantsCountByMacroCategoriesMetric(readModel),
       'onboardedTenantsCountByMacroCategoriesMetric'
     ),
+    wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducersMetric'),
   ])
 
   log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
@@ -82,6 +85,7 @@ async function main(): Promise<void> {
     tenantDistributionMetric,
     tenantSignupsTrendMetric,
     onboardedTenantsCountByMacroCategoriesMetric,
+    topProducers,
   })
 
   await Promise.all([
