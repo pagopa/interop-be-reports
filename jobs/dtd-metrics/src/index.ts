@@ -4,9 +4,9 @@ import { env } from './configs/env.js'
 import { Metrics } from './models/metrics.model.js'
 import {
   getPublishedEServicesMetric,
-  getPublishedEServicesByMacroCategoriesMetric,
   getEServicesByMacroCategoriesMetric,
   getMostSubscribedEServicesMetric,
+  getTopProducersBySubscribersMetric,
   getOnboardedTenantsCountMetric,
   getTenantDistributionMetric,
   getTenantSignupsTrendMetric,
@@ -48,17 +48,17 @@ async function main(): Promise<void> {
 
   const [
     publishedEServices,
-    macroCategoriesPublishedEServicesMetric,
+    eservicesByMacroCategories,
     mostSubscribedEServices,
     topProducersBySubscribers,
-    onboardedTenantsCountMetric,
-    tenantDistributionMetric,
-    tenantSignupsTrendMetric,
-    onboardedTenantsCountByMacroCategoriesMetric,
+    onboardedTenantsCount,
+    tenantDistribution,
+    tenantSignupsTrend,
+    onboardedTenantsCountByMacroCategories,
     topProducers,
   ] = await Promise.all([
     wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServicesMetric'),
-    wrapPromiseWithLogs(getEServicesByMacroCategoriesMetric(readModel), 'eServicesByMacroCategories'),
+    wrapPromiseWithLogs(getEServicesByMacroCategoriesMetric(readModel), 'eservicesByMacroCategories'),
     wrapPromiseWithLogs(getMostSubscribedEServicesMetric(readModel), 'mostSubscribedEServicesMetric'),
     wrapPromiseWithLogs(getTopProducersBySubscribersMetric(readModel), 'topProducersBySubscribers'),
     wrapPromiseWithLogs(getOnboardedTenantsCountMetric(readModel), 'onboardedTenantsCountMetric'),
@@ -75,15 +75,15 @@ async function main(): Promise<void> {
 
   const output = Metrics.parse({
     publishedEServices,
-    macroCategoriesPublishedEServicesMetric,
+    eservicesByMacroCategories,
     mostSubscribedEServices,
     topProducersBySubscribers,
-    onboardedTenantsCountMetric,
-    tenantDistributionMetric,
-    tenantSignupsTrendMetric,
-    onboardedTenantsCountByMacroCategoriesMetric,
+    onboardedTenantsCount,
+    tenantDistribution,
+    tenantSignupsTrend,
+    onboardedTenantsCountByMacroCategories,
     topProducers,
-  })
+  } satisfies Metrics)
 
   await Promise.all([
     githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${env.FILENAME}`),

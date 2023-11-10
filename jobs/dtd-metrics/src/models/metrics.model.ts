@@ -104,15 +104,14 @@ export const TopProducersMetric = timedMetricObject(z.array(TopProducersMetricIt
 export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 
 export const Metrics = z.object({
-  publishedEServicesMetric: PublishedEServicesMetric,
-  macroCategoriesPublishedEServicesMetric: PublishedEServicesByMacroCategoriesMetric,
+  publishedEServices: PublishedEServicesMetric,
   eservicesByMacroCategories: EServicesByMacroCategoriesMetric,
   mostSubscribedEServices: MostSubscribedEServicesMetric,
   topProducersBySubscribers: TopProducersBySubscribersMetric,
-  onboardedTenantsCountMetric: OnboardedTenantsCountMetric,
-  tenantDistributionMetric: TenantDistributionMetric,
-  tenantSignupsTrendMetric: TenantSignupsTrendMetric,
-  onboardedTenantsCountByMacroCategoriesMetric: OnboardedTenantsCountByMacroCategoriesMetric,
+  onboardedTenantsCount: OnboardedTenantsCountMetric,
+  tenantDistribution: TenantDistributionMetric,
+  tenantSignupsTrend: TenantSignupsTrendMetric,
+  onboardedTenantsCountByMacroCategories: OnboardedTenantsCountByMacroCategoriesMetric,
   topProducers: TopProducersMetric,
 })
 
