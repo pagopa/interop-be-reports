@@ -22,6 +22,12 @@ describe('getTopProducersMetric', () => {
           descriptors: [{ state: 'Published', publishedAt: nineMonthsAgoDate.toISOString() }],
         }),
       },
+      {
+        data: getEServiceMock({
+          producerId: producer1Uuid,
+          descriptors: [{ publishedAt: nineMonthsAgoDate.toISOString() }],
+        }),
+      },
       { data: getEServiceMock({ producerId: producer2Uuid }) },
       { data: getEServiceMock({ producerId: producer2Uuid, descriptors: [{ state: 'Archived' }] }) },
       { data: getEServiceMock({ producerId: producer2Uuid, descriptors: [{ state: 'Deprecated' }] }) },
@@ -52,10 +58,10 @@ describe('getTopProducersMetric', () => {
 
     expect(result.lastSixMonths[0]).toEqual({ producerName: 'Producer 2', count: 1 })
 
-    expect(result.lastTwelveMonths[0]).toEqual({ producerName: 'Producer 1', count: 1 })
+    expect(result.lastTwelveMonths[0]).toEqual({ producerName: 'Producer 1', count: 2 })
     expect(result.lastTwelveMonths[1]).toEqual({ producerName: 'Producer 2', count: 1 })
 
-    expect(result.fromTheBeginning[0]).toEqual({ producerName: 'Producer 1', count: 3 })
+    expect(result.fromTheBeginning[0]).toEqual({ producerName: 'Producer 1', count: 4 })
     expect(result.fromTheBeginning[1]).toEqual({ producerName: 'Producer 2', count: 2 })
   })
 })
