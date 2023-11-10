@@ -71,7 +71,7 @@ async function main(): Promise<void> {
       getOnboardedTenantsCountByMacroCategoriesMetric(readModel),
       'onboardedTenantsCountByMacroCategoriesMetric'
     ),
-    wrapPromiseWithLogs(getTopProducersMetric(readModel), 'MostPublishedEserviceProviders'),
+    wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducersMetric'),
   ])
 
   log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
