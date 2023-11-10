@@ -35,7 +35,7 @@ describe('getPublishedEServicesMetric', () => {
     ])
 
     const result = await getPublishedEServicesMetric(readModelMock)
-    expect(result.publishedEServicesCount).toStrictEqual(3)
-    expect(result.lastMonthPublishedEServicesCount).toStrictEqual(2)
+    expect(result.count).toStrictEqual(3)
+    expect(result.lastMonthCount).toStrictEqual(2)
   })
 })

@@ -46,7 +46,7 @@ async function main(): Promise<void> {
   await getMacroCategoriesWithAttributes(readModel)
 
   const [
-    publishedEServicesMetric,
+    publishedEServices,
     macroCategoriesPublishedEServicesMetric,
     top10MostSubscribedEServicesMetric,
     top10ProviderWithMostSubscriberMetric,
@@ -74,7 +74,7 @@ async function main(): Promise<void> {
   log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
   const output = Metrics.parse({
-    publishedEServicesMetric,
+    publishedEServices,
     macroCategoriesPublishedEServicesMetric,
     top10MostSubscribedEServicesMetric,
     top10ProviderWithMostSubscriberMetric,

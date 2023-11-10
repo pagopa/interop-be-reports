@@ -1,38 +1,55 @@
 import { EServiceDescriptor, ReadModelClient } from '@interop-be-reports/commons'
 import { PublishedEServicesMetric } from '../models/metrics.model.js'
+import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
+import { Document } from 'mongodb'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3744
  **/
 export async function getPublishedEServicesMetric(readModel: ReadModelClient): Promise<PublishedEServicesMetric> {
-  const publishedEServicesCount = await readModel.eservices.countDocuments({
+  const oneMonthAgoDate = getMonthsAgoDate(1)
+  const twoMonthsAgoDate = getMonthsAgoDate(2)
+
+  const publishedEServiceFilter: Document = {
     'data.descriptors.state': {
       $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
     },
-  })
+  }
 
-  const oneMonthAgo = new Date()
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+  const publishedEServicesCountPromise = readModel.eservices.countDocuments(publishedEServiceFilter)
 
-  const lastMonthPublishedEServicesCount = await readModel.eservices.countDocuments({
-    'data.descriptors.state': {
-      $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
-    },
+  const lastMonthPublishedEServicesCountPromise = readModel.eservices.countDocuments({
+    ...publishedEServiceFilter,
     'data.descriptors': {
       $elemMatch: {
         version: '1',
         publishedAt: {
-          $gte: oneMonthAgo.toISOString(),
+          $gte: oneMonthAgoDate.toISOString(),
         },
       },
     },
   })
 
-  const variation = (lastMonthPublishedEServicesCount / publishedEServicesCount) * 100
-
-  return PublishedEServicesMetric.parse({
-    publishedEServicesCount,
-    lastMonthPublishedEServicesCount,
-    variation: Number(variation.toFixed(1)),
+  const twoMonthsAgoPublishedEServicesCountPromise = readModel.eservices.countDocuments({
+    ...publishedEServiceFilter,
+    'data.descriptors': {
+      $elemMatch: {
+        version: '1',
+        publishedAt: {
+          $lte: oneMonthAgoDate.toISOString(),
+          $gte: twoMonthsAgoDate.toISOString(),
+        },
+      },
+    },
   })
+
+  const [count, lastMonthCount, twoMonthsAgoPublishedEServicesCount] = await Promise.all([
+    publishedEServicesCountPromise,
+    lastMonthPublishedEServicesCountPromise,
+    twoMonthsAgoPublishedEServicesCountPromise,
+  ])
+
+  const variation = getVariationPercentage(lastMonthCount, twoMonthsAgoPublishedEServicesCount)
+
+  return PublishedEServicesMetric.parse({ count, lastMonthCount, variation })
 }
