@@ -59,7 +59,7 @@ describe('getTenantSignupsTrendMetric', () => {
     ]
 
     const attributes = [
-      { data: { id: comuneAttributeUuid, code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'> } },
+      { data: { id: comuneAttributeUuid, code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'> } },
       {
         data: {
           id: aziendaOspedalieraAttributeUuid,
@@ -74,7 +74,7 @@ describe('getTenantSignupsTrendMetric', () => {
     const result = await getTenantSignupsTrendMetric(readModelMock)
 
     const comuniMetric = result.fromTheBeginning.find(
-      (metric) => metric.name === ('Comuni e città metropolitane' satisfies MacroCategoryName)
+      (metric) => metric.name === ('Comuni' satisfies MacroCategoryName)
     )
 
     const aziendeOspedaliereMetric = result.fromTheBeginning.find(

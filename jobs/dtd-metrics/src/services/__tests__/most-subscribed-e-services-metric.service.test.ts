@@ -176,7 +176,7 @@ describe('getMostSubscribedEServicesMetric', () => {
       {
         data: getAttributeMock({
           id: comuneAttributeUuid,
-          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
+          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
         }),
       },
       {

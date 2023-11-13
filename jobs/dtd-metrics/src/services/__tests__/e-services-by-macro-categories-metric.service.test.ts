@@ -80,13 +80,13 @@ describe('getEServicesByMacroCategoriesMetric', () => {
       {
         data: getAttributeMock({
           id: 'attribute-comune',
-          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
+          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
         }),
       },
       {
         data: getAttributeMock({
           id: 'attribute-altra-pub-amm-loc-1',
-          code: 'C16' satisfies MacroCategoryCodeFor<'Pubbliche Amministrazioni Centrali'>,
+          code: 'C11' satisfies MacroCategoryCodeFor<'Pubbliche Amministrazioni Centrali'>,
         }),
       },
       {
@@ -109,7 +109,7 @@ describe('getEServicesByMacroCategoriesMetric', () => {
       result.find((a) => (a.name as MacroCategoryName) === 'Pubbliche Amministrazioni Centrali')?.count
     ).toStrictEqual(2)
 
-    expect(result.find((a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane')?.count).toStrictEqual(2)
+    expect(result.find((a) => (a.name as MacroCategoryName) === 'Comuni')?.count).toStrictEqual(2)
     expect(result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')?.count).toStrictEqual(1)
   })
 })

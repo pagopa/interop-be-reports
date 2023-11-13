@@ -89,7 +89,7 @@ describe('getTopProducersBySubscribersMetric', () => {
       {
         data: getAttributeMock({
           id: comuneAttributeUuid,
-          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni e città metropolitane'>,
+          code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
           kind: 'Certified',
         }),
       },
@@ -107,9 +107,7 @@ describe('getTopProducersBySubscribersMetric', () => {
     const producer1 = result.fromTheBeginning[0]
     expect(producer1.producerName).toStrictEqual('Producer 1')
 
-    const producer1Comuni = producer1.macroCategories.find(
-      (a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane'
-    )
+    const producer1Comuni = producer1.macroCategories.find((a) => (a.name as MacroCategoryName) === 'Comuni')
 
     const producer1AziendeOspedaliere = producer1.macroCategories.find(
       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
@@ -120,9 +118,7 @@ describe('getTopProducersBySubscribersMetric', () => {
 
     const producer2 = result.fromTheBeginning[1]
     expect(producer2.producerName).toStrictEqual('Producer 2')
-    const producer2Comuni = producer2.macroCategories.find(
-      (a) => (a.name as MacroCategoryName) === 'Comuni e città metropolitane'
-    )
+    const producer2Comuni = producer2.macroCategories.find((a) => (a.name as MacroCategoryName) === 'Comuni')
     const producer2AziendeOspedaliere = producer2.macroCategories.find(
       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
     )
