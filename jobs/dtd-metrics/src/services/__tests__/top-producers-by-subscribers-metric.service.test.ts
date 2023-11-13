@@ -119,6 +119,6 @@ describe('getTopProducersBySubscribersMetric', () => {
       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
     )
     expect(producer2Comuni?.subscribersCount).toStrictEqual(1)
-    expect(producer2AziendeOspedaliere?.subscribersCount).toStrictEqual(0)
+    expect(producer2AziendeOspedaliere?.subscribersCount).toBeUndefined()
   })
 })

@@ -128,6 +128,7 @@ describe('getMostSubscribedEServicesMetric', () => {
         data: getTenantMock({
           id: producerUuid,
           name: 'Producer',
+          attributes: [{ id: comuneAttributeUuid, type: 'PersistentCertifiedAttribute' }],
         }),
       },
       {

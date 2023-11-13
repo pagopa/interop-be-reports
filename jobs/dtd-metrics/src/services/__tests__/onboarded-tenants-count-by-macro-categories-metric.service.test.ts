@@ -1,4 +1,4 @@
-import { getTenantMock } from '@interop-be-reports/commons'
+import { Tenant, getAttributeMock, getTenantMock } from '@interop-be-reports/commons'
 import { randomUUID } from 'crypto'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { sub } from 'date-fns'
@@ -53,17 +53,47 @@ describe('getOnboardedTenantsCountByMacroCategoriesMetric', () => {
       },
     ]
 
-    const attributes = [
-      { data: { id: comuneAttributeUuid, code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'> } },
+    const getNotOnboardedTenantMock = (createdAt: string, attributeId: string): Tenant => {
+      const tenant = getTenantMock<Tenant>({
+        createdAt,
+        attributes: [{ id: attributeId }],
+      })
+      delete tenant.selfcareId
+      return tenant
+    }
+
+    const notOnboardedTenants = [
       {
-        data: {
-          id: aziendaOspedalieraAttributeUuid,
-          code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
-        },
+        data: getNotOnboardedTenantMock(oneMonthAgoDate, comuneAttributeUuid),
+      },
+      {
+        data: getNotOnboardedTenantMock(oneMonthAgoDate, comuneAttributeUuid),
+      },
+      {
+        data: getNotOnboardedTenantMock(sixMonthsAgoDate, comuneAttributeUuid),
+      },
+      {
+        data: getNotOnboardedTenantMock(sixMonthsAgoDate, aziendaOspedalieraAttributeUuid),
+      },
+      {
+        data: getNotOnboardedTenantMock(oneYearAgoDate, aziendaOspedalieraAttributeUuid),
+      },
+      {
+        data: getNotOnboardedTenantMock(oneYearAgoDate, aziendaOspedalieraAttributeUuid),
       },
     ]
 
-    await seedCollection('tenants', oboardedTenants)
+    const attributes = [
+      { data: getAttributeMock({ id: comuneAttributeUuid, code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'> }) },
+      {
+        data: getAttributeMock({
+          id: aziendaOspedalieraAttributeUuid,
+          code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
+        }),
+      },
+    ]
+
+    await seedCollection('tenants', [...oboardedTenants, ...notOnboardedTenants])
     await seedCollection('attributes', attributes)
 
     const globalStore = await GlobalStoreService.init(readModelMock)
