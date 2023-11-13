@@ -104,6 +104,7 @@ export async function getTopProducersBySubscribersMetric(
             b.macroCategories.reduce((curr, prev) => curr + prev.subscribersCount, 0) -
             a.macroCategories.reduce((curr, prev) => curr + prev.subscribersCount, 0)
         )
+        .slice(0, 10)
     )
   }
 
