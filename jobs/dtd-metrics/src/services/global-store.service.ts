@@ -1,4 +1,4 @@
-import { Attribute, ReadModelClient, SafeMap } from '@interop-be-reports/commons'
+import { Attribute, ReadModelClient } from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import { MacroCategories, MacroCategory } from '../models/macro-categories.model.js'
 import { z } from 'zod'
@@ -15,21 +15,21 @@ type GlobalStoreTenant = z.infer<typeof GlobalStoreTenant>
 export class GlobalStoreService {
   tenants: Array<GlobalStoreTenant>
   onboardedTenants: Array<GlobalStoreTenant>
-  tenantsMap: SafeMap<string, GlobalStoreTenant>
+  tenantsMap: Map<string, GlobalStoreTenant>
   macroCategories: MacroCategories
 
   public getMacroCategoryFromTenantId(tenantId: string): MacroCategory | undefined {
     return this.macroCategories.find(({ tenantsIds }) => tenantsIds.has(tenantId))
   }
 
-  public getTenantFromId(tenantId: string): GlobalStoreTenant {
+  public getTenantFromId(tenantId: string): GlobalStoreTenant | undefined {
     return this.tenantsMap.get(tenantId)
   }
 
   private constructor(tenants: Array<GlobalStoreTenant>, macroCategories: MacroCategories) {
     this.tenants = tenants
-    this.tenantsMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant]))
     this.onboardedTenants = tenants.filter(({ selfcareId }) => !!selfcareId)
+    this.tenantsMap = new Map(tenants.map((tenant) => [tenant.id, tenant]))
     this.macroCategories = macroCategories
   }
 

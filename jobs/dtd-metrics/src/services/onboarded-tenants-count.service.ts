@@ -16,8 +16,6 @@ export async function getOnboardedTenantsCountMetric(
     (tenant) => tenant.createdAt >= twoMonthsAgoDate && tenant.createdAt <= oneMonthAgoDate
   ).length
 
-  console.log(lastMonthTenantsCount, twoMonthsAgoTenantsCount)
-
   const variation = getVariationPercentage(lastMonthTenantsCount, twoMonthsAgoTenantsCount)
 
   return { totalTenantsCount, lastMonthTenantsCount, variation }

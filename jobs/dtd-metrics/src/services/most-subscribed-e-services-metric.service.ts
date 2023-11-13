@@ -74,18 +74,24 @@ export async function getMostSubscribedEServicesMetric(
    * { [eserviceId]: { producerId, eserviceName, producerName, agreements: [ { macrocategoryId, consumerName } ] } }
    */
   const eservicesMap = agreements.reduce<EServiceMap>((acc, next) => {
+    const consumer = globalStore.getTenantFromId(next.consumerId)
+    const producer = globalStore.getTenantFromId(next.producerId)
+    const macrocategoryId = globalStore.getMacroCategoryFromTenantId(next.consumerId)?.id
+
+    if (!consumer || !macrocategoryId || !producer) {
+      console.log(consumer, producer)
+      return acc
+    }
+
     // If it's the first time we meet this eservice id, initialize a new array
     if (!acc[next.eserviceId]) {
       acc[next.eserviceId] = {
         producerId: next.producerId,
         eserviceName: next.eserviceName,
-        producerName: globalStore.getTenantFromId(next.producerId).name,
+        producerName: producer.name,
         agreements: [],
       }
     }
-
-    const consumer = globalStore.getTenantFromId(next.consumerId)
-    const macrocategoryId = globalStore.getMacroCategoryFromTenantId(next.consumerId)?.id
 
     // Add to the array the macrocategory this tenant belongs to
     acc[next.eserviceId].agreements.push({
