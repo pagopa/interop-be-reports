@@ -1,11 +1,11 @@
 import { AgreementState, ReadModelClient, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
 import { TopProducersBySubscribersMetric } from '../models/metrics.model.js'
-import { getMacroCategoriesWithAttributes, getMonthsAgoDate } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { z } from 'zod'
+import { GlobalStoreService } from './global-store.service.js'
 
 const ProducerAgreement = z.object({
   consumerId: z.string(),
-  certifiedAttributes: z.array(z.string()),
   createdAt: z.coerce.date(),
 })
 
@@ -18,14 +18,9 @@ const ProducerAgreements = z.object({
  * @see https://pagopa.atlassian.net/browse/PIN-3747
  */
 export async function getTopProducersBySubscribersMetric(
-  readModel: ReadModelClient
+  readModel: ReadModelClient,
+  globalStore: GlobalStoreService
 ): Promise<TopProducersBySubscribersMetric> {
-  const macroCategoriesWithAttributes = await getMacroCategoriesWithAttributes(readModel)
-
-  const allMacroCategoriesAttributeIds = macroCategoriesWithAttributes
-    .map((macro) => macro.attributes.map((a) => a.id))
-    .flat()
-
   const sixMonthsAgoDate = getMonthsAgoDate(6)
   const twelveMonthsAgoDate = getMonthsAgoDate(12)
   const fromTheBeginningDate = undefined
@@ -40,9 +35,6 @@ export async function getTopProducersBySubscribersMetric(
           'data.state': {
             $in: ['Active', 'Suspended'] satisfies Array<AgreementState>,
           },
-          'data.certifiedAttributes': {
-            $elemMatch: { id: { $in: allMacroCategoriesAttributeIds } },
-          },
         },
       },
       {
@@ -51,7 +43,6 @@ export async function getTopProducersBySubscribersMetric(
           agreements: {
             $push: {
               consumerId: '$data.consumerId',
-              certifiedAttributes: '$data.certifiedAttributes.id',
               createdAt: '$data.createdAt',
             },
           },
@@ -84,30 +75,27 @@ export async function getTopProducersBySubscribersMetric(
         .map((producer) => {
           return {
             producerName: producer.name,
-            macroCategories: macroCategoriesWithAttributes.map((macroCategory) => {
-              /**
-               * Filter out agreements that not belong to the macro category or that are not
-               * created after the given date
-               */
-              const macroCategoryAgreements = producer.agreements.filter((agreement) => {
-                const macroCategoryAttributesIds = macroCategory.attributes.map((a) => a.id)
+            macroCategories: globalStore.macroCategories
+              .map((macroCategory) => {
+                /**
+                 * Filter out agreements that not belong to the macro category or that are not
+                 * created after the given date
+                 */
+                const macroCategoryAgreements = producer.agreements.filter((agreement) => {
+                  const isInMacroCategory = macroCategory.tenantsIds.has(agreement.consumerId)
+                  const isCreatedAfterDate = date ? agreement.createdAt >= date : true
 
-                const isInMacroCategory = agreement.certifiedAttributes.some((a) =>
-                  macroCategoryAttributesIds.includes(a)
-                )
+                  return isInMacroCategory && isCreatedAfterDate
+                })
 
-                const isCreatedAfterDate = date ? agreement.createdAt > date : true
+                /**
+                 * Count the number of subscribers
+                 * */
+                const subscribersCount = new Set(macroCategoryAgreements.map((a) => a.consumerId)).size
 
-                return isInMacroCategory && isCreatedAfterDate
+                return { id: macroCategory.id, name: macroCategory.name, subscribersCount }
               })
-
-              /**
-               * Count the number of subscribers
-               * */
-              const subscribersCount = new Set(macroCategoryAgreements.map((a) => a.consumerId)).size
-
-              return { id: macroCategory.id, name: macroCategory.name, subscribersCount }
-            }),
+              .filter((macroCategory) => macroCategory.subscribersCount > 0),
           }
         })
         /**
@@ -118,6 +106,7 @@ export async function getTopProducersBySubscribersMetric(
             b.macroCategories.reduce((curr, prev) => curr + prev.subscribersCount, 0) -
             a.macroCategories.reduce((curr, prev) => curr + prev.subscribersCount, 0)
         )
+        .slice(0, 10)
     )
   }
 

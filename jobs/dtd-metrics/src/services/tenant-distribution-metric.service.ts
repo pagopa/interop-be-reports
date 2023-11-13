@@ -1,14 +1,13 @@
 import { AgreementState, ReadModelClient } from '@interop-be-reports/commons'
 import { TenantDistributionMetric } from '../models/metrics.model.js'
 import { z } from 'zod'
+import { GlobalStoreService } from './global-store.service.js'
 
-export async function getTenantDistributionMetric(readModel: ReadModelClient): Promise<TenantDistributionMetric> {
-  const onBoardedTenantIdsQueryPromise = readModel.tenants
-    .find({ 'data.selfcareId': { $exists: true } }, { projection: { _id: 0, 'data.id': 1 } })
-    .map(({ data }) => z.string().parse(data.id))
-    .toArray()
-
-  const activeAgreementsQueryPromise = readModel.agreements
+export async function getTenantDistributionMetric(
+  readModel: ReadModelClient,
+  globalStore: GlobalStoreService
+): Promise<TenantDistributionMetric> {
+  const activeAgreements = await readModel.agreements
     .find(
       { 'data.state': { $in: ['Active', 'Suspended'] satisfies Array<AgreementState> } },
       {
@@ -28,11 +27,6 @@ export async function getTenantDistributionMetric(readModel: ReadModelClient): P
         .parse(data)
     )
     .toArray()
-
-  const [onBoardedTenantIds, activeAgreements] = await Promise.all([
-    onBoardedTenantIdsQueryPromise,
-    activeAgreementsQueryPromise,
-  ])
 
   const agreementsConsumersIds = new Set(activeAgreements.map((agreement) => agreement.consumerId))
   const agreementsProducersIds = new Set(activeAgreements.map((agreement) => agreement.producerId))
@@ -63,14 +57,14 @@ export async function getTenantDistributionMetric(readModel: ReadModelClient): P
   }
 
   // The label is misleading, this is actually the number of onboarded tenants that are neither consumers nor producers
-  const onlyFirstAccess: TenantDistributionItem = { 
+  const onlyFirstAccess: TenantDistributionItem = {
     label: 'Solo primo accesso',
     count: 0,
   }
 
-  function resolveTenantDistribution(tenantId: string): void {
-    const isTenantProducer = checkIsProducer(tenantId)
-    const isTenantConsumer = checkIsConsumer(tenantId)
+  function resolveTenantDistribution<TTenant extends { id: string }>({ id }: TTenant): void {
+    const isTenantProducer = checkIsProducer(id)
+    const isTenantConsumer = checkIsConsumer(id)
 
     if (isTenantProducer && isTenantConsumer) bothConsumersAndProducers.count++
     else if (isTenantProducer) onlyProducers.count++
@@ -78,7 +72,7 @@ export async function getTenantDistributionMetric(readModel: ReadModelClient): P
     else onlyFirstAccess.count++
   }
 
-  onBoardedTenantIds.forEach(resolveTenantDistribution)
+  globalStore.onboardedTenants.forEach(resolveTenantDistribution)
 
   return [onlyConsumers, onlyProducers, bothConsumersAndProducers, onlyFirstAccess]
 }

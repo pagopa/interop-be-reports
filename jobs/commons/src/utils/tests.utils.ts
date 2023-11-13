@@ -1,6 +1,7 @@
 import cloneDeep from 'lodash/cloneDeep.js'
 import merge from 'lodash/merge.js'
 import { EService, Attribute, Tenant, Agreement, Purpose } from '../models/index.js'
+import { randomUUID } from 'crypto'
 
 /**
  * Create and returns a mock factory function
@@ -103,6 +104,7 @@ export const getAttributeMock = createMockFactory<Attribute>({
 export const getTenantMock = createMockFactory<Tenant>({
   id: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
   name: 'Nome produttore 1',
+  selfcareId: randomUUID(),
   attributes: [],
   createdAt: new Date(),
   externalId: {

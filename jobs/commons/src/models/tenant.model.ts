@@ -37,11 +37,7 @@ export const TenantDeclaredAttribute = z.object({
   type: z.literal('PersistentDeclaredAttribute'),
 })
 
-export const TenantAttribute = z.union([
-  TenantCertifiedAttribute,
-  TenantVerifiedAttribute,
-  TenantDeclaredAttribute,
-])
+export const TenantAttribute = z.union([TenantCertifiedAttribute, TenantVerifiedAttribute, TenantDeclaredAttribute])
 
 export const ExternalId = z.object({
   origin: z.string(),
@@ -64,10 +60,7 @@ export const PersistentTenantFeatureOther = z.object({
   type: z.string(),
 })
 
-export const PersistentTenantFeature = z.union([
-  PersistentTenantFeatureCertifier,
-  PersistentTenantFeatureOther,
-])
+export const PersistentTenantFeature = z.union([PersistentTenantFeatureCertifier, PersistentTenantFeatureOther])
 
 export const Tenant = z.object({
   id: z.string().uuid(),
@@ -76,8 +69,8 @@ export const Tenant = z.object({
   externalId: ExternalId,
   features: z.array(PersistentTenantFeature),
   attributes: z.array(TenantAttribute),
-  createdAt: z.string().pipe(z.coerce.date()),
-  updatedAt: z.string().pipe(z.coerce.date()).optional(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date().optional(),
   mails: z.array(TenantMail),
   name: z.string(),
 })

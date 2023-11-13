@@ -2,6 +2,7 @@ import { getAgreementMock, getAttributeMock, getTenantMock } from '@interop-be-r
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { getTopProducersBySubscribersMetric } from '../top-producers-by-subscribers-metric.service.js'
 import { randomUUID } from 'crypto'
+import { GlobalStoreService } from '../global-store.service.js'
 
 const producer1Uuid = randomUUID()
 const producer2Uuid = randomUUID()
@@ -17,42 +18,36 @@ describe('getTopProducersBySubscribersMetric', () => {
         data: getAgreementMock({
           producerId: producer1Uuid,
           consumerId: comuneConsumerUuid,
-          certifiedAttributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getAgreementMock({
           producerId: producer1Uuid,
           consumerId: comuneConsumerUuid,
-          certifiedAttributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getAgreementMock({
           producerId: producer2Uuid,
           consumerId: comuneConsumerUuid,
-          certifiedAttributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getAgreementMock({
           producerId: producer1Uuid,
           consumerId: aziendaOspedalieraConsumerUuid,
-          certifiedAttributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
       },
       {
         data: getAgreementMock({
           producerId: producer1Uuid,
           consumerId: aziendaOspedalieraConsumerUuid,
-          certifiedAttributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
       },
       {
         data: getAgreementMock({
           producerId: producer2Uuid,
           consumerId: aziendaOspedalieraConsumerUuid,
-          certifiedAttributes: [{ id: aziendaOspedalieraAttributeUuid }],
           state: 'Pending',
         }),
       },
@@ -73,7 +68,7 @@ describe('getTopProducersBySubscribersMetric', () => {
       },
       {
         data: getTenantMock({
-          id: comuneAttributeUuid,
+          id: comuneConsumerUuid,
           attributes: [{ id: comuneAttributeUuid, type: 'PersistentCertifiedAttribute' }],
         }),
       },
@@ -102,7 +97,8 @@ describe('getTopProducersBySubscribersMetric', () => {
       },
     ])
 
-    const result = await getTopProducersBySubscribersMetric(readModelMock)
+    const globalStore = await GlobalStoreService.init(readModelMock)
+    const result = await getTopProducersBySubscribersMetric(readModelMock, globalStore)
 
     const producer1 = result.fromTheBeginning[0]
     expect(producer1.producerName).toStrictEqual('Producer 1')
@@ -123,6 +119,6 @@ describe('getTopProducersBySubscribersMetric', () => {
       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
     )
     expect(producer2Comuni?.subscribersCount).toStrictEqual(1)
-    expect(producer2AziendeOspedaliere?.subscribersCount).toStrictEqual(0)
+    expect(producer2AziendeOspedaliere?.subscribersCount).toBeUndefined()
   })
 })

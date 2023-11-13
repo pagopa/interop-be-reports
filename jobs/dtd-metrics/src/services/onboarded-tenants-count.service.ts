@@ -1,35 +1,20 @@
-import { ReadModelClient } from '@interop-be-reports/commons'
 import { OnboardedTenantsCountMetric } from '../models/metrics.model.js'
 import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
-import { Document } from 'mongodb'
+import { GlobalStoreService } from './global-store.service.js'
 
-export async function getOnboardedTenantsCountMetric(readModel: ReadModelClient): Promise<OnboardedTenantsCountMetric> {
-  const isTenantOnboardedFilter: Document = {
-    'data.selfcareId': { $exists: true },
-  }
+export async function getOnboardedTenantsCountMetric(
+  globalStore: GlobalStoreService
+): Promise<OnboardedTenantsCountMetric> {
+  const oneMonthAgoDate = getMonthsAgoDate(1)
+  const twoMonthsAgoDate = getMonthsAgoDate(2)
 
-  const totalTenantsCountPromise = readModel.tenants.countDocuments(isTenantOnboardedFilter)
-  const lastMonthTenantsCountPromise = readModel.tenants.countDocuments({
-    // TODO this should be 'onboardedAt', for now we use 'createdAt'
-    'data.createdAt': {
-      $gte: getMonthsAgoDate(1).toISOString(),
-    },
-    ...isTenantOnboardedFilter,
-  })
-  const twoMonthsAgoTenantsCountPromise = readModel.tenants.countDocuments({
-    // TODO this should be 'onboardedAt', for now we use 'createdAt'
-    'data.createdAt': {
-      $lte: getMonthsAgoDate(1).toISOString(),
-      $gte: getMonthsAgoDate(2).toISOString(),
-    },
-    ...isTenantOnboardedFilter,
-  })
-
-  const [totalTenantsCount, lastMonthTenantsCount, twoMonthsAgoTenantsCount] = await Promise.all([
-    totalTenantsCountPromise,
-    lastMonthTenantsCountPromise,
-    twoMonthsAgoTenantsCountPromise,
-  ])
+  const totalTenantsCount = globalStore.onboardedTenants.length
+  const lastMonthTenantsCount = globalStore.onboardedTenants.filter(
+    (tenant) => tenant.createdAt >= oneMonthAgoDate
+  ).length
+  const twoMonthsAgoTenantsCount = globalStore.onboardedTenants.filter(
+    (tenant) => tenant.createdAt >= twoMonthsAgoDate && tenant.createdAt <= oneMonthAgoDate
+  ).length
 
   const variation = getVariationPercentage(lastMonthTenantsCount, twoMonthsAgoTenantsCount)
 
