@@ -1,17 +1,17 @@
 import { ReadPreferenceMode } from 'mongodb'
 import { AwsS3BucketClient, ReadModelClient, withExecutionTime } from '@interop-be-reports/commons'
 import { env } from './configs/env.js'
-import { MetricsOutput, MetricsQueriesResult } from './models/metrics.model.js'
+import { MetricsOutput } from './models/metrics.model.js'
 import {
   getPublishedEServicesMetric,
   getEServicesByMacroCategoriesMetric,
   getMostSubscribedEServicesMetric,
   getTopProducersBySubscribersMetric,
-  getOnboardedTenantsCountMetric,
-  getTenantDistributionMetric,
-  getTenantSignupsTrendMetric,
-  getOnboardedTenantsCountByMacroCategoriesMetric,
   getTopProducersMetric,
+  // getOnboardedTenantsCountMetric,
+  // getTenantDistributionMetric,
+  // getTenantSignupsTrendMetric,
+  // getOnboardedTenantsCountByMacroCategoriesMetric,
 } from './services/index.js'
 import { GithubClient } from './services/github-client.service.js'
 import { wrapPromiseWithLogs } from './utils/helpers.utils.js'
@@ -45,22 +45,37 @@ async function main(): Promise<void> {
   const globalStore = await GlobalStoreService.init(readModel)
   log('Global store initialized!\n')
 
-  const queriesResult: MetricsQueriesResult = await Promise.all([
-    wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServices'),
-    wrapPromiseWithLogs(getEServicesByMacroCategoriesMetric(readModel), 'eservicesByMacroCategories'),
-    wrapPromiseWithLogs(getMostSubscribedEServicesMetric(readModel, globalStore), 'mostSubscribedEServices'),
-    wrapPromiseWithLogs(getTopProducersBySubscribersMetric(readModel, globalStore), 'topProducersBySubscribers'),
-    wrapPromiseWithLogs(getOnboardedTenantsCountMetric(globalStore), 'onboardedTenantsCount'),
-    wrapPromiseWithLogs(getTenantDistributionMetric(readModel, globalStore), 'tenantDistribution'),
-    wrapPromiseWithLogs(getTenantSignupsTrendMetric(globalStore), 'tenantSignupsTrend'),
-    wrapPromiseWithLogs(
-      getOnboardedTenantsCountByMacroCategoriesMetric(globalStore),
-      'onboardedTenantsCountByMacroCategories'
+  const output = MetricsOutput.parse({
+    // --- FIRST BATCH ---
+    publishedEServices: await wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServices'),
+    eservicesByMacroCategories: await wrapPromiseWithLogs(
+      getEServicesByMacroCategoriesMetric(readModel),
+      'eservicesByMacroCategories'
     ),
-    wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducers'),
-  ])
-
-  const output = MetricsOutput.parse(queriesResult)
+    mostSubscribedEServices: await wrapPromiseWithLogs(
+      getMostSubscribedEServicesMetric(readModel, globalStore),
+      'mostSubscribedEServices'
+    ),
+    topProducersBySubscribers: await wrapPromiseWithLogs(
+      getTopProducersBySubscribersMetric(readModel, globalStore),
+      'topProducersBySubscribers'
+    ),
+    topProducers: await wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducers'),
+    // --- SECOND BATCH ---
+    // onboardedTenantsCount: await wrapPromiseWithLogs(
+    //   getOnboardedTenantsCountMetric(globalStore),
+    //   'onboardedTenantsCount'
+    // ),
+    // onboardedTenantsCount: await wrapPromiseWithLogs(
+    //   getTenantDistributionMetric(readModel, globalStore),
+    //   'tenantDistribution'
+    // ),
+    // tenantSignupsTrend: await wrapPromiseWithLogs(getTenantSignupsTrendMetric(globalStore), 'tenantSignupsTrend'),
+    // onboardedTenantsCountByMacroCategories: await wrapPromiseWithLogs(
+    //   getOnboardedTenantsCountByMacroCategoriesMetric(globalStore),
+    //   'onboardedTenantsCountByMacroCategories'
+    // ),
+  } satisfies MetricsOutput)
 
   log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
