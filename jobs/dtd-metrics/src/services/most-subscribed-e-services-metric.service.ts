@@ -78,10 +78,7 @@ export async function getMostSubscribedEServicesMetric(
     const producer = globalStore.getTenantFromId(next.producerId)
     const macrocategoryId = globalStore.getMacroCategoryFromTenantId(next.consumerId)?.id
 
-    if (!consumer || !macrocategoryId || !producer) {
-      console.log(consumer, producer)
-      return acc
-    }
+    if (!consumer || !macrocategoryId || !producer) return acc
 
     // If it's the first time we meet this eservice id, initialize a new array
     if (!acc[next.eserviceId]) {
