@@ -75,25 +75,27 @@ export async function getTopProducersBySubscribersMetric(
         .map((producer) => {
           return {
             producerName: producer.name,
-            macroCategories: globalStore.macroCategories.map((macroCategory) => {
-              /**
-               * Filter out agreements that not belong to the macro category or that are not
-               * created after the given date
-               */
-              const macroCategoryAgreements = producer.agreements.filter((agreement) => {
-                const isInMacroCategory = macroCategory.tenantsIds.has(agreement.consumerId)
-                const isCreatedAfterDate = date ? agreement.createdAt >= date : true
+            macroCategories: globalStore.macroCategories
+              .map((macroCategory) => {
+                /**
+                 * Filter out agreements that not belong to the macro category or that are not
+                 * created after the given date
+                 */
+                const macroCategoryAgreements = producer.agreements.filter((agreement) => {
+                  const isInMacroCategory = macroCategory.tenantsIds.has(agreement.consumerId)
+                  const isCreatedAfterDate = date ? agreement.createdAt >= date : true
 
-                return isInMacroCategory && isCreatedAfterDate
+                  return isInMacroCategory && isCreatedAfterDate
+                })
+
+                /**
+                 * Count the number of subscribers
+                 * */
+                const subscribersCount = new Set(macroCategoryAgreements.map((a) => a.consumerId)).size
+
+                return { id: macroCategory.id, name: macroCategory.name, subscribersCount }
               })
-
-              /**
-               * Count the number of subscribers
-               * */
-              const subscribersCount = new Set(macroCategoryAgreements.map((a) => a.consumerId)).size
-
-              return { id: macroCategory.id, name: macroCategory.name, subscribersCount }
-            }),
+              .filter((macroCategory) => macroCategory.subscribersCount > 0),
           }
         })
         /**
