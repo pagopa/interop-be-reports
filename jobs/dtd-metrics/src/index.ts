@@ -49,7 +49,7 @@ async function main(): Promise<void> {
     // --- FIRST BATCH ---
     publishedEServices: await wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServices'),
     eservicesByMacroCategories: await wrapPromiseWithLogs(
-      getEServicesByMacroCategoriesMetric(readModel),
+      getEServicesByMacroCategoriesMetric(readModel, globalStore),
       'eservicesByMacroCategories'
     ),
     mostSubscribedEServices: await wrapPromiseWithLogs(
