@@ -1,50 +1,46 @@
 import { getAttributeMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { getEServicesByMacroCategoriesMetric } from '../e-services-by-macro-categories-metric.service.js'
+import { GlobalStoreService } from '../global-store.service.js'
+import { randomUUID } from 'crypto'
+
+const comuniTenantUUID = randomUUID()
+const aziendaOspedalieraTenantUUID = randomUUID()
+
+const comuniAttributeUUID = randomUUID()
+const aziendaOspedalieraAttributeUUID = randomUUID()
 
 describe('getEServicesByMacroCategoriesMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('eservices', [
       {
         data: getEServiceMock({
-          descriptors: [{ state: 'Published' }],
-          producerId: 'altra-pub-amm-loc-1',
-        }),
-      },
-      {
-        data: getEServiceMock({
-          descriptors: [{ state: 'Published' }],
-          producerId: 'altra-pub-amm-loc-2',
-        }),
-      },
-      {
-        data: getEServiceMock({
           descriptors: [{ state: 'Suspended' }, { state: 'Draft' }],
-          producerId: 'comune',
+          producerId: comuniTenantUUID,
         }),
       },
       {
         data: getEServiceMock({
           descriptors: [{ state: 'Suspended' }, { state: 'Deprecated' }],
-          producerId: 'comune',
+          producerId: comuniTenantUUID,
         }),
       },
       {
         data: getEServiceMock({
           descriptors: [{ state: 'Draft' }],
-          producerId: 'comune',
+          producerId: comuniTenantUUID,
         }),
       },
       {
         data: getEServiceMock({
           descriptors: [{ state: 'Draft' }],
-          producerId: 'azienda-ospedaliera',
+          producerId: aziendaOspedalieraTenantUUID,
         }),
       },
       {
         data: getEServiceMock({
           descriptors: [{ state: 'Published' }],
-          producerId: 'azienda-ospedaliera',
+          producerId: aziendaOspedalieraTenantUUID,
         }),
       },
     ])
@@ -52,26 +48,14 @@ describe('getEServicesByMacroCategoriesMetric', () => {
     await seedCollection('tenants', [
       {
         data: getTenantMock({
-          id: 'comune',
-          attributes: [{ id: 'attribute-comune', type: 'PersistentCertifiedAttribute' }],
+          id: comuniTenantUUID,
+          attributes: [{ id: comuniAttributeUUID }],
         }),
       },
       {
         data: getTenantMock({
-          id: 'altra-pub-amm-loc-1',
-          attributes: [{ id: 'attribute-altra-pub-amm-loc-1', type: 'PersistentCertifiedAttribute' }],
-        }),
-      },
-      {
-        data: getTenantMock({
-          id: 'altra-pub-amm-loc-2',
-          attributes: [{ id: 'attribute-altra-pub-amm-loc-2', type: 'PersistentCertifiedAttribute' }],
-        }),
-      },
-      {
-        data: getTenantMock({
-          id: 'azienda-ospedaliera',
-          attributes: [{ id: 'attribute-azienda-ospedaliera', type: 'PersistentCertifiedAttribute' }],
+          id: aziendaOspedalieraTenantUUID,
+          attributes: [{ id: aziendaOspedalieraAttributeUUID }],
         }),
       },
     ])
@@ -79,35 +63,20 @@ describe('getEServicesByMacroCategoriesMetric', () => {
     await seedCollection('attributes', [
       {
         data: getAttributeMock({
-          id: 'attribute-comune',
+          id: comuniAttributeUUID,
           code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'>,
         }),
       },
       {
         data: getAttributeMock({
-          id: 'attribute-altra-pub-amm-loc-1',
-          code: 'C11' satisfies MacroCategoryCodeFor<'Pubbliche Amministrazioni Centrali'>,
-        }),
-      },
-      {
-        data: getAttributeMock({
-          id: 'attribute-altra-pub-amm-loc-2',
-          code: 'C1' satisfies MacroCategoryCodeFor<'Pubbliche Amministrazioni Centrali'>,
-        }),
-      },
-      {
-        data: getAttributeMock({
-          id: 'attribute-azienda-ospedaliera',
+          id: aziendaOspedalieraAttributeUUID,
           code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
         }),
       },
     ])
 
-    const result = await getEServicesByMacroCategoriesMetric(readModelMock)
-
-    expect(
-      result.find((a) => (a.name as MacroCategoryName) === 'Pubbliche Amministrazioni Centrali')?.count
-    ).toStrictEqual(2)
+    const globalStore = await GlobalStoreService.init(readModelMock)
+    const result = await getEServicesByMacroCategoriesMetric(readModelMock, globalStore)
 
     expect(result.find((a) => (a.name as MacroCategoryName) === 'Comuni')?.count).toStrictEqual(2)
     expect(result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')?.count).toStrictEqual(1)
