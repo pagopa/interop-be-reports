@@ -17,17 +17,12 @@ export async function getEServices(readModel: ReadModelClient): Promise<Array<ES
         },
       },
       {
-        $project: {
-          id: '$data.id',
-          name: '$data.name',
-          description: '$data.description',
-          technology: '$data.technology',
-          producerName: { $arrayElemAt: ['$producer.data.name', 0] },
-          descriptors: '$data.descriptors',
+        $addFields: {
+          'data.producerName': { $arrayElemAt: ['$producer.data.name', 0] },
         },
       },
     ])
-    .map((eservice) => EServiceQueryOutput.parse(eservice))
+    .map(({ data }) => EServiceQueryOutput.parse(data))
     .toArray()
 }
 

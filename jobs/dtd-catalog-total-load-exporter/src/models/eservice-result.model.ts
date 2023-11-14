@@ -1,18 +1,7 @@
 import { EServiceDescriptor, EService } from '@interop-be-reports/commons'
 import { z } from 'zod'
 
-const EServiceCommonData = EService.pick({
-  id: true,
-  name: true,
-  description: true,
-  technology: true,
-}).and(
-  z.object({
-    producerName: z.string(),
-  })
-)
-
-export const EServiceQueryOutput = EServiceCommonData.and(EService.pick({ attributes: true, descriptors: true }))
+export const EServiceQueryOutput = EService.and(z.object({ producerName: z.string() }))
 
 export const EServiceResultAttribute = z.object({
   name: z.string(),
@@ -33,8 +22,14 @@ export const EServiceResultAttributes = z.object({
   declared: z.array(z.union([EServiceResultAttributeSingle, EServiceResultAttributesGroup])),
 })
 
-export const EServiceResult = EServiceCommonData.and(
+export const EServiceResult = EService.pick({
+  id: true,
+  name: true,
+  description: true,
+  technology: true,
+}).and(
   z.object({
+    producerName: z.string(),
     attributes: EServiceResultAttributes,
     activeDescriptor: EServiceDescriptor.pick({
       id: true,

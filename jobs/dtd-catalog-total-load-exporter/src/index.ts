@@ -54,7 +54,7 @@ const result: Array<EServiceResult> = eservices
 
     return EServiceResult.parse({
       ...eservice,
-      attributes: remapDescriptorAttributesToEServiceResultAttributes(eservice.attributes, attributesMap),
+      attributes: remapDescriptorAttributesToEServiceResultAttributes(activeDescriptor.attributes, attributesMap),
       activeDescriptor: {
         id: activeDescriptor.id,
         state: activeDescriptor.state,
@@ -71,6 +71,5 @@ const result: Array<EServiceResult> = eservices
 log(`Uploading data to ${env.STORAGE_BUCKET}...`)
 
 await awsS3BucketClient.uploadData(result, env.FILENAME)
-await readModelClient.close()
 
 log('Done.')

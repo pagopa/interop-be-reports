@@ -1,4 +1,4 @@
-import { Attribute, DescriptorAttributes, SafeMap } from '@interop-be-reports/commons'
+import { Attribute, DescriptorAttributes, SafeMap, getActiveDescriptor } from '@interop-be-reports/commons'
 import {
   EServiceQueryOutput,
   EServiceResultAttribute,
@@ -53,9 +53,15 @@ export function remapDescriptorAttributesToEServiceResultAttributes(
 export function getAllAttributesIdsInEServicesActiveDescriptors(eservices: Array<EServiceQueryOutput>): Array<string> {
   const attributesIds: Set<string> = new Set()
 
-  eservices.forEach(({ attributes }) => {
-    if (!attributes) return
-    ;[...attributes.certified, ...attributes.verified, ...attributes.declared].forEach((attributesGroup) => {
+  eservices.forEach((eservice) => {
+    const activeDescriptor = getActiveDescriptor(eservice.descriptors)
+
+    if (!activeDescriptor) {
+      throw new Error(`EService ${eservice.name} - ${eservice.id} has no active descriptor`)
+    }
+
+    const { certified, verified, declared } = activeDescriptor.attributes
+    ;[...certified, ...verified, ...declared].forEach((attributesGroup) => {
       attributesGroup.forEach(({ id }) => attributesIds.add(id))
     })
   })
