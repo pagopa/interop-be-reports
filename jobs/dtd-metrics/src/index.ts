@@ -13,7 +13,7 @@ import {
   // onboardedTenantsCountByMacroCategoriesMetric,
 } from './metrics/index.js'
 import { GithubClient, GlobalStoreService } from './services/index.js'
-import { produceMetrics } from './utils/helpers.utils.js'
+import { produceMetricsOutput } from './utils/helpers.utils.js'
 import { writeFileSync } from 'fs'
 
 const log = console.log
@@ -67,7 +67,7 @@ async function main(): Promise<void> {
     // onboardedTenantsCountByMacroCategoriesMetric,
   ]
 
-  const output = await produceMetrics(readModel, globalStore, metricsObjs, metricsFilter)
+  const output = await produceMetricsOutput(readModel, globalStore, metricsObjs, metricsFilter)
 
   if (metricsFilter) {
     writeFileSync(`./dev-output.json`, JSON.stringify(output, null, 2))

@@ -27,7 +27,7 @@ type MetricObj<TMetricKey extends keyof MetricsOutput> = {
  * @param metricName the name of the metric, it will be used for logging. It must be a key of MetricsOutput model type
  * @param metricFactory the factory function that will be called to compute the metric. It will receive the readModel and the globalStore as parameters
  *
- * @returns the metric object that can be used in the produceMetrics function
+ * @returns the metric object that can be used in the produceMetricsOutput function
  */
 export function createMetric<TMetricKey extends keyof MetricsOutput>(
   metricName: TMetricKey,
@@ -63,7 +63,7 @@ export function createMetric<TMetricKey extends keyof MetricsOutput>(
  *
  * @returns the metrics output
  */
-export async function produceMetrics(
+export async function produceMetricsOutput(
   readModel: ReadModelClient,
   globalStore: GlobalStoreService,
   metricObjs: Array<MetricObj<keyof MetricsOutput>>,
