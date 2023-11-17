@@ -42,8 +42,9 @@ async function main(): Promise<void> {
 
   if (metricsFilter) {
     log('Metric filtering enabled!')
+    log('-----------------------------------------------')
     log('---- THIS IS ONLY FOR DEVELOPMENT PURPOSES ----')
-    log('The output will not be uploaded to S3 or Github but written to ./dev-output.json.')
+    log('-----------------------------------------------')
     log(`Filtering metrics by: "${metricsFilter}".\n`)
   }
 
@@ -71,8 +72,7 @@ async function main(): Promise<void> {
 
   if (metricsFilter) {
     writeFileSync(`./dev-output.json`, JSON.stringify(output, null, 2))
-    log(`\nOutput written to ./dev-output.json\n`)
-    return
+    log(`\nOutput written to ./dev-output.json`)
   }
 
   log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
