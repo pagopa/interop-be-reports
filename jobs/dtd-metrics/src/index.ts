@@ -37,11 +37,11 @@ async function main(): Promise<void> {
   const githubClient = new GithubClient(env.GITHUB_ACCESS_TOKEN)
   const awsS3BucketClient = new AwsS3BucketClient(env.STORAGE_BUCKET)
 
-  log('Retrieving metrics...')
-
   log('Initializing global store...')
   const globalStore = await GlobalStoreService.init(readModel)
   log('Global store initialized!\n')
+
+  log('Producing metrics...\n')
 
   const output = await produceMetrics(readModel, globalStore, [
     // --- FIRST BATCH ---
