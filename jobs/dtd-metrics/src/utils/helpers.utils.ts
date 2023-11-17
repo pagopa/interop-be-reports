@@ -27,7 +27,7 @@ type MetricObj<TMetricKey extends keyof MetricsOutput> = {
  * @param metricName the name of the metric, it will be used for logging. It must be a key of MetricsOutput model type
  * @param metricFactory the factory function that will be called to compute the metric. It will receive the readModel and the globalStore as parameters
  *
- * @returns a function that will execute the metricFactory and log the execution time
+ * @returns the metric object that can be used in the produceMetrics function
  */
 export function wrapMetricFactoryFn<TMetricKey extends keyof MetricsOutput>(
   metricName: TMetricKey,
