@@ -38,21 +38,18 @@ async function main(): Promise<void> {
   const githubClient = new GithubClient(env.GITHUB_ACCESS_TOKEN)
   const awsS3BucketClient = new AwsS3BucketClient(env.STORAGE_BUCKET)
 
-  const metricsFilter = env.DEV_FILTER_METRICS
-
-  if (metricsFilter) {
-    log('Metric filtering enabled!')
-    log('-----------------------------------------------')
-    log('---- THIS IS ONLY FOR DEVELOPMENT PURPOSES ----')
-    log('-----------------------------------------------')
-    log(`Filtering metrics by: "${metricsFilter}".\n`)
-  }
-
   log('Initializing global store...')
   const globalStore = await GlobalStoreService.init(readModel)
   log('Global store initialized!\n')
 
   log('Producing metrics...\n')
+
+  const metricsFilter = env.DEV_FILTER_METRICS
+
+  if (metricsFilter) {
+    log('Metric filtering enabled!')
+    log(`Filtering metrics by: "${metricsFilter}".\n`)
+  }
 
   const metricsObjs = [
     // --- FIRST BATCH ---
@@ -70,7 +67,7 @@ async function main(): Promise<void> {
 
   const output = await produceMetricsOutput(readModel, globalStore, metricsObjs, metricsFilter)
 
-  if (metricsFilter) {
+  if (env.DEV_PRODUCE_JSON) {
     writeFileSync(`./dev-output.json`, JSON.stringify(output, null, 2))
     log(`\nOutput written to ./dev-output.json`)
   }

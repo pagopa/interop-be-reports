@@ -25,7 +25,13 @@ export const Env = z.object({
   GITHUB_ACCESS_TOKEN: z.string(),
   FILENAME: z.string(),
 
+  // If set, only metrics with names matching this string will be produced
   DEV_FILTER_METRICS: z.string().optional(),
+  // If set, a JSON file with the metrics output will be produced
+  DEV_PRODUCE_JSON: z
+    .string()
+    .optional()
+    .transform((value) => value === 'true'),
 })
 
 export type Env = z.infer<typeof Env>

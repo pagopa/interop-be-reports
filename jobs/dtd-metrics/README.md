@@ -2,15 +2,6 @@
 
 This job is used to generate metrics and upload them into a bucked and a repo.
 
-## How to run for development
-
-```bash
-pnpm start
-```
-
-> It is possible to run only a specific metric by passing the `DEV_FILTER_METRICS` environment variable. This <u>MUST BE USED</u> only in development and is useful to test a specific metric without having to wait for the whole job to finish.
-> If passed, the metrics output will be put in a file named `dev-output.json`.
-
 ## How to create a new metric
 
 1. Create the type model of the metric output in the `models/metrics.model.ts` file.
