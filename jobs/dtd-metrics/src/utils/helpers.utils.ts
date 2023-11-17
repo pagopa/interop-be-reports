@@ -77,9 +77,6 @@ export async function produceMetricsOutput(
     metricsOutput[metricObj.name] = await metricObj.factoryFn(readModel, globalStore)
   }
 
-  if (filter) {
-    return MetricsOutput.partial().parse(metricsOutput)
-  }
-
-  return MetricsOutput.parse(metricsOutput)
+  if (filter) return MetricsOutput.partial().parse(metricsOutput)
+  else return MetricsOutput.parse(metricsOutput)
 }
