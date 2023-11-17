@@ -59,18 +59,26 @@ export function createMetric<TMetricKey extends keyof MetricsOutput>(
  * @param readModel the readModel client
  * @param globalStore the globalStore service
  * @param metricObjs the list of metric objects to execute
+ * @param filter an optional filter to only execute some metrics. If specified, the output will be a partial MetricsOutput
  *
  * @returns the metrics output
  */
 export async function produceMetrics(
   readModel: ReadModelClient,
   globalStore: GlobalStoreService,
-  metricObjs: Array<MetricObj<keyof MetricsOutput>>
-): Promise<MetricsOutput> {
+  metricObjs: Array<MetricObj<keyof MetricsOutput>>,
+  filter: string | undefined
+): Promise<MetricsOutput | Partial<MetricsOutput>> {
   const metricsOutput: Record<string, unknown> = {}
 
   for (const metricObj of metricObjs) {
+    // If a filter is specified, skip the metric if its name does not include the filter
+    if (filter && !metricObj.name.includes(filter)) continue
     metricsOutput[metricObj.name] = await metricObj.factoryFn(readModel, globalStore)
+  }
+
+  if (filter) {
+    return MetricsOutput.partial().parse(metricsOutput)
   }
 
   return MetricsOutput.parse(metricsOutput)

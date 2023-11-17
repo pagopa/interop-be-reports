@@ -24,6 +24,8 @@ export const Env = z.object({
   GITHUB_REPO_OWNER: z.string(),
   GITHUB_ACCESS_TOKEN: z.string(),
   FILENAME: z.string(),
+
+  DEV_FILTER_METRICS: z.string().optional(),
 })
 
 export type Env = z.infer<typeof Env>

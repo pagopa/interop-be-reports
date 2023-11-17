@@ -14,6 +14,7 @@ import {
 } from './metrics/index.js'
 import { GithubClient, GlobalStoreService } from './services/index.js'
 import { produceMetrics } from './utils/helpers.utils.js'
+import { writeFileSync } from 'fs'
 
 const log = console.log
 
@@ -37,13 +38,22 @@ async function main(): Promise<void> {
   const githubClient = new GithubClient(env.GITHUB_ACCESS_TOKEN)
   const awsS3BucketClient = new AwsS3BucketClient(env.STORAGE_BUCKET)
 
+  const metricsFilter = env.DEV_FILTER_METRICS
+
+  if (metricsFilter) {
+    log('Metric filtering enabled!')
+    log('---- THIS IS ONLY FOR DEVELOPMENT PURPOSES ----')
+    log('The output will not be uploaded to S3 or Github but written to ./dev-output.json.')
+    log(`Filtering metrics by: "${metricsFilter}".\n`)
+  }
+
   log('Initializing global store...')
   const globalStore = await GlobalStoreService.init(readModel)
   log('Global store initialized!\n')
 
   log('Producing metrics...\n')
 
-  const output = await produceMetrics(readModel, globalStore, [
+  const metricsObjs = [
     // --- FIRST BATCH ---
     publishedEServicesMetric,
     eservicesByMacroCategoriesMetric,
@@ -55,7 +65,15 @@ async function main(): Promise<void> {
     // tenantDistributionMetric,
     // tenantSignupsTrendMetric,
     // onboardedTenantsCountByMacroCategoriesMetric,
-  ])
+  ]
+
+  const output = await produceMetrics(readModel, globalStore, metricsObjs, metricsFilter)
+
+  if (metricsFilter) {
+    writeFileSync(`./dev-output.json`, JSON.stringify(output, null, 2))
+    log(`\nOutput written to ./dev-output.json\n`)
+    return
+  }
 
   log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
