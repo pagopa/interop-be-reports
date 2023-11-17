@@ -1,8 +1,9 @@
 import { getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
 import { readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { randomUUID } from 'crypto'
-import { getTopProducersMetric } from '../top-producers-metric.service.js'
 import { getMonthsAgoDate } from '../../utils/helpers.utils.js'
+import { GlobalStoreService } from '../../services/global-store.service.js'
+import { topProducersMetric } from '../top-producers.metric.js'
 
 const producer1Uuid = randomUUID()
 const producer2Uuid = randomUUID()
@@ -54,7 +55,8 @@ describe('getTopProducersMetric', () => {
       },
     ])
 
-    const result = await getTopProducersMetric(readModelMock)
+    const globalStore = await GlobalStoreService.init(readModelMock)
+    const result = await topProducersMetric.factoryFn(readModelMock, globalStore)
 
     expect(result.lastSixMonths[0]).toEqual({ producerName: 'Producer 2', count: 1 })
 

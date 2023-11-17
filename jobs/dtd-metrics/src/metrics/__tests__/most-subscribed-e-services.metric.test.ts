@@ -1,8 +1,8 @@
 import { getAgreementMock, getAttributeMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
-import { getMostSubscribedEServicesMetric } from '../most-subscribed-e-services-metric.service.js'
 import { randomUUID } from 'crypto'
-import { GlobalStoreService } from '../global-store.service.js'
+import { GlobalStoreService } from '../../services/global-store.service.js'
+import { mostSubscribedEServicesMetric } from '../most-subscribed-e-services.metric.js'
 
 const eservice1Uuid = randomUUID()
 const eservice2Uuid = randomUUID()
@@ -19,7 +19,7 @@ const aziendaOspedaliera3Uuid = randomUUID()
 const comuneAttributeUuid = randomUUID()
 const aziendaOspedalieraAttributeUuid = randomUUID()
 
-describe('getMostSubscribedEServicesMetric', () => {
+describe('mostSubscribedEServicesMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('eservices', [
       { data: getEServiceMock({ name: 'eservice-1', id: eservice1Uuid, producerId: producerUuid }) },
@@ -191,7 +191,7 @@ describe('getMostSubscribedEServicesMetric', () => {
     ])
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await getMostSubscribedEServicesMetric(readModelMock, globalStore)
+    const result = await mostSubscribedEServicesMetric.factoryFn(readModelMock, globalStore)
 
     const comuniTop10 = result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')
       ?.mostSubscribedEServices

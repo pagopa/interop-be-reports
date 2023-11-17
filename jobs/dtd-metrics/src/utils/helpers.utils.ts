@@ -1,4 +1,7 @@
 import { sub } from 'date-fns'
+import { MetricsOutput } from '../models/metrics.model.js'
+import { ReadModelClient } from '@interop-be-reports/commons'
+import { GlobalStoreService } from '../services/global-store.service.js'
 
 export function getMonthsAgoDate(numMonths: number): Date {
   return sub(new Date(), { months: numMonths })
@@ -8,18 +11,67 @@ export function getVariationPercentage(current: number, previous: number): numbe
   return Number((previous === 0 ? 0 : ((current - previous) / previous) * 100).toFixed(1))
 }
 
-export async function wrapPromiseWithLogs<T>(promise: Promise<T>, name: string): Promise<T> {
-  console.log(`> Starting ${name}...`)
+type MetricFactoryFn<TMetricKey extends keyof MetricsOutput> = (
+  readModel: ReadModelClient,
+  globalStore: GlobalStoreService
+) => Promise<MetricsOutput[TMetricKey]>
 
-  const timeLog = `> Done! ${name} finished executing in`
-  console.time(timeLog)
+type MetricObj<TMetricKey extends keyof MetricsOutput> = {
+  name: TMetricKey
+  factoryFn: MetricFactoryFn<TMetricKey>
+}
 
-  try {
-    const result = await promise
-    console.timeEnd(timeLog)
-    return result
-  } catch (e) {
-    console.error(`Error while executing ${name}`)
-    throw e
+/**
+ * Utility function to wrap a metric with logs plus some type safety-ness for the metric output.
+ * The metric factory output type is inferred from the MetricsOutput model.
+ * @param metricName the name of the metric, it will be used for logging. It must be a key of MetricsOutput model type
+ * @param metricFactory the factory function that will be called to compute the metric. It will receive the readModel and the globalStore as parameters
+ *
+ * @returns a function that will execute the metricFactory and log the execution time
+ */
+export function wrapMetricFactoryFn<TMetricKey extends keyof MetricsOutput>(
+  metricName: TMetricKey,
+  metricFactory: MetricFactoryFn<TMetricKey>
+): MetricObj<TMetricKey> {
+  return {
+    name: metricName,
+    factoryFn: async (readModel, globalStore): ReturnType<MetricFactoryFn<TMetricKey>> => {
+      console.log(`> Starting ${metricName}...`)
+
+      const timeLog = `> Done! ${metricName} finished executing in`
+      console.time(timeLog)
+
+      try {
+        const result = await metricFactory(readModel, globalStore)
+        console.timeEnd(timeLog)
+        return result
+      } catch (e) {
+        console.error(`Error while executing ${metricName}`)
+        throw e
+      }
+    },
   }
+}
+
+/**
+ * Utility function to produce the metrics output from a list of metric objects.
+ * Metrics factory functions will be executed sequentially.
+ * @param readModel the readModel client
+ * @param globalStore the globalStore service
+ * @param metricObjs the list of metric objects to execute
+ *
+ * @returns the metrics output
+ */
+export async function produceMetrics(
+  readModel: ReadModelClient,
+  globalStore: GlobalStoreService,
+  metricObjs: Array<MetricObj<keyof MetricsOutput>>
+): Promise<MetricsOutput> {
+  const metricsOutput: Record<string, unknown> = {}
+
+  for (const metricObj of metricObjs) {
+    metricsOutput[metricObj.name] = await metricObj.factoryFn(readModel, globalStore)
+  }
+
+  return MetricsOutput.parse(metricsOutput)
 }

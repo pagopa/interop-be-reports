@@ -1,13 +1,13 @@
 import { Tenant, getAttributeMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, readModelMock, repeatObjInArray, seedCollection } from '../../utils/tests.utils.js'
 import { randomUUID } from 'crypto'
-import { getOnboardedTenantsCountMetric } from '../onboarded-tenants-count.service.js'
-import { GlobalStoreService } from '../global-store.service.js'
 import { getMonthsAgoDate } from '../../utils/helpers.utils.js'
+import { GlobalStoreService } from '../../services/global-store.service.js'
+import { onboardedTenantsCountMetric } from '../onboarded-tenants-count.metric.js'
 
 const comuniAttributeId = randomUUID()
 
-describe('getOnboardedTenantsCountMetric', () => {
+describe('onboardedTenantsCountMetric', () => {
   it('should return the correct metrics', async () => {
     const onboardedTenant = getTenantMock({
       selfcareId: randomUUID(),
@@ -36,9 +36,9 @@ describe('getOnboardedTenantsCountMetric', () => {
     ])
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await getOnboardedTenantsCountMetric(globalStore)
+    const result = await onboardedTenantsCountMetric.factoryFn(readModelMock, globalStore)
 
-    expect(result.totalTenantsCount).toBe(onboardedTenants.length + onboardedLastMonthTenants.length)
-    expect(result.lastMonthTenantsCount).toBe(onboardedLastMonthTenants.length)
+    expect(result?.totalTenantsCount).toBe(onboardedTenants.length + onboardedLastMonthTenants.length)
+    expect(result?.lastMonthTenantsCount).toBe(onboardedLastMonthTenants.length)
   })
 })

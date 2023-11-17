@@ -1,8 +1,8 @@
 import { getAttributeMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
-import { getEServicesByMacroCategoriesMetric } from '../e-services-by-macro-categories-metric.service.js'
-import { GlobalStoreService } from '../global-store.service.js'
 import { randomUUID } from 'crypto'
+import { GlobalStoreService } from '../../services/global-store.service.js'
+import { eservicesByMacroCategoriesMetric } from '../e-services-by-macro-categories.metric.js'
 
 const comuniTenantUUID = randomUUID()
 const aziendaOspedalieraTenantUUID = randomUUID()
@@ -10,7 +10,7 @@ const aziendaOspedalieraTenantUUID = randomUUID()
 const comuniAttributeUUID = randomUUID()
 const aziendaOspedalieraAttributeUUID = randomUUID()
 
-describe('getEServicesByMacroCategoriesMetric', () => {
+describe('eservicesByMacroCategoriesMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('eservices', [
       {
@@ -76,7 +76,7 @@ describe('getEServicesByMacroCategoriesMetric', () => {
     ])
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await getEServicesByMacroCategoriesMetric(readModelMock, globalStore)
+    const result = await eservicesByMacroCategoriesMetric.factoryFn(readModelMock, globalStore)
 
     expect(result.find((a) => (a.name as MacroCategoryName) === 'Comuni')?.count).toStrictEqual(2)
     expect(result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')?.count).toStrictEqual(1)

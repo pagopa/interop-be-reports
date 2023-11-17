@@ -1,12 +1,9 @@
-import { AgreementState, ReadModelClient } from '@interop-be-reports/commons'
+import { AgreementState } from '@interop-be-reports/commons'
 import { TenantDistributionMetric } from '../models/metrics.model.js'
 import { z } from 'zod'
-import { GlobalStoreService } from './global-store.service.js'
+import { wrapMetricFactoryFn } from '../utils/helpers.utils.js'
 
-export async function getTenantDistributionMetric(
-  readModel: ReadModelClient,
-  globalStore: GlobalStoreService
-): Promise<TenantDistributionMetric> {
+export const tenantDistributionMetric = wrapMetricFactoryFn('tenantDistribution', async (readModel, globalStore) => {
   const activeAgreements = await readModel.agreements
     .find(
       { 'data.state': { $in: ['Active', 'Suspended'] satisfies Array<AgreementState> } },
@@ -75,4 +72,4 @@ export async function getTenantDistributionMetric(
   globalStore.onboardedTenants.forEach(resolveTenantDistribution)
 
   return [onlyConsumers, onlyProducers, bothConsumersAndProducers, onlyFirstAccess]
-}
+})

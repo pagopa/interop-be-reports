@@ -1,8 +1,8 @@
 import { getAgreementMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, readModelMock, seedCollection } from '../../utils/tests.utils.js'
-import { getTenantDistributionMetric } from '../tenant-distribution-metric.service.js'
-import { GlobalStoreService } from '../global-store.service.js'
 import { randomUUID } from 'crypto'
+import { GlobalStoreService } from '../../services/global-store.service.js'
+import { tenantDistributionMetric } from '../tenant-distribution.metric.js'
 
 const producerUUID = randomUUID()
 const consumerUUID = randomUUID()
@@ -10,7 +10,7 @@ const bothUUID = randomUUID()
 const firstAccessUUID = randomUUID()
 const comuniAttributeUUID = randomUUID()
 
-describe('getTenantDistributionMetric', () => {
+describe('tenantDistributionMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('tenants', [
       { data: getTenantMock({ id: producerUUID, attributes: [{ id: comuniAttributeUUID }] }) },
@@ -30,11 +30,11 @@ describe('getTenantDistributionMetric', () => {
     ])
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await getTenantDistributionMetric(readModelMock, globalStore)
+    const result = await tenantDistributionMetric.factoryFn(readModelMock, globalStore)
 
-    expect(result[0].count).toEqual(1)
-    expect(result[1].count).toEqual(1)
-    expect(result[2].count).toEqual(1)
-    expect(result[3].count).toEqual(1)
+    expect(result?.[0].count).toEqual(1)
+    expect(result?.[1].count).toEqual(1)
+    expect(result?.[2].count).toEqual(1)
+    expect(result?.[3].count).toEqual(1)
   })
 })

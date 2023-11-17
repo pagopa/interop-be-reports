@@ -1,9 +1,8 @@
-import { getMonthsAgoDate } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate, wrapMetricFactoryFn } from '../utils/helpers.utils.js'
 import { add } from 'date-fns'
 import { TenantSignupsTrendMetric } from '../models/metrics.model.js'
-import { GlobalStoreService } from './global-store.service.js'
 
-export async function getTenantSignupsTrendMetric(globalStore: GlobalStoreService): Promise<TenantSignupsTrendMetric> {
+export const tenantSignupsTrendMetric = wrapMetricFactoryFn('tenantSignupsTrend', async (_readModel, globalStore) => {
   // Get the oldest tenant date, which will be used as the starting point for the timeseries
   const oldestTenantDate = globalStore.onboardedTenants.reduce((oldestDate, tenant) => {
     if (tenant.createdAt < oldestDate) {
@@ -62,7 +61,7 @@ export async function getTenantSignupsTrendMetric(globalStore: GlobalStoreServic
   })
 
   return result
-}
+})
 
 function toTimeseriesSequenceData(
   startingDate: Date,

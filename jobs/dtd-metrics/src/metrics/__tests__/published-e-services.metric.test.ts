@@ -1,8 +1,9 @@
 import { getEServiceMock } from '@interop-be-reports/commons'
-import { getPublishedEServicesMetric } from '../published-e-services-metric.service.js'
 import { readModelMock, seedCollection } from '../../utils/tests.utils.js'
+import { GlobalStoreService } from '../../services/global-store.service.js'
+import { publishedEServicesMetric } from '../published-e-services.metric.js'
 
-describe('getPublishedEServicesMetric', () => {
+describe('publishedEServicesMetric', () => {
   it('should return the correct metrics', async () => {
     const today = new Date()
     const moreThanOneMonthAgo = new Date(today)
@@ -34,7 +35,8 @@ describe('getPublishedEServicesMetric', () => {
       { data: getEServiceMock({ descriptors: [{ state: 'Draft' }] }) },
     ])
 
-    const result = await getPublishedEServicesMetric(readModelMock)
+    const globalStore = await GlobalStoreService.init(readModelMock)
+    const result = await publishedEServicesMetric.factoryFn(readModelMock, globalStore)
     expect(result.count).toStrictEqual(3)
     expect(result.lastMonthCount).toStrictEqual(2)
   })

@@ -2,8 +2,8 @@ import { Tenant, getAttributeMock, getTenantMock } from '@interop-be-reports/com
 import { randomUUID } from 'crypto'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { sub } from 'date-fns'
-import { getOnboardedTenantsCountByMacroCategoriesMetric } from '../onboarded-tenants-count-by-macro-categories-metric.service.js'
-import { GlobalStoreService } from '../global-store.service.js'
+import { GlobalStoreService } from '../../services/global-store.service.js'
+import { onboardedTenantsCountByMacroCategoriesMetric } from '../onboarded-tenants-count-by-macro-categories.metric.js'
 
 const comuneAttributeUuid = randomUUID()
 const aziendaOspedalieraAttributeUuid = randomUUID()
@@ -12,7 +12,7 @@ const oneMonthAgoDate = sub(new Date(), { months: 1 }).toISOString()
 const sixMonthsAgoDate = sub(new Date(), { months: 6 }).toISOString()
 const oneYearAgoDate = sub(new Date(), { years: 1 }).toISOString()
 
-describe('getOnboardedTenantsCountByMacroCategoriesMetric', () => {
+describe('onboardedTenantsCountByMacroCategoriesMetric', () => {
   it('should return the correct metrics', async () => {
     const oboardedTenants = [
       {
@@ -97,13 +97,13 @@ describe('getOnboardedTenantsCountByMacroCategoriesMetric', () => {
     await seedCollection('attributes', attributes)
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await getOnboardedTenantsCountByMacroCategoriesMetric(globalStore)
+    const result = await onboardedTenantsCountByMacroCategoriesMetric.factoryFn(readModelMock, globalStore)
 
-    const comuniMetric = result.fromTheBeginning.find(
+    const comuniMetric = result?.fromTheBeginning.find(
       (metric) => metric.name === ('Comuni' satisfies MacroCategoryName)
     )
 
-    const aziendeOspedaliereMetric = result.fromTheBeginning.find(
+    const aziendeOspedaliereMetric = result?.fromTheBeginning.find(
       (metric) => metric.name === ('Aziende Ospedaliere e ASL' satisfies MacroCategoryName)
     )
 
