@@ -1,9 +1,9 @@
 import { AgreementState } from '@interop-be-reports/commons'
 import { TenantDistributionMetric } from '../models/metrics.model.js'
 import { z } from 'zod'
-import { wrapMetricFactoryFn } from '../utils/helpers.utils.js'
+import { createMetric } from '../utils/helpers.utils.js'
 
-export const tenantDistributionMetric = wrapMetricFactoryFn('tenantDistribution', async (readModel, globalStore) => {
+export const tenantDistributionMetric = createMetric('tenantDistribution', async (readModel, globalStore) => {
   const activeAgreements = await readModel.agreements
     .find(
       { 'data.state': { $in: ['Active', 'Suspended'] satisfies Array<AgreementState> } },

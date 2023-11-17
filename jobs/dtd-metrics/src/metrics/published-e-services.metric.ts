@@ -1,12 +1,12 @@
 import { EServiceDescriptor } from '@interop-be-reports/commons'
 import { PublishedEServicesMetric } from '../models/metrics.model.js'
-import { getMonthsAgoDate, getVariationPercentage, wrapMetricFactoryFn } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate, getVariationPercentage, createMetric } from '../utils/helpers.utils.js'
 import { Document } from 'mongodb'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3744
  **/
-export const publishedEServicesMetric = wrapMetricFactoryFn('publishedEServices', async (readModel) => {
+export const publishedEServicesMetric = createMetric('publishedEServices', async (readModel) => {
   const oneMonthAgoDate = getMonthsAgoDate(1)
   const twoMonthsAgoDate = getMonthsAgoDate(2)
 

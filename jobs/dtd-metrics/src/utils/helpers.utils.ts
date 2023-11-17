@@ -29,7 +29,7 @@ type MetricObj<TMetricKey extends keyof MetricsOutput> = {
  *
  * @returns the metric object that can be used in the produceMetrics function
  */
-export function wrapMetricFactoryFn<TMetricKey extends keyof MetricsOutput>(
+export function createMetric<TMetricKey extends keyof MetricsOutput>(
   metricName: TMetricKey,
   metricFactory: MetricFactoryFn<TMetricKey>
 ): MetricObj<TMetricKey> {

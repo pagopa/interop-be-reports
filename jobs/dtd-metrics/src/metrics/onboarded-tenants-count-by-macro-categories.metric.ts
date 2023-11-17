@@ -1,5 +1,5 @@
 import { OnboardedTenantsCountByMacroCategoriesMetric } from '../models/metrics.model.js'
-import { getMonthsAgoDate, wrapMetricFactoryFn } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate, createMetric } from '../utils/helpers.utils.js'
 import { MacroCategory } from '../models/macro-categories.model.js'
 
 type OnboardedTenantsCountByMacroCategoriesMetricItem = OnboardedTenantsCountByMacroCategoriesMetric[
@@ -7,7 +7,7 @@ type OnboardedTenantsCountByMacroCategoriesMetricItem = OnboardedTenantsCountByM
   | 'lastSixMonths'
   | 'lastTwelveMonths'][number]
 
-export const onboardedTenantsCountByMacroCategoriesMetric = wrapMetricFactoryFn(
+export const onboardedTenantsCountByMacroCategoriesMetric = createMetric(
   'onboardedTenantsCountByMacroCategories',
   async (_readModel, globalStore) => {
     // Get the onboarded and total tenants count for each macro category

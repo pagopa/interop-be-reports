@@ -1,6 +1,6 @@
 import { AgreementState, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
 import { TopProducersBySubscribersMetric } from '../models/metrics.model.js'
-import { getMonthsAgoDate, wrapMetricFactoryFn } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate, createMetric } from '../utils/helpers.utils.js'
 import { z } from 'zod'
 
 const ProducerAgreement = z.object({
@@ -16,7 +16,7 @@ const ProducerAgreements = z.object({
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3747
  */
-export const topProducersBySubscribersMetric = wrapMetricFactoryFn(
+export const topProducersBySubscribersMetric = createMetric(
   'topProducersBySubscribers',
   async (readModel, globalStore) => {
     const sixMonthsAgoDate = getMonthsAgoDate(6)
