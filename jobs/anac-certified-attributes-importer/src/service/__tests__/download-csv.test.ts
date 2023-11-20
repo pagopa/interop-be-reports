@@ -49,14 +49,14 @@ describe('CSV getFileName', () => {
     expect(result).toStrictEqual(`${sftpConfigTest.fileNamePrefix}-99998877.csv`)
   })
 
-  // it('should fail if there are not files in folder', async () => {
-  //   const sftpClient = new SftpClient({ ...sftpConfigTest, forceFileName: undefined })
+  it('should fail if there are not files in folder', async () => {
+    const sftpClient = new SftpClient({ ...sftpConfigTest, forceFileName: undefined })
 
-  //   const fileList: sftp.FileInfo[] = []
+    const fileList: sftp.FileInfo[] = []
 
-  //   await expect(() => sftpClient.getFileName(async (_: string) => Promise.resolve(fileList))).rejects.toThrowError('No files found in folder')
+    await expect(() => sftpClient.getFileName(async (_: string) => Promise.resolve(fileList))).rejects.toThrowError('No files found in folder')
 
-  // })
+  })
 
 
   // it('should retrieve requested forced file', async () => {
