@@ -1,5 +1,6 @@
 import sftp from 'ssh2-sftp-client'
 import { SftpConfig } from '../config/sftp.config.js'
+import { logInfo } from '@interop-be-reports/commons';
 
 export class SftpClient {
   fileNameRegex: RegExp
@@ -8,7 +9,7 @@ export class SftpClient {
     this.fileNameRegex = new RegExp('^' + this.config.fileNamePrefix + '-\\d{8}\\.csv$');
   }
 
-  public async downloadCSV(): Promise<string> {
+  public async downloadCSV(jobCorrelationId: string): Promise<string> {
     // Note: The file should be small enough to fit in memory
 
     const sftpClient = new sftp()
@@ -22,7 +23,9 @@ export class SftpClient {
 
     const fileName = await this.getFileName(folderPath => sftpClient.list(folderPath))
 
-    const file = await sftpClient.get(fileName)
+    logInfo(jobCorrelationId, `Loading file ${fileName}`)
+
+    const file = await sftpClient.get(this.config.folderPath + fileName)
 
     await sftpClient.end()
 
