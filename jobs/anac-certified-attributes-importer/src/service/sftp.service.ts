@@ -3,7 +3,7 @@ import { SftpConfig } from '../config/sftp.config.js'
 import { logInfo } from '@interop-be-reports/commons';
 
 export class SftpClient {
-  fileNameRegex: RegExp
+  private fileNameRegex: RegExp
 
   constructor(private config: SftpConfig) {
     this.fileNameRegex = new RegExp('^' + this.config.fileNamePrefix + '-\\d{8}\\.csv$');
