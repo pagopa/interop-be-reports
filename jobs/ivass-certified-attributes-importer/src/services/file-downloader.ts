@@ -18,9 +18,9 @@ const openPage = async (page: puppeteer.Page): Promise<void> => {
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 const findDownloadButton = async (page: puppeteer.Page) => {
-  const table = await page.$("html > body > inquiry-root > #sub-navbar > inquiry-area-download > [class='card'] > inquiry-grid > ag-grid-angular > [ref='eRootWrapper'] > [ref='rootWrapperBody'] > [ref='gridPanel']")
-  const row = await table?.$("[ref='eBodyViewport'] > [ref='eCenterColsClipper'] > [ref='eCenterViewport'] > [ref='eCenterContainer'] > [row-index='2']")
-  const csvButton = await row?.$("[col-id='csv'] > inquiry-pdf-csv > div > img")
+  const table = await page.$("html > body > inquiry-root > #sub-navbar > inquiry-area-download > [class='card'] > inquiry-grid > ag-grid-angular > [ref='eRootWrapper'] > [ref='rootWrapperBody'] > [ref='gridPanel']");
+  const row = await table?.$("[ref='eBodyViewport'] > [ref='eCenterColsClipper'] > [ref='eCenterViewport'] > [ref='eCenterContainer'] > [row-index='2']");
+  const csvButton = await row?.$("[col-id='csv'] > inquiry-pdf-csv > div > img");
   return csvButton
 };
 
@@ -31,26 +31,26 @@ const setupDownload = async (page: puppeteer.Page): Promise<void> => {
 
 const unzipFile = async (zipFileName: string): Promise<string> => {
 
-  const zipFile = await fs.promises.readFile('./my-downloads/' + zipFileName)
+  const zipFile = await fs.promises.readFile('./my-downloads/' + zipFileName);
 
   const zipBlob = new Blob([zipFile], { type: 'application/zip' });
 
   const entries = await (new zip.ZipReader(new zip.BlobReader(zipBlob))).getEntries({ filenameEncoding: 'utf-8' });
 
-  const csvEntries = entries.filter(entry => entry.filename.endsWith('.csv'))
+  const csvEntries = entries.filter(entry => entry.filename.endsWith('.csv'));
 
   if (csvEntries.length === 0)
-    throw new Error('The archive does not contain csv files')
+    throw new Error('The archive does not contain csv files');
 
   if (csvEntries.length > 1)
-    throw new Error('The archive contains multiple csv files')
+    throw new Error('The archive contains multiple csv files');
 
   const entry = entries[0]
 
   if (!entry.getData)
-    throw new Error('Unexpected error: getData method is undefined')
+    throw new Error('Unexpected error: getData method is undefined');
 
-  const entryBlob: Blob = await entry.getData(new zip.BlobWriter())
+  const entryBlob: Blob = await entry.getData(new zip.BlobWriter());
 
   const arrayBuffer = await entryBlob.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
@@ -66,10 +66,10 @@ const downloadFile = async <T>(csvButton: puppeteer.ElementHandle<T>): Promise<s
   await csvButton.click();
   await delay(3000);
 
-  const files = await fs.promises.readdir('./my-downloads')
-  const zipFiles = files.filter(fileName => fileName.endsWith('.zip'))
+  const files = await fs.promises.readdir('./my-downloads');
+  const zipFiles = files.filter(fileName => fileName.endsWith('.zip'));
   if (zipFiles.length === 0)
-    throw Error('No files found in download folder')
+    throw Error('No files found in download folder');
 
   return zipFiles[0]
 };
