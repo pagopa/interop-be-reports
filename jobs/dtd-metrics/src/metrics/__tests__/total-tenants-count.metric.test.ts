@@ -38,7 +38,7 @@ describe('getOnboardedTenantsCountMetric', () => {
     const globalStore = await GlobalStoreService.init(readModelMock)
     const result = await getOnboardedTenantsCountMetric(readModelMock, globalStore)
 
-    expect(result?.totalTenantsCount).toBe(onboardedTenants.length + onboardedLastMonthTenants.length)
-    expect(result?.lastMonthTenantsCount).toBe(onboardedLastMonthTenants.length)
+    expect(result[0].totalTenantsCount).toBe(onboardedTenants.length + onboardedLastMonthTenants.length)
+    expect(result[0].lastMonthTenantsCount).toBe(onboardedLastMonthTenants.length)
   })
 })

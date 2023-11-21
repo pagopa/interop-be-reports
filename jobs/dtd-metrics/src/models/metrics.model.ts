@@ -131,8 +131,8 @@ export const MetricsOutput = z.object({
   mostSubscribedEServices: MostSubscribedEServicesMetric,
   topProducersBySubscribers: TopProducersBySubscribersMetric,
   topProducers: TopProducersMetric,
+  onboardedTenantsCount: OnboardedTenantsCountMetric,
   // .optional() will be removed once the metric will be implemented
-  onboardedTenantsCount: OnboardedTenantsCountMetric.optional(),
   tenantDistribution: TenantDistributionMetric.optional(),
   tenantSignupsTrend: TenantSignupsTrendMetric.optional(),
   onboardedTenantsCountByMacroCategories: OnboardedTenantsCountByMacroCategoriesMetric.optional(),
