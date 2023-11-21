@@ -60,6 +60,8 @@ jobs:
             package_path: ./jobs/dtd-metrics
           - image_name: dtd-catalog-total-load-exporter
             package_path: ./jobs/dtd-catalog-total-load-exporter
+          - image_name: ivass-certified-attributes-importer
+            package_path: ./jobs/ivass-certified-attributes-importer
 
     permissions:
       id-token: write
