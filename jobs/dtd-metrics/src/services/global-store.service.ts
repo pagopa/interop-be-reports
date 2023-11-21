@@ -6,6 +6,7 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 import { URL } from 'url'
 import { getOnboardedTenants, log } from '../utils/helpers.utils.js'
+import { MacroCategoryName } from '../utils/tests.utils.js'
 
 const __dirname = new URL('.', import.meta.url).pathname
 const GLOBAL_STORE_CACHE_PATH = path.join(__dirname, '.global-store-cache')
@@ -17,7 +18,7 @@ const GlobalStoreTenant = z.object({
   selfcareId: z.string().optional(),
   macroCategoryId: z.string(),
 })
-type GlobalStoreTenant = z.infer<typeof GlobalStoreTenant>
+export type GlobalStoreTenant = z.infer<typeof GlobalStoreTenant>
 
 const GlobalStoreCacheObj = z.object({
   macroCategories: MacroCategories,
@@ -49,6 +50,12 @@ export class GlobalStoreService {
 
   public getTenantFromId(tenantId: string): GlobalStoreTenant | undefined {
     return this.tenantsMap.get(tenantId)
+  }
+
+  public getMacroCategoryByName(name: MacroCategoryName): MacroCategory {
+    const macroCategory = this.macroCategories.find(({ name: macroCategoryName }) => macroCategoryName === name)
+    if (!macroCategory) throw new Error(`Macro category ${name} not found`)
+    return macroCategory
   }
 
   private constructor(tenants: Array<GlobalStoreTenant>, macroCategories: MacroCategories) {

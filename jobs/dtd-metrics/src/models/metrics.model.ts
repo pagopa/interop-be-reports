@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 
 export const PublishedEServicesMetric = z.object({
   count: z.number(),
@@ -68,11 +69,32 @@ export const TenantSignupsTrendMetric = timedMetricObject(
   )
 )
 
-export const OnboardedTenantsCountMetric = z.object({
-  totalTenantsCount: z.number(),
-  lastMonthTenantsCount: z.number(),
-  variation: z.number(),
-})
+export const OnboardedTenantsCountMetric = z.tuple([
+  z.object({
+    name: z.literal('Totale'),
+    totalTenantsCount: z.number(),
+    lastMonthTenantsCount: z.number(),
+    variation: z.number(),
+  }),
+  z.object({
+    name: z.literal(MACRO_CATEGORIES[2].name),
+    totalTenantsCount: z.number(),
+    lastMonthTenantsCount: z.number(),
+    variation: z.number(),
+  }),
+  z.object({
+    name: z.literal(MACRO_CATEGORIES[6].name),
+    totalTenantsCount: z.number(),
+    lastMonthTenantsCount: z.number(),
+    variation: z.number(),
+  }),
+  z.object({
+    name: z.literal(MACRO_CATEGORIES[9].name),
+    totalTenantsCount: z.number(),
+    lastMonthTenantsCount: z.number(),
+    variation: z.number(),
+  }),
+])
 
 export const TenantDistributionMetric = z.array(
   z.object({

@@ -7,7 +7,7 @@ import {
   getMostSubscribedEServicesMetric,
   getTopProducersBySubscribersMetric,
   getTopProducersMetric,
-  // getOnboardedTenantsCountMetric,
+  getOnboardedTenantsCountMetric,
   // getTenantDistributionMetric,
   // getTenantSignupsTrendMetric,
   // getOnboardedTenantsCountByMacroCategoriesMetric,
@@ -47,7 +47,7 @@ try {
     .addMetric('mostSubscribedEServices', getMostSubscribedEServicesMetric)
     .addMetric('topProducersBySubscribers', getTopProducersBySubscribersMetric)
     .addMetric('topProducers', getTopProducersMetric)
-    // .addMetric('onboardedTenantsCount', getOnboardedTenantsCountMetric)
+    .addMetric('onboardedTenantsCount', getOnboardedTenantsCountMetric)
     // .addMetric('tenantDistribution', getTenantDistributionMetric)
     // .addMetric('tenantSignupsTrend', getTenantSignupsTrendMetric)
     // .addMetric('onboardedTenantsCountByMacroCategories', getOnboardedTenantsCountByMacroCategoriesMetric)
