@@ -5,7 +5,7 @@ import { SourceFileConfig } from "../config/sourcefile.config.js";
 
 const initBrowser = async () => {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: "new",
     slowMo: 50,
   });
   return browser;
