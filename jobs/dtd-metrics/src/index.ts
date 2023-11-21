@@ -14,10 +14,9 @@ import {
 } from './metrics/index.js'
 import { GithubClient, GlobalStoreService } from './services/index.js'
 import { MetricsProducerService } from './services/metrics-producer.service.js'
+import { log } from './utils/helpers.utils.js'
 
-const log = console.log
-
-log('Starting program\n')
+log.info('Starting program\n')
 
 const readModel = await ReadModelClient.connect({
   mongodbReplicaSet: env.MONGODB_REPLICA_SET,
@@ -35,11 +34,11 @@ try {
   const githubClient = new GithubClient(env.GITHUB_ACCESS_TOKEN)
   const awsS3BucketClient = new AwsS3BucketClient(env.STORAGE_BUCKET)
 
-  log('Initializing global store...')
+  log.info('Initializing global store...')
   const globalStore = await GlobalStoreService.init(readModel, { cache: env.CACHE_GLOBAL_STORE })
-  log('Global store initialized!\n')
+  log.info('Global store initialized!\n')
 
-  log('Producing metrics...\n')
+  log.info('Producing metrics...\n')
 
   const output = await new MetricsProducerService(readModel, globalStore)
     .addMetric('publishedEServices', getPublishedEServicesMetric)
@@ -56,16 +55,16 @@ try {
       produceJSON: env.PRODUCE_OUTPUT_JSON,
     })
 
-  log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
+  log.info(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
   await Promise.all([
     githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${env.FILENAME}`),
     awsS3BucketClient.uploadData(output, env.FILENAME),
   ])
 
-  log('Done!\n')
+  log.info('Done!\n')
 } catch (err) {
-  log('An error occurred while producing metrics:')
+  log.error('An error occurred while producing metrics:')
   throw err
 } finally {
   await readModel.close()
