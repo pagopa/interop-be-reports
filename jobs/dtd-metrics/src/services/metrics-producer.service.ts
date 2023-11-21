@@ -53,7 +53,7 @@ export class MetricsProducerService {
     const output = filter ? MetricsOutput.partial().parse(metricsOutput) : MetricsOutput.parse(metricsOutput)
 
     if (produceJSON) {
-      writeFileSync('output.json', JSON.stringify(output, null, 2))
+      writeFileSync('dtd-metrics.json', JSON.stringify(output, null, 2))
     }
 
     return output
