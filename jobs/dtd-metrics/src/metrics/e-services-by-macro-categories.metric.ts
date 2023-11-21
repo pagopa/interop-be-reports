@@ -1,96 +1,46 @@
-import { ATTRIBUTES_COLLECTION_NAME, EServiceDescriptor, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
-import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
+import { EServiceDescriptor } from '@interop-be-reports/commons'
 import { EServicesByMacroCategoriesMetric } from '../models/metrics.model.js'
+import { MacroCategory } from '../models/macro-categories.model.js'
+import { z } from 'zod'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3745
  */
-export const getEServicesByMacroCategoriesMetric: MetricFactoryFn<'eservicesByMacroCategories'> = async (readModel) => {
-  async function getMacroCategoryPublishedEServiceCount(
-    macroCategory: (typeof MACRO_CATEGORIES)[number]
-  ): Promise<EServicesByMacroCategoriesMetric[number]> {
-    const result = await readModel.eservices
-      .aggregate([
-        {
-          $match: {
-            'data.descriptors.state': {
-              $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
-            },
+export const getEServicesByMacroCategoriesMetric: MetricFactoryFn<'eservicesByMacroCategories'> = async (
+  readModel,
+  globalStore
+) => {
+  const eservices = await readModel.eservices
+    .aggregate([
+      {
+        $match: {
+          'data.descriptors.state': {
+            $in: ['Published', 'Suspended'] satisfies Array<EServiceDescriptor['state']>,
           },
         },
-        { $replaceRoot: { newRoot: '$data' } },
-        {
-          $project: {
-            _id: 0,
-            id: 1,
-            producerId: 1,
-          },
+      },
+      {
+        $project: {
+          _id: 0,
+          'data.producerId': 1,
         },
-        {
-          $lookup: {
-            from: TENANTS_COLLECTION_NAME,
-            localField: 'producerId',
-            foreignField: 'data.id',
-            as: 'producer',
-          },
-        },
-        {
-          $lookup: {
-            from: ATTRIBUTES_COLLECTION_NAME,
-            localField: 'producer.data.attributes.id',
-            foreignField: 'data.id',
-            as: 'producerAttributes',
-          },
-        },
-        {
-          $project: {
-            codes: {
-              $map: {
-                input: '$producerAttributes',
-                as: 'attr',
-                in: '$$attr.data.code',
-              },
-            },
-          },
-        },
-        {
-          $group: {
-            _id: 0,
-            result: {
-              $sum: {
-                $cond: [
-                  {
-                    $or: macroCategory.ipaCodes.map((code) => ({
-                      $in: [code, '$codes'],
-                    })),
-                  },
-                  1,
-                  0,
-                ],
-              },
-            },
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            result: 1,
-          },
-        },
-      ])
-      .toArray()
+      },
+    ])
+    .map(({ data }) => z.object({ producerId: z.string() }).parse(data))
+    .toArray()
 
-    return {
-      id: macroCategory.id,
-      name: macroCategory.name,
-      count: result[0]?.result ?? 0,
-    }
-  }
+  const getMacroCategoryPublishedEServicesCount = (macroCategory: MacroCategory): number =>
+    eservices.reduce((count, eservice) => {
+      if (macroCategory.tenantsIds.includes(eservice.producerId)) return count + 1
+      else return count
+    }, 0)
 
-  const result = await Promise.all(
-    MACRO_CATEGORIES.map((macroCategory) => getMacroCategoryPublishedEServiceCount(macroCategory))
-  )
+  const result = globalStore.macroCategories.map((macroCategory) => ({
+    id: macroCategory.id,
+    name: macroCategory.name,
+    count: getMacroCategoryPublishedEServicesCount(macroCategory),
+  }))
 
   return EServicesByMacroCategoriesMetric.parse(result)
 }
