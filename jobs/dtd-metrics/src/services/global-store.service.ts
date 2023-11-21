@@ -29,6 +29,13 @@ type GlobalStoreInitConfig = {
   cache?: boolean
 }
 
+/**
+ * This service is used to retrieve and manage common used data
+ * to avoid querying multiple times the read model for the same data.
+ *
+ * The initialization of this service is quite heavy, while developing
+ * is recommended to use the cache option to avoid overloading the read model.
+ */
 export class GlobalStoreService {
   tenants: Array<GlobalStoreTenant>
   onboardedTenants: Array<GlobalStoreTenant>

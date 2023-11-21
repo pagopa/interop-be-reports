@@ -26,6 +26,9 @@ export class MetricsProducerService {
     private globalStore: GlobalStoreService
   ) {}
 
+  /**
+   * Adds a metric to the metrics list.
+   */
   public addMetric<TMetricKey extends keyof MetricsOutput, TMetricFactoryFn extends MetricFactoryFn<TMetricKey>>(
     metricName: TMetricKey,
     metricFactory: TMetricFactoryFn
@@ -38,6 +41,11 @@ export class MetricsProducerService {
     return this
   }
 
+  /**
+   * Executes all the metrics sequentially and returns a MetricsOutput object.
+   * If a filter is specified, only the metrics whose name includes the filter will be executed.
+   * If produceJSON is true, the output will be written to a file named `dtd-metrics.json`.
+   */
   public async produceOutput({
     produceJSON,
     filter,
@@ -59,6 +67,9 @@ export class MetricsProducerService {
     return output
   }
 
+  /**
+   * Wraps a metric factory function with logs
+   */
   private wrapFactoryFnWithLogs<
     TMetricKey extends keyof MetricsOutput,
     TMetricFactoryFn extends MetricFactoryFn<TMetricKey>,
