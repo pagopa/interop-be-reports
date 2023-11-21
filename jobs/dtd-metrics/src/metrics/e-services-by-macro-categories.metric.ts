@@ -1,12 +1,12 @@
 import { ATTRIBUTES_COLLECTION_NAME, EServiceDescriptor, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import { EServicesByMacroCategoriesMetric } from '../models/metrics.model.js'
-import { createMetric } from '../utils/helpers.utils.js'
+import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3745
  */
-export const eservicesByMacroCategoriesMetric = createMetric('eservicesByMacroCategories', async (readModel) => {
+export const getEServicesByMacroCategoriesMetric: MetricFactoryFn<'eservicesByMacroCategories'> = async (readModel) => {
   async function getMacroCategoryPublishedEServiceCount(
     macroCategory: (typeof MACRO_CATEGORIES)[number]
   ): Promise<EServicesByMacroCategoriesMetric[number]> {
@@ -93,4 +93,4 @@ export const eservicesByMacroCategoriesMetric = createMetric('eservicesByMacroCa
   )
 
   return EServicesByMacroCategoriesMetric.parse(result)
-})
+}

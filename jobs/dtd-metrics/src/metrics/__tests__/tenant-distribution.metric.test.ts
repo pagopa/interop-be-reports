@@ -2,7 +2,7 @@ import { getAgreementMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { randomUUID } from 'crypto'
 import { GlobalStoreService } from '../../services/global-store.service.js'
-import { tenantDistributionMetric } from '../tenant-distribution.metric.js'
+import { getTenantDistributionMetric } from '../tenant-distribution.metric.js'
 
 const producerUUID = randomUUID()
 const consumerUUID = randomUUID()
@@ -10,7 +10,7 @@ const bothUUID = randomUUID()
 const firstAccessUUID = randomUUID()
 const comuniAttributeUUID = randomUUID()
 
-describe('tenantDistributionMetric', () => {
+describe('getTenantDistributionMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('tenants', [
       { data: getTenantMock({ id: producerUUID, attributes: [{ id: comuniAttributeUUID }] }) },
@@ -30,7 +30,7 @@ describe('tenantDistributionMetric', () => {
     ])
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await tenantDistributionMetric.factoryFn(readModelMock, globalStore)
+    const result = await getTenantDistributionMetric(readModelMock, globalStore)
 
     expect(result?.[0].count).toEqual(1)
     expect(result?.[1].count).toEqual(1)

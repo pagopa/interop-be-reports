@@ -1,9 +1,10 @@
 import { Agreement, AgreementState, ESERVICES_COLLECTION_NAME } from '@interop-be-reports/commons'
-import { getMonthsAgoDate, createMetric } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { z } from 'zod'
 import orderBy from 'lodash/orderBy.js'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import { MostSubscribedEServicesMetric } from '../models/metrics.model.js'
+import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
 type RelevantAgreementInfo = { macrocategoryId: string; consumerName: string; consumerId: string; createdAt: Date }
 type EServiceMap = Record<
@@ -23,7 +24,10 @@ type EServiceCollectionItem = {
   agreements: Array<RelevantAgreementInfo>
 }
 
-export const mostSubscribedEServicesMetric = createMetric('mostSubscribedEServices', async (readModel, globalStore) => {
+export const getMostSubscribedEServicesMetric: MetricFactoryFn<'mostSubscribedEServices'> = async (
+  readModel,
+  globalStore
+) => {
   /*
    * We retrieve all the agreement data we need (eserviceId, consumerId, producerId, eserviceName).
    * The state of the agreement must be Active or Suspended.
@@ -166,4 +170,4 @@ export const mostSubscribedEServicesMetric = createMetric('mostSubscribedEServic
   })
 
   return MostSubscribedEServicesMetric.parse(result)
-})
+}

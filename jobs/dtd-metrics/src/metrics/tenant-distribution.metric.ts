@@ -1,9 +1,9 @@
 import { AgreementState } from '@interop-be-reports/commons'
 import { TenantDistributionMetric } from '../models/metrics.model.js'
 import { z } from 'zod'
-import { createMetric } from '../utils/helpers.utils.js'
+import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
-export const tenantDistributionMetric = createMetric('tenantDistribution', async (readModel, globalStore) => {
+export const getTenantDistributionMetric: MetricFactoryFn<'tenantDistribution'> = async (readModel, globalStore) => {
   const activeAgreements = await readModel.agreements
     .find(
       { 'data.state': { $in: ['Active', 'Suspended'] satisfies Array<AgreementState> } },
@@ -55,7 +55,7 @@ export const tenantDistributionMetric = createMetric('tenantDistribution', async
 
   // The label is misleading, this is actually the number of onboarded tenants that are neither consumers nor producers
   const onlyFirstAccess: TenantDistributionItem = {
-    label: 'Solo primo accesso',
+    label: 'Solo accesso',
     count: 0,
   }
 
@@ -72,4 +72,4 @@ export const tenantDistributionMetric = createMetric('tenantDistribution', async
   globalStore.onboardedTenants.forEach(resolveTenantDistribution)
 
   return [onlyConsumers, onlyProducers, bothConsumersAndProducers, onlyFirstAccess]
-})
+}

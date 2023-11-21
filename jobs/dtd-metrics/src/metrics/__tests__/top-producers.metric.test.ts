@@ -3,7 +3,7 @@ import { readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { randomUUID } from 'crypto'
 import { getMonthsAgoDate } from '../../utils/helpers.utils.js'
 import { GlobalStoreService } from '../../services/global-store.service.js'
-import { topProducersMetric } from '../top-producers.metric.js'
+import { getTopProducersMetric } from '../top-producers.metric.js'
 
 const producer1Uuid = randomUUID()
 const producer2Uuid = randomUUID()
@@ -56,7 +56,7 @@ describe('getTopProducersMetric', () => {
     ])
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await topProducersMetric.factoryFn(readModelMock, globalStore)
+    const result = await getTopProducersMetric(readModelMock, globalStore)
 
     expect(result.lastSixMonths[0]).toEqual({ producerName: 'Producer 2', count: 1 })
 

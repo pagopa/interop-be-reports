@@ -1,6 +1,10 @@
-import { getMonthsAgoDate, getVariationPercentage, createMetric } from '../utils/helpers.utils.js'
+import { MetricFactoryFn } from '../services/metrics-producer.service.js'
+import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
 
-export const onboardedTenantsCountMetric = createMetric('onboardedTenantsCount', async (_readModel, globalStore) => {
+export const getOnboardedTenantsCountMetric: MetricFactoryFn<'onboardedTenantsCount'> = async (
+  _readModel,
+  globalStore
+) => {
   const oneMonthAgoDate = getMonthsAgoDate(1)
   const twoMonthsAgoDate = getMonthsAgoDate(2)
 
@@ -15,4 +19,4 @@ export const onboardedTenantsCountMetric = createMetric('onboardedTenantsCount',
   const variation = getVariationPercentage(lastMonthTenantsCount, twoMonthsAgoTenantsCount)
 
   return { totalTenantsCount, lastMonthTenantsCount, variation }
-})
+}

@@ -1,76 +1,60 @@
 import { ReadPreferenceMode } from 'mongodb'
-import { AwsS3BucketClient, ReadModelClient, withExecutionTime } from '@interop-be-reports/commons'
+import { AwsS3BucketClient, ReadModelClient } from '@interop-be-reports/commons'
 import { env } from './configs/env.js'
 import {
-  publishedEServicesMetric,
-  eservicesByMacroCategoriesMetric,
-  mostSubscribedEServicesMetric,
-  topProducersBySubscribersMetric,
-  topProducersMetric,
-  // onboardedTenantsCountMetric,
-  // tenantDistributionMetric,
-  // tenantSignupsTrendMetric,
-  // onboardedTenantsCountByMacroCategoriesMetric,
+  getPublishedEServicesMetric,
+  getEServicesByMacroCategoriesMetric,
+  getMostSubscribedEServicesMetric,
+  getTopProducersBySubscribersMetric,
+  getTopProducersMetric,
+  // getOnboardedTenantsCountMetric,
+  // getTenantDistributionMetric,
+  // getTenantSignupsTrendMetric,
+  // getOnboardedTenantsCountByMacroCategoriesMetric,
 } from './metrics/index.js'
 import { GithubClient, GlobalStoreService } from './services/index.js'
-import { produceMetricsOutput } from './utils/helpers.utils.js'
-import { writeFileSync } from 'fs'
+import { MetricsProducerService } from './services/metrics-producer.service.js'
 
 const log = console.log
 
-let readModel: ReadModelClient
+log('Starting program\n')
 
-async function main(): Promise<void> {
-  log('Starting program\n')
+const readModel = await ReadModelClient.connect({
+  mongodbReplicaSet: env.MONGODB_REPLICA_SET,
+  mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
+  mongodbReadPreference: env.MONGODB_READ_PREFERENCE as ReadPreferenceMode,
+  mongodbRetryWrites: env.MONGODB_RETRY_WRITES,
+  readModelDbHost: env.READ_MODEL_DB_HOST,
+  readModelDbPort: env.READ_MODEL_DB_PORT,
+  readModelDbUser: env.READ_MODEL_DB_USER,
+  readModelDbPassword: env.READ_MODEL_DB_PASSWORD,
+  readModelDbName: env.READ_MODEL_DB_NAME,
+})
 
-  readModel = await ReadModelClient.connect({
-    mongodbReplicaSet: env.MONGODB_REPLICA_SET,
-    mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
-    mongodbReadPreference: env.MONGODB_READ_PREFERENCE as ReadPreferenceMode,
-    mongodbRetryWrites: env.MONGODB_RETRY_WRITES,
-    readModelDbHost: env.READ_MODEL_DB_HOST,
-    readModelDbPort: env.READ_MODEL_DB_PORT,
-    readModelDbUser: env.READ_MODEL_DB_USER,
-    readModelDbPassword: env.READ_MODEL_DB_PASSWORD,
-    readModelDbName: env.READ_MODEL_DB_NAME,
-  })
-
+try {
   const githubClient = new GithubClient(env.GITHUB_ACCESS_TOKEN)
   const awsS3BucketClient = new AwsS3BucketClient(env.STORAGE_BUCKET)
 
   log('Initializing global store...')
-  const globalStore = await GlobalStoreService.init(readModel)
+  const globalStore = await GlobalStoreService.init(readModel, { cache: env.CACHE_GLOBAL_STORE })
   log('Global store initialized!\n')
 
   log('Producing metrics...\n')
 
-  const metricsFilter = env.DEV_FILTER_METRICS
-
-  if (metricsFilter) {
-    log('Metric filtering enabled!')
-    log(`Filtering metrics by: "${metricsFilter}".\n`)
-  }
-
-  const metricsObjs = [
-    // --- FIRST BATCH ---
-    publishedEServicesMetric,
-    eservicesByMacroCategoriesMetric,
-    mostSubscribedEServicesMetric,
-    topProducersBySubscribersMetric,
-    topProducersMetric,
-    // --- SECOND BATCH ---
-    // onboardedTenantsCountMetric,
-    // tenantDistributionMetric,
-    // tenantSignupsTrendMetric,
-    // onboardedTenantsCountByMacroCategoriesMetric,
-  ]
-
-  const output = await produceMetricsOutput(readModel, globalStore, metricsObjs, metricsFilter)
-
-  if (env.DEV_PRODUCE_JSON) {
-    writeFileSync(`./dev-output.json`, JSON.stringify(output, null, 2))
-    log(`\nOutput written to ./dev-output.json`)
-  }
+  const output = await new MetricsProducerService(readModel, globalStore)
+    .addMetric('publishedEServices', getPublishedEServicesMetric)
+    .addMetric('eservicesByMacroCategories', getEServicesByMacroCategoriesMetric)
+    .addMetric('mostSubscribedEServices', getMostSubscribedEServicesMetric)
+    .addMetric('topProducersBySubscribers', getTopProducersBySubscribersMetric)
+    .addMetric('topProducers', getTopProducersMetric)
+    // .addMetric('onboardedTenantsCount', getOnboardedTenantsCountMetric)
+    // .addMetric('tenantDistribution', getTenantDistributionMetric)
+    // .addMetric('tenantSignupsTrend', getTenantSignupsTrendMetric)
+    // .addMetric('onboardedTenantsCountByMacroCategories', getOnboardedTenantsCountByMacroCategoriesMetric)
+    .produceOutput({
+      filter: env.METRICS_FILTER,
+      produceJSON: env.PRODUCE_OUTPUT_JSON,
+    })
 
   log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
@@ -80,8 +64,9 @@ async function main(): Promise<void> {
   ])
 
   log('Done!\n')
+} catch (err) {
+  log('An error occurred while producing metrics:')
+  throw err
+} finally {
+  await readModel.close()
 }
-
-withExecutionTime(main).finally(async () => {
-  if (readModel) await readModel.close()
-})

@@ -2,7 +2,7 @@ import { getAgreementMock, getAttributeMock, getEServiceMock, getTenantMock } fr
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { randomUUID } from 'crypto'
 import { GlobalStoreService } from '../../services/global-store.service.js'
-import { mostSubscribedEServicesMetric } from '../most-subscribed-e-services.metric.js'
+import { getMostSubscribedEServicesMetric } from '../most-subscribed-e-services.metric.js'
 
 const eservice1Uuid = randomUUID()
 const eservice2Uuid = randomUUID()
@@ -19,7 +19,7 @@ const aziendaOspedaliera3Uuid = randomUUID()
 const comuneAttributeUuid = randomUUID()
 const aziendaOspedalieraAttributeUuid = randomUUID()
 
-describe('mostSubscribedEServicesMetric', () => {
+describe('getMostSubscribedEServicesMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('eservices', [
       { data: getEServiceMock({ name: 'eservice-1', id: eservice1Uuid, producerId: producerUuid }) },
@@ -191,7 +191,7 @@ describe('mostSubscribedEServicesMetric', () => {
     ])
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await mostSubscribedEServicesMetric.factoryFn(readModelMock, globalStore)
+    const result = await getMostSubscribedEServicesMetric(readModelMock, globalStore)
 
     const comuniTop10 = result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')
       ?.mostSubscribedEServices

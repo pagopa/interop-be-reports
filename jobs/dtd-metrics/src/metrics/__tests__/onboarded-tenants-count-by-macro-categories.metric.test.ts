@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { sub } from 'date-fns'
 import { GlobalStoreService } from '../../services/global-store.service.js'
-import { onboardedTenantsCountByMacroCategoriesMetric } from '../onboarded-tenants-count-by-macro-categories.metric.js'
+import { getOnboardedTenantsCountByMacroCategoriesMetric } from '../onboarded-tenants-count-by-macro-categories.metric.js'
 
 const comuneAttributeUuid = randomUUID()
 const aziendaOspedalieraAttributeUuid = randomUUID()
@@ -12,7 +12,7 @@ const oneMonthAgoDate = sub(new Date(), { months: 1 }).toISOString()
 const sixMonthsAgoDate = sub(new Date(), { months: 6 }).toISOString()
 const oneYearAgoDate = sub(new Date(), { years: 1 }).toISOString()
 
-describe('onboardedTenantsCountByMacroCategoriesMetric', () => {
+describe('getOnboardedTenantsCountByMacroCategoriesMetric', () => {
   it('should return the correct metrics', async () => {
     const oboardedTenants = [
       {
@@ -97,7 +97,7 @@ describe('onboardedTenantsCountByMacroCategoriesMetric', () => {
     await seedCollection('attributes', attributes)
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await onboardedTenantsCountByMacroCategoriesMetric.factoryFn(readModelMock, globalStore)
+    const result = await getOnboardedTenantsCountByMacroCategoriesMetric(readModelMock, globalStore)
 
     const comuniMetric = result?.fromTheBeginning.find(
       (metric) => metric.name === ('Comuni' satisfies MacroCategoryName)

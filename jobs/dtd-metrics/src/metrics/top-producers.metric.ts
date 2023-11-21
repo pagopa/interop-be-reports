@@ -1,11 +1,12 @@
 import { EServiceDescriptor, ReadModelClient, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
 import { TopProducersMetricItem, TopProducersMetric } from '../models/metrics.model.js'
-import { getMonthsAgoDate, createMetric } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate } from '../utils/helpers.utils.js'
+import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-4215
  */
-export const topProducersMetric = createMetric('topProducers', async (readModel) => {
+export const getTopProducersMetric: MetricFactoryFn<'topProducers'> = async (readModel) => {
   const sixMonthsAgoDate = getMonthsAgoDate(6)
   const twelveMonthsAgoDate = getMonthsAgoDate(12)
   const fromTheBeginningDate = undefined
@@ -17,7 +18,7 @@ export const topProducersMetric = createMetric('topProducers', async (readModel)
   )
 
   return TopProducersMetric.parse({ lastSixMonths, lastTwelveMonths, fromTheBeginning })
-})
+}
 
 export async function getTopProducersMetricFromDate(
   readModel: ReadModelClient,

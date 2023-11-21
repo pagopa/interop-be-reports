@@ -26,9 +26,14 @@ export const Env = z.object({
   FILENAME: z.string(),
 
   // If set, only metrics with names matching this string will be produced
-  DEV_FILTER_METRICS: z.string().optional(),
+  METRICS_FILTER: z.string().optional(),
   // If set, a JSON file with the metrics output will be produced
-  DEV_PRODUCE_JSON: z
+  PRODUCE_OUTPUT_JSON: z
+    .string()
+    .optional()
+    .transform((value) => value === 'true'),
+  // If set, the data that needs to fetch the global store will be cached, used to speed up development
+  CACHE_GLOBAL_STORE: z
     .string()
     .optional()
     .transform((value) => value === 'true'),

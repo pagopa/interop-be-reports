@@ -2,7 +2,7 @@ import { getAgreementMock, getAttributeMock, getTenantMock } from '@interop-be-r
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { randomUUID } from 'crypto'
 import { GlobalStoreService } from '../../services/global-store.service.js'
-import { topProducersBySubscribersMetric } from '../top-producers-by-subscribers.metric.js'
+import { getTopProducersBySubscribersMetric } from '../top-producers-by-subscribers.metric.js'
 
 const producer1Uuid = randomUUID()
 const producer2Uuid = randomUUID()
@@ -11,7 +11,7 @@ const aziendaOspedalieraConsumerUuid = randomUUID()
 const comuneAttributeUuid = randomUUID()
 const aziendaOspedalieraAttributeUuid = randomUUID()
 
-describe('topProducersBySubscribersMetric', () => {
+describe('getTopProducersBySubscribersMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('agreements', [
       {
@@ -98,7 +98,7 @@ describe('topProducersBySubscribersMetric', () => {
     ])
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await topProducersBySubscribersMetric.factoryFn(readModelMock, globalStore)
+    const result = await getTopProducersBySubscribersMetric(readModelMock, globalStore)
 
     const producer1 = result.fromTheBeginning[0]
     expect(producer1.producerName).toStrictEqual('Producer 1')

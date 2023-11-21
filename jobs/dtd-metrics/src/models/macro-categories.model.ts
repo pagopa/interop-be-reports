@@ -24,7 +24,7 @@ export const MacroCategory = z.object({
   ipaCodes: z.array(z.string()),
   attributes: z.array(MacroCategoryAttribute),
   tenants: z.array(MacroCategoryTenant),
-  tenantsIds: z.set(z.string()),
+  tenantsIds: z.array(z.string()),
 })
 
 export const MacroCategories = z.array(MacroCategory)
