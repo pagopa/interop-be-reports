@@ -53,7 +53,7 @@ export class GlobalStoreService {
 
   private constructor(tenants: Array<GlobalStoreTenant>, macroCategories: MacroCategories) {
     this.tenants = tenants
-    this.onboardedTenants = tenants.filter(({ selfcareId }) => !!selfcareId)
+    this.onboardedTenants = GlobalStoreService.getOnboardedTenants(tenants)
     this.tenantsMap = new Map(tenants.map((tenant) => [tenant.id, tenant]))
     this.macroCategories = macroCategories
   }
@@ -109,6 +109,7 @@ export class GlobalStoreService {
         ipaCodes: macroCategory.ipaCodes,
         attributes: macroCategoryAttributes,
         tenants: macroCategoryTenants,
+        onboardedTenants: this.getOnboardedTenants(macroCategoryTenants),
         tenantsIds: Array.from(new Set(macroCategoryTenants.map(({ id }) => id))),
       })
     }
@@ -135,5 +136,9 @@ export class GlobalStoreService {
 
   private static cacheInitializationData(cache: GlobalStoreCacheObj): void {
     writeFileSync(GLOBAL_STORE_CACHE_PATH, JSON.stringify(cache))
+  }
+
+  private static getOnboardedTenants(tenants: Array<GlobalStoreTenant>): Array<GlobalStoreTenant> {
+    return tenants.filter(({ selfcareId }) => !!selfcareId)
   }
 }
