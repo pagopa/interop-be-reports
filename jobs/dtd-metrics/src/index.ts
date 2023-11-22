@@ -9,7 +9,7 @@ import {
   getTopProducersMetric,
   // getOnboardedTenantsCountMetric,
   // getTenantDistributionMetric,
-  // getTenantSignupsTrendMetric,
+  // getTenantOnboardingTrendMetric,
   // getOnboardedTenantsCountByMacroCategoriesMetric,
 } from './metrics/index.js'
 import { GithubClient, GlobalStoreService } from './services/index.js'
@@ -49,7 +49,7 @@ try {
     .addMetric('topProducers', getTopProducersMetric)
     // .addMetric('onboardedTenantsCount', getOnboardedTenantsCountMetric)
     // .addMetric('tenantDistribution', getTenantDistributionMetric)
-    // .addMetric('tenantSignupsTrend', getTenantSignupsTrendMetric)
+    // .addMetric('tenantOnboardingTrend', getTenantOnboardingTrendMetric)
     // .addMetric('onboardedTenantsCountByMacroCategories', getOnboardedTenantsCountByMacroCategoriesMetric)
     .produceOutput({
       filter: env.METRICS_FILTER,

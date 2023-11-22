@@ -1,9 +1,9 @@
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { add } from 'date-fns'
-import { TenantSignupsTrendMetric } from '../models/metrics.model.js'
+import { TenantOnboardingTrendMetric } from '../models/metrics.model.js'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
-export const getTenantSignupsTrendMetric: MetricFactoryFn<'tenantSignupsTrend'> = (_readModel, globalStore) => {
+export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTrend'> = (_readModel, globalStore) => {
   // Get the oldest tenant date, which will be used as the starting point for the timeseries
   const oldestTenantDate = globalStore.onboardedTenants.reduce((oldestDate, tenant) => {
     if (tenant.createdAt < oldestDate) {
@@ -28,7 +28,7 @@ export const getTenantSignupsTrendMetric: MetricFactoryFn<'tenantSignupsTrend'> 
 
   const fromTheBeginningData = globalStore.macroCategories
 
-  const result = TenantSignupsTrendMetric.parse({
+  const result = TenantOnboardingTrendMetric.parse({
     lastSixMonths: sixMonthsAgoData.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
