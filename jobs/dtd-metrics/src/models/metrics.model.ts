@@ -76,7 +76,7 @@ export const OnboardedTenantsCountMetric = z.object({
 
 export const TenantDistributionMetric = z.array(
   z.object({
-    label: z.enum(['Solo fruitore', 'Solo erogatore', 'Sia fruitore che erogatore', 'Solo accesso']),
+    activity: z.enum(['Solo fruitore', 'Solo erogatore', 'Sia fruitore che erogatore', 'Solo accesso']),
     count: z.number(),
   })
 )

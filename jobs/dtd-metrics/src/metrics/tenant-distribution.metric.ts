@@ -39,23 +39,22 @@ export const getTenantDistributionMetric: MetricFactoryFn<'tenantDistribution'> 
   type TenantDistributionItem = TenantDistributionMetric[number]
 
   const onlyConsumers: TenantDistributionItem = {
-    label: 'Solo fruitore',
+    activity: 'Solo fruitore',
     count: 0,
   }
 
   const onlyProducers: TenantDistributionItem = {
-    label: 'Solo erogatore',
+    activity: 'Solo erogatore',
     count: 0,
   }
 
   const bothConsumersAndProducers: TenantDistributionItem = {
-    label: 'Sia fruitore che erogatore',
+    activity: 'Sia fruitore che erogatore',
     count: 0,
   }
 
-  // The label is misleading, this is actually the number of onboarded tenants that are neither consumers nor producers
-  const onlyFirstAccess: TenantDistributionItem = {
-    label: 'Solo accesso',
+  const onlyAccess: TenantDistributionItem = {
+    activity: 'Solo accesso',
     count: 0,
   }
 
@@ -66,10 +65,10 @@ export const getTenantDistributionMetric: MetricFactoryFn<'tenantDistribution'> 
     if (isTenantProducer && isTenantConsumer) bothConsumersAndProducers.count++
     else if (isTenantProducer) onlyProducers.count++
     else if (isTenantConsumer) onlyConsumers.count++
-    else onlyFirstAccess.count++
+    else onlyAccess.count++
   }
 
   globalStore.onboardedTenants.forEach(resolveTenantDistribution)
 
-  return [onlyConsumers, onlyProducers, bothConsumersAndProducers, onlyFirstAccess]
+  return [onlyConsumers, onlyProducers, bothConsumersAndProducers, onlyAccess]
 }
