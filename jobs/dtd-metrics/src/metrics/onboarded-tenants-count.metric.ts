@@ -1,5 +1,5 @@
 import { OnboardedTenantsCountMetric } from '../models/metrics.model.js'
-import { GlobalStoreTenant } from '../services/global-store.service.js'
+import { GlobalStoreService, GlobalStoreTenant } from '../services/global-store.service.js'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
 
@@ -7,47 +7,31 @@ export const getOnboardedTenantsCountMetric: MetricFactoryFn<'onboardedTenantsCo
   _readModel,
   globalStore
 ) => {
-  const allOnboardedTenants = globalStore.onboardedTenants
-  const comuniOnboardedTenants = globalStore.getMacroCategoryByName('Comuni').onboardedTenants
-  const regioniOnboardedTenants = globalStore.getMacroCategoryByName('Regioni').onboardedTenants
-  const universitaEAFAMOnboardedTenants = globalStore.getMacroCategoryByName('Università e AFAM').onboardedTenants
-
-  const totalOnboardedTenantsCount = allOnboardedTenants.length
-  const comuniOnboardedTenantsCount = comuniOnboardedTenants.length
-  const regioniOnboardedTenantsCount = regioniOnboardedTenants.length
-  const universitaEAFAMOnboardedTenantsCount = universitaEAFAMOnboardedTenants.length
-
-  const lastMonthTotalOnboardedTenantsCount = getLastMonthTenantsCount(allOnboardedTenants)
-  const lastMonthComuniOnboardedTenantsCount = getLastMonthTenantsCount(comuniOnboardedTenants)
-  const lastMonthRegioniOnboardedTenantsCount = getLastMonthTenantsCount(regioniOnboardedTenants)
-  const lastMonthUniversitaEAFAMOnboardedTenantsCount = getLastMonthTenantsCount(universitaEAFAMOnboardedTenants)
-
   return OnboardedTenantsCountMetric.parse([
-    {
-      name: 'Totale',
-      totalTenantsCount: totalOnboardedTenantsCount,
-      lastMonthTenantsCount: lastMonthTotalOnboardedTenantsCount,
-      variation: getVariationCount(allOnboardedTenants, lastMonthTotalOnboardedTenantsCount),
-    },
-    {
-      name: 'Comuni',
-      totalTenantsCount: comuniOnboardedTenantsCount,
-      lastMonthTenantsCount: lastMonthComuniOnboardedTenantsCount,
-      variation: getVariationCount(comuniOnboardedTenants, lastMonthComuniOnboardedTenantsCount),
-    },
-    {
-      name: 'Regioni',
-      totalTenantsCount: regioniOnboardedTenantsCount,
-      lastMonthTenantsCount: lastMonthRegioniOnboardedTenantsCount,
-      variation: getVariationCount(regioniOnboardedTenants, lastMonthRegioniOnboardedTenantsCount),
-    },
-    {
-      name: 'Università e AFAM',
-      totalTenantsCount: universitaEAFAMOnboardedTenantsCount,
-      lastMonthTenantsCount: lastMonthUniversitaEAFAMOnboardedTenantsCount,
-      variation: getVariationCount(universitaEAFAMOnboardedTenants, lastMonthUniversitaEAFAMOnboardedTenantsCount),
-    },
+    getMetricData('Totale', globalStore),
+    getMetricData('Comuni', globalStore),
+    getMetricData('Regioni', globalStore),
+    getMetricData('Università e AFAM', globalStore),
   ])
+}
+
+function getMetricData(
+  name: OnboardedTenantsCountMetric[number]['name'],
+  globalStore: GlobalStoreService
+): OnboardedTenantsCountMetric[number] {
+  const onboardedTenants =
+    name === 'Totale' ? globalStore.onboardedTenants : globalStore.getMacroCategoryByName(name).onboardedTenants
+
+  const totalTenantsCount = onboardedTenants.length
+  const lastMonthTenantsCount = getLastMonthTenantsCount(onboardedTenants)
+  const variation = getVariationCount(onboardedTenants, lastMonthTenantsCount)
+
+  return {
+    name,
+    totalTenantsCount,
+    lastMonthTenantsCount,
+    variation,
+  }
 }
 
 function getLastMonthTenantsCount(tenants: Array<GlobalStoreTenant>): number {
