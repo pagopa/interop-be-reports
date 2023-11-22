@@ -2,7 +2,7 @@ import { ReadModelClient } from '@interop-be-reports/commons'
 import { MetricsOutput } from '../models/metrics.model.js'
 import { GlobalStoreService } from './global-store.service.js'
 import { writeFileSync } from 'fs'
-import { log } from '../utils/helpers.utils.js'
+import { log, timer } from '../utils/helpers.utils.js'
 
 export type MetricFactoryFn<TMetricKey extends keyof MetricsOutput> = (
   readModel: ReadModelClient,
@@ -78,12 +78,10 @@ export class MetricsProducerService {
     return async (readModel, globalStore) => {
       log.info(`> Starting ${metricName}...`)
 
-      const timeLog = `> Done! ${metricName} finished executing in`
-      console.time(timeLog)
-
       try {
+        timer.start()
         const result = await metricFactory(readModel, globalStore)
-        console.timeEnd(timeLog)
+        log.info(`> Done! ${metricName} finished executing in ${timer.stop()}s`)
         return result
       } catch (e) {
         log.error(`Error while executing ${metricName}`)

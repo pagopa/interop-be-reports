@@ -17,3 +17,14 @@ export const log = {
   warn: logWarn.bind(null, cidJob),
   error: logError.bind(null, cidJob),
 }
+
+export const timer = {
+  timeStart: 0,
+  start(): void {
+    this.timeStart = performance.now()
+  },
+  stop(): number {
+    const timeEnd = performance.now()
+    return Number(((timeEnd - this.timeStart) / 100).toFixed(2))
+  },
+}
