@@ -25,6 +25,6 @@ export const timer = {
   },
   stop(): number {
     const timeEnd = performance.now()
-    return Number(((timeEnd - this.timeStart) / 100).toFixed(2))
+    return Number(((timeEnd - this.timeStart) / 1000).toFixed(2))
   },
 }
