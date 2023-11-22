@@ -90,8 +90,7 @@ const prepareTenantsProcessor =
 
       await Promise.all(
         zipBy(validOrgs, tenants, extractTenantCode, (tenant) => tenant.externalId.value).map(async ([org, tenant]) => {
-
-          if (org.DATA_ISCRIZIONE_ALBO_ELENCO.getDate() < now && org.DATA_CANCELLAZIONE_ALBO_ELENCO.getDate() > now)
+          if (org.DATA_ISCRIZIONE_ALBO_ELENCO.getTime() < now && org.DATA_CANCELLAZIONE_ALBO_ELENCO.getTime() > now)
             await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.ivassInsurances)
           else await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.ivassInsurances)
         })
@@ -163,6 +162,7 @@ function getBatch(
     columns: true,
     from: fromLine,
     to: fromLine + batchSize - 1,
+    delimiter: ';'
   }) as Array<object>
 
   const records: CsvRow[] = rawRecords
