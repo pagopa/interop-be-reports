@@ -1,15 +1,16 @@
 import { IVASS_INSURANCES_ATTRIBUTE_CODE } from '../config/constants.js'
 import { parse } from 'csv/sync'
-import { ReadModelQueries, TenantProcessService } from '../service/index.js'
 import { RefreshableInteropToken, zipBy, logError, logWarn, logInfo } from '@interop-be-reports/commons'
 import crypto from 'crypto'
 import { AttributeIdentifiers, BatchParseResult, IvassAttributes } from '../model/processor.model.js'
+import { TenantProcessService } from './tenant-process.service.js'
 import { PersistentTenant } from '../model/tenant.model.js'
 import { CsvRow, RawCsvRow } from '../model/csv-row.model.js'
 import { InteropContext } from '../model/interop-context.model.js'
+import { ReadModelQueries } from './read-model-queries.service.js'
 
 export async function importAttributes(
-  filoeDownloader: FileDownloader,
+  csvDownloader: () => Promise<string>,
   readModel: ReadModelQueries,
   tenantProcess: TenantProcessService,
   refreshableToken: RefreshableInteropToken,
@@ -22,7 +23,7 @@ export async function importAttributes(
 
   const batchSize = recordsBatchSize
 
-  const fileContent = await filoeDownloader.downloadCSV()
+  const fileContent = await csvDownloader()
 
   const attributes: IvassAttributes = await getAttributesIdentifiers(readModel, ivassTenantId)
 
@@ -37,7 +38,7 @@ export async function importAttributes(
     await processTenants(
       batchResult.records,
       (org) => org.CODICE_FISCALE,
-      (codes) => readModel.getNonPATenants(codes)
+      (codes) => readModel.getIVASSTenants(codes)
     )
 
     fromLine = fromLine + batchSize

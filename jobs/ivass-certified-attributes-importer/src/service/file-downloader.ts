@@ -84,8 +84,9 @@ export const downloadCSV = async (config: SourceFileConfig): Promise<string> => 
   const fileName = await downloadFile(csvButton, config.outputDir);
 
   const csvPath = await unzipFile(fileName, config.outputDir);
+  const fileContent = await fs.promises.readFile(csvPath)
 
   await browser.close();
 
-  return csvPath;
+  return fileContent.toString();
 }
