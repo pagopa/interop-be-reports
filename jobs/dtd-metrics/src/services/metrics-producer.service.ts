@@ -7,7 +7,7 @@ import { log } from '../utils/helpers.utils.js'
 export type MetricFactoryFn<TMetricKey extends keyof MetricsOutput> = (
   readModel: ReadModelClient,
   globalStore: GlobalStoreService
-) => Promise<MetricsOutput[TMetricKey]>
+) => Promise<MetricsOutput[TMetricKey]> | MetricsOutput[TMetricKey]
 
 type MetricObj<TMetricKey extends keyof MetricsOutput> = {
   name: TMetricKey

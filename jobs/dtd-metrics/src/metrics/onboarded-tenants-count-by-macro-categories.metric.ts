@@ -10,12 +10,12 @@ type OnboardedTenantsCountByMacroCategoriesMetricItem = OnboardedTenantsCountByM
 
 export const getOnboardedTenantsCountByMacroCategoriesMetric: MetricFactoryFn<
   'onboardedTenantsCountByMacroCategories'
-> = async (_readModel, globalStore) => {
+> = (_readModel, globalStore) => {
   // Get the onboarded and total tenants count for each macro category
-  async function getTotalAndOnboardedTenantsCountFromMacroCategory(
+  function getTotalAndOnboardedTenantsCountFromMacroCategory(
     macroCategory: MacroCategory,
     date: Date | undefined
-  ): Promise<OnboardedTenantsCountByMacroCategoriesMetricItem> {
+  ): OnboardedTenantsCountByMacroCategoriesMetricItem {
     //TODO eventually the createdAt field will be substituted by the onboardedAt field once it will be available
     const tenants = date ? macroCategory.tenants.filter((t) => t.createdAt >= date) : macroCategory.tenants
 
@@ -26,14 +26,14 @@ export const getOnboardedTenantsCountByMacroCategoriesMetric: MetricFactoryFn<
   }
 
   const result = OnboardedTenantsCountByMacroCategoriesMetric.parse({
-    lastSixMonths: await Promise.all(
-      globalStore.macroCategories.map((m) => getTotalAndOnboardedTenantsCountFromMacroCategory(m, getMonthsAgoDate(6)))
+    lastSixMonths: globalStore.macroCategories.map((m) =>
+      getTotalAndOnboardedTenantsCountFromMacroCategory(m, getMonthsAgoDate(6))
     ),
-    lastTwelveMonths: await Promise.all(
-      globalStore.macroCategories.map((m) => getTotalAndOnboardedTenantsCountFromMacroCategory(m, getMonthsAgoDate(12)))
+    lastTwelveMonths: globalStore.macroCategories.map((m) =>
+      getTotalAndOnboardedTenantsCountFromMacroCategory(m, getMonthsAgoDate(12))
     ),
-    fromTheBeginning: await Promise.all(
-      globalStore.macroCategories.map((m) => getTotalAndOnboardedTenantsCountFromMacroCategory(m, undefined))
+    fromTheBeginning: globalStore.macroCategories.map((m) =>
+      getTotalAndOnboardedTenantsCountFromMacroCategory(m, undefined)
     ),
   })
 

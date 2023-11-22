@@ -1,10 +1,7 @@
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
 
-export const getOnboardedTenantsCountMetric: MetricFactoryFn<'onboardedTenantsCount'> = async (
-  _readModel,
-  globalStore
-) => {
+export const getOnboardedTenantsCountMetric: MetricFactoryFn<'onboardedTenantsCount'> = (_readModel, globalStore) => {
   const oneMonthAgoDate = getMonthsAgoDate(1)
   const twoMonthsAgoDate = getMonthsAgoDate(2)
 
