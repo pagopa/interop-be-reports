@@ -9,30 +9,21 @@ import { ReadModelQueries } from "../read-model-queries.service.js";
 import { TenantProcessService } from "../tenant-process.service.js";
 import { importAttributes } from "../processor.js";
 
-// import {
-//   ATTRIBUTE_IVASS_INSURANCES_ID,
-//   downloadCSVMock,
-//   downloadCSVMockGenerator,
-//   getAttributeByExternalIdMock,
-//   getIVASSTenantsMock,
-//   getTenantByIdMock,
-//   getTenantByIdMockGenerator,
-//   getTenantsMockGenerator,
-//   internalAssignCertifiedAttributeMock,
-//   internalRevokeCertifiedAttributeMock,
-//   persistentTenant,
-//   persistentTenantAttribute,
-// } from './helpers.js'
-// import { PersistentTenant } from '../../model/tenant.model.js'
-
 import {
+  ATTRIBUTE_IVASS_INSURANCES_ID,
   downloadCSVMock,
+  downloadCSVMockGenerator,
   getAttributeByExternalIdMock,
   getIVASSTenantsMock,
   getTenantByIdMock,
+  // getTenantByIdMockGenerator,
+  getTenantsMockGenerator,
   internalAssignCertifiedAttributeMock,
   internalRevokeCertifiedAttributeMock,
+  persistentTenant,
+  persistentTenantAttribute,
 } from './helpers.js'
+import { PersistentTenant } from '../../model/tenant.model.js'
 
 describe('IVASS Certified Attributes Importer', () => {
   const tokenGeneratorMock = {} as InteropTokenGenerator
@@ -95,221 +86,285 @@ describe('IVASS Certified Attributes Importer', () => {
     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
   })
 
-//   it('should succeed, assigning only missing attributes', async () => {
-//     const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,IVASS_incaricato,IVASS_abilitato,IVASS_in_convalida
-// 0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE`
+  it('should succeed, assigning only missing attributes', async () => {
+    const csvFileContent = `CODICE_IVASS;DATA_ISCRIZIONE_ALBO_ELENCO;DATA_CANCELLAZIONE_ALBO_ELENCO;DENOMINAZIONE_IMPRESA;CODICE_FISCALE
+    D0001;2020-12-02;9999-12-31;Org1;0000012345678901
+    D0002;2020-06-10;9999-12-31;Org2;0000012345678902
+    D0003;2019-07-19;9999-12-31;Org3;0000012345678903`
 
-//     const readModelTenants: PersistentTenant[] = [
-//       {
-//         ...persistentTenant,
-//         externalId: { origin: 'IPA', value: 'ipa_code_123' },
-//         attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_ABILITATO_ID }],
-//       },
-//     ]
+    const readModelTenants: PersistentTenant[] = [
+      {
+        ...persistentTenant,
+        externalId: { origin: 'IVASS', value: '12345678901' },
+        attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_INSURANCES_ID }],
+      },
+      {
+        ...persistentTenant,
+        externalId: { origin: 'IVASS', value: '12345678902' },
+        attributes: [{ ...persistentTenantAttribute }],
+      },
+      {
+        ...persistentTenant,
+        externalId: { origin: 'IVASS', value: '12345678903' },
+        attributes: [],
+      },
+    ]
 
-//     const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
-//     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+    const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
 
-//     const getPATenantsMock = getTenantsMockGenerator((_) => readModelTenants)
-//     const getPATenantsSpy = vi.spyOn(readModelQueriesMock, 'getPATenants').mockImplementation(getPATenantsMock)
+    const getIVASSTenantsMock = getTenantsMockGenerator((_) => readModelTenants)
+    const getIVASSTenantsSpy = vi.spyOn(readModelQueriesMock, 'getIVASSTenants').mockImplementation(getIVASSTenantsMock)
 
-//     await run()
+    await importAttributes(
+      localDownloadCSVMock,
+      readModelQueriesMock,
+      tenantProcessMock,
+      refreshableTokenMock,
+      10,
+      'ivass-tenant-id'
+    )
 
-//     expect(downloadCSVSpy).toBeCalledTimes(1)
-//     expect(getTenantByIdSpy).toBeCalledTimes(1)
-//     expect(getAttributeByExternalIdSpy).toBeCalledTimes(3)
+    expect(localDownloadCSVMock).toBeCalledTimes(1)
+    expect(getTenantByIdSpy).toBeCalledTimes(1)
+    expect(getAttributeByExternalIdSpy).toBeCalledTimes(1)
 
-//     expect(getPATenantsSpy).toBeCalledTimes(1)
-//     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+    expect(getIVASSTenantsSpy).toBeCalledTimes(1)
 
-//     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
-//     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
-//     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
-//   })
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
+    expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
+    expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
+  })
 
-//   it('should succeed, unassigning only existing attributes', async () => {
-//     const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,IVASS_incaricato,IVASS_abilitato,IVASS_in_convalida
-// 0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,FALSE,FALSE,FALSE`
+  it('should succeed, unassigning expired organizations ', async () => {
+    const csvFileContent = `CODICE_IVASS;DATA_ISCRIZIONE_ALBO_ELENCO;DATA_CANCELLAZIONE_ALBO_ELENCO;DENOMINAZIONE_IMPRESA;CODICE_FISCALE
+    D0001;2020-12-02;2021-12-31;Org1;0000012345678901
+    D0002;2100-06-10;9999-12-31;Org2;0000012345678902`
 
-//     const readModelTenants: PersistentTenant[] = [
-//       {
-//         ...persistentTenant,
-//         externalId: { origin: 'IPA', value: 'ipa_code_123' },
-//         attributes: [
-//           { ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_ABILITATO_ID },
-//           { ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_INCARICATO_ID },
-//         ],
-//       },
-//     ]
+    const readModelTenants: PersistentTenant[] = [
+      {
+        ...persistentTenant,
+        externalId: { origin: 'IVASS', value: '12345678901' },
+        attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_INSURANCES_ID }],
+      },
+      {
+        ...persistentTenant,
+        externalId: { origin: 'IVASS', value: '12345678902' },
+        attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_INSURANCES_ID }],
+      },
+    ]
 
-//     const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
-//     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+    const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
 
-//     const getPATenantsMock = getTenantsMockGenerator((_) => readModelTenants)
-//     const getPATenantsSpy = vi.spyOn(readModelQueriesMock, 'getPATenants').mockImplementation(getPATenantsMock)
+    const getIVASSTenantsMock = getTenantsMockGenerator((_) => readModelTenants)
+    const getIVASSTenantsSpy = vi.spyOn(readModelQueriesMock, 'getIVASSTenants').mockImplementation(getIVASSTenantsMock)
 
-//     await run()
+    await importAttributes(
+      localDownloadCSVMock,
+      readModelQueriesMock,
+      tenantProcessMock,
+      refreshableTokenMock,
+      10,
+      'ivass-tenant-id'
+    )
 
-//     expect(downloadCSVSpy).toBeCalledTimes(1)
-//     expect(getTenantByIdSpy).toBeCalledTimes(1)
-//     expect(getAttributeByExternalIdSpy).toBeCalledTimes(3)
+    expect(localDownloadCSVMock).toBeCalledTimes(1)
+    expect(getTenantByIdSpy).toBeCalledTimes(1)
+    expect(getAttributeByExternalIdSpy).toBeCalledTimes(1)
 
-//     expect(getPATenantsSpy).toBeCalledTimes(1)
-//     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+    expect(getIVASSTenantsSpy).toBeCalledTimes(1)
 
-//     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
-//     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
-//     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(2)
-//   })
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
+    expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
+    expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(2)
+  })
 
-//   it('should succeed, only for tenants that exist on read model ', async () => {
-//     const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,IVASS_incaricato,IVASS_abilitato,IVASS_in_convalida
-// 0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE
-// 9876543210,Org name not in Tenants,gsp2@pec.it,ipa_code_456,TRUE,TRUE,TRUE`
+  // it('should succeed, unassigning only existing attributes', async () => {
+  //   const csvFileContent = `CODICE_IVASS;DATA_ISCRIZIONE_ALBO_ELENCO;DATA_CANCELLAZIONE_ALBO_ELENCO;DENOMINAZIONE_IMPRESA;CODICE_FISCALE
+  //   D0001;2020-12-02;9999-12-31;Org1;0000012345678901
+  //   D0002;2020-06-10;9999-12-31;Org2;0000012345678902
+  //   D0003;2019-07-19;9999-12-31;Org3;0000012345678903`
 
-//     const readModelTenants: PersistentTenant[] = [
-//       {
-//         ...persistentTenant,
-//         externalId: { origin: 'IPA', value: 'ipa_code_123' },
-//         attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_ABILITATO_ID }],
-//       },
-//     ]
+  //   const readModelTenants: PersistentTenant[] = [
+  //     {
+  //       ...persistentTenant,
+  //       externalId: { origin: 'IVASS', value: 'ipa_code_123' },
+  //       attributes: [
+  //         { ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_ABILITATO_ID },
+  //         { ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_INCARICATO_ID },
+  //       ],
+  //     },
+  //   ]
 
-//     const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
-//     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+  //   const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
+  //   const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
 
-//     const getPATenantsMock = getTenantsMockGenerator((_) => readModelTenants)
-//     const getPATenantsSpy = vi.spyOn(readModelQueriesMock, 'getPATenants').mockImplementation(getPATenantsMock)
+  //   const getIVASSTenantsMock = getTenantsMockGenerator((_) => readModelTenants)
+  //   const getIVASSTenantsSpy = vi.spyOn(readModelQueriesMock, 'getIVASSTenants').mockImplementation(getIVASSTenantsMock)
 
-//     await run()
+  //   await run()
 
-//     expect(downloadCSVSpy).toBeCalledTimes(1)
-//     expect(getTenantByIdSpy).toBeCalledTimes(1)
-//     expect(getAttributeByExternalIdSpy).toBeCalledTimes(3)
+  //   expect(downloadCSVSpy).toBeCalledTimes(1)
+  //   expect(getTenantByIdSpy).toBeCalledTimes(1)
+  //   expect(getAttributeByExternalIdSpy).toBeCalledTimes(1)
 
-//     expect(getPATenantsSpy).toBeCalledTimes(1)
-//     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+  //   expect(getIVASSTenantsSpy).toBeCalledTimes(1)
+  //   expect(getNonIVASSTenantsSpy).toBeCalledTimes(0)
 
-//     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
-//     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
-//     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
-//   })
+  //   expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
+  //   expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
+  //   expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(2)
+  // })
 
-//   it('should succeed with more than one batch', async () => {
-//     const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,IVASS_incaricato,IVASS_abilitato,IVASS_in_convalida
-// 0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE
-// 9876543210,Org name not in Tenants,gsp2@pec.it,ipa_code_456,TRUE,TRUE,TRUE
-// 9876543299,Org name not in Tenants,gsp3@pec.it,ipa_code_789,TRUE,TRUE,TRUE`
+  //   it('should succeed, only for tenants that exist on read model ', async () => {
+  //     const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,IVASS_incaricato,IVASS_abilitato,IVASS_in_convalida
+  // 0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE
+  // 9876543210,Org name not in Tenants,gsp2@pec.it,ipa_code_456,TRUE,TRUE,TRUE`
 
-//     const readModelTenants: PersistentTenant[] = [
-//       {
-//         ...persistentTenant,
-//         externalId: { origin: 'IPA', value: 'ipa_code_123' },
-//         attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_ABILITATO_ID }],
-//       },
-//     ]
+  //     const readModelTenants: PersistentTenant[] = [
+  //       {
+  //         ...persistentTenant,
+  //         externalId: { origin: 'IVASS', value: 'ipa_code_123' },
+  //         attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_ABILITATO_ID }],
+  //       },
+  //     ]
 
-//     const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
-//     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+  //     const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
+  //     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
 
-//     const getPATenantsSpy = vi
-//       .spyOn(readModelQueriesMock, 'getPATenants')
-//       .mockImplementationOnce(getTenantsMockGenerator((_) => readModelTenants))
-//       .mockImplementation(getTenantsMockGenerator((_) => []))
+  //     const getIVASSTenantsMock = getTenantsMockGenerator((_) => readModelTenants)
+  //     const getIVASSTenantsSpy = vi.spyOn(readModelQueriesMock, 'getIVASSTenants').mockImplementation(getIVASSTenantsMock)
 
-//     await importAttributes(
-//       sftpClientMock,
-//       readModelQueriesMock,
-//       tenantProcessMock,
-//       refreshableTokenMock,
-//       1,
-//       'ivass-tenant-id'
-//     )
+  //     await run()
 
-//     expect(downloadCSVSpy).toBeCalledTimes(1)
-//     expect(getTenantByIdSpy).toBeCalledTimes(1)
-//     expect(getAttributeByExternalIdSpy).toBeCalledTimes(3)
+  //     expect(downloadCSVSpy).toBeCalledTimes(1)
+  //     expect(getTenantByIdSpy).toBeCalledTimes(1)
+  //     expect(getAttributeByExternalIdSpy).toBeCalledTimes(1)
 
-//     expect(getPATenantsSpy).toBeCalledTimes(3)
-//     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+  //     expect(getIVASSTenantsSpy).toBeCalledTimes(1)
+  //     expect(getNonIVASSTenantsSpy).toBeCalledTimes(0)
 
-//     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
-//     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
-//     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
-//   })
+  //     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
+  //     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
+  //     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
+  //   })
 
-//   it('should fail on CSV retrieve error', async () => {
-//     const localDownloadCSVMock = (): Promise<string> => Promise.reject(new Error('CSV Retrieve error'))
-//     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+  //   it('should succeed with more than one batch', async () => {
+  //     const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,IVASS_incaricato,IVASS_abilitato,IVASS_in_convalida
+  // 0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE
+  // 9876543210,Org name not in Tenants,gsp2@pec.it,ipa_code_456,TRUE,TRUE,TRUE
+  // 9876543299,Org name not in Tenants,gsp3@pec.it,ipa_code_789,TRUE,TRUE,TRUE`
 
-//     await expect(() => run()).rejects.toThrowError('CSV Retrieve error')
+  //     const readModelTenants: PersistentTenant[] = [
+  //       {
+  //         ...persistentTenant,
+  //         externalId: { origin: 'IVASS', value: 'ipa_code_123' },
+  //         attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_ABILITATO_ID }],
+  //       },
+  //     ]
 
-//     expect(downloadCSVSpy).toBeCalledTimes(1)
-//     expect(getTenantByIdSpy).toBeCalledTimes(0)
-//     expect(getAttributeByExternalIdSpy).toBeCalledTimes(0)
+  //     const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
+  //     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
 
-//     expect(getIVASSTenantsSpy).toBeCalledTimes(0)
-//     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+  //     const getIVASSTenantsSpy = vi
+  //       .spyOn(readModelQueriesMock, 'getIVASSTenants')
+  //       .mockImplementationOnce(getTenantsMockGenerator((_) => readModelTenants))
+  //       .mockImplementation(getTenantsMockGenerator((_) => []))
 
-//     expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
-//     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
-//     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
-//   })
+  //     await importAttributes(
+  //       sftpClientMock,
+  //       readModelQueriesMock,
+  //       tenantProcessMock,
+  //       refreshableTokenMock,
+  //       1,
+  //       'ivass-tenant-id'
+  //     )
 
-//   it('should fail if the tenant is not configured as certifier', async () => {
-//     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(downloadCSVMock)
+  //     expect(downloadCSVSpy).toBeCalledTimes(1)
+  //     expect(getTenantByIdSpy).toBeCalledTimes(1)
+  //     expect(getAttributeByExternalIdSpy).toBeCalledTimes(1)
 
-//     const getTenantByIdMock = getTenantByIdMockGenerator((tenantId) => ({
-//       ...persistentTenant,
-//       id: tenantId,
-//       features: [],
-//     }))
-//     getTenantByIdSpy.mockImplementationOnce(getTenantByIdMock)
+  //     expect(getIVASSTenantsSpy).toBeCalledTimes(3)
+  //     expect(getNonIVASSTenantsSpy).toBeCalledTimes(0)
 
-//     await expect(() => run()).rejects.toThrowError('Tenant with id ivass-tenant-id is not a certifier')
+  //     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
+  //     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
+  //     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
+  //   })
 
-//     expect(downloadCSVSpy).toBeCalledTimes(1)
-//     expect(getTenantByIdSpy).toBeCalledTimes(1)
-//     expect(getAttributeByExternalIdSpy).toBeCalledTimes(0)
+  //   it('should fail on CSV retrieve error', async () => {
+  //     const localDownloadCSVMock = (): Promise<string> => Promise.reject(new Error('CSV Retrieve error'))
+  //     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
 
-//     expect(getIVASSTenantsSpy).toBeCalledTimes(0)
-//     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+  //     await expect(() => run()).rejects.toThrowError('CSV Retrieve error')
 
-//     expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
-//     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
-//     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
-//   })
+  //     expect(downloadCSVSpy).toBeCalledTimes(1)
+  //     expect(getTenantByIdSpy).toBeCalledTimes(0)
+  //     expect(getAttributeByExternalIdSpy).toBeCalledTimes(0)
 
-//   it('should skip CSV file rows with unexpected schema', async () => {
-//     const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,IVASS_incaricato,IVASS_abilitato,IVASS_in_convalida
-//     ,Wrong format row,gsp1@pec.it,ipa_code_123,TRUE,TRUE,
-//     0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE`
+  //     expect(getIVASSTenantsSpy).toBeCalledTimes(0)
+  //     expect(getNonIVASSTenantsSpy).toBeCalledTimes(0)
 
-//     const readModelTenants: PersistentTenant[] = [
-//       {
-//         ...persistentTenant,
-//         externalId: { origin: 'IPA', value: 'ipa_code_123' },
-//         attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_ABILITATO_ID }],
-//       },
-//     ]
+  //     expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
+  //     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
+  //     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
+  //   })
 
-//     const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
-//     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+  //   it('should fail if the tenant is not configured as certifier', async () => {
+  //     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(downloadCSVMock)
 
-//     const getPATenantsMock = getTenantsMockGenerator((_) => readModelTenants)
-//     const getPATenantsSpy = vi.spyOn(readModelQueriesMock, 'getPATenants').mockImplementation(getPATenantsMock)
+  //     const getTenantByIdMock = getTenantByIdMockGenerator((tenantId) => ({
+  //       ...persistentTenant,
+  //       id: tenantId,
+  //       features: [],
+  //     }))
+  //     getTenantByIdSpy.mockImplementationOnce(getTenantByIdMock)
 
-//     await run()
+  //     await expect(() => run()).rejects.toThrowError('Tenant with id ivass-tenant-id is not a certifier')
 
-//     expect(downloadCSVSpy).toBeCalledTimes(1)
-//     expect(getTenantByIdSpy).toBeCalledTimes(1)
-//     expect(getAttributeByExternalIdSpy).toBeCalledTimes(3)
+  //     expect(downloadCSVSpy).toBeCalledTimes(1)
+  //     expect(getTenantByIdSpy).toBeCalledTimes(1)
+  //     expect(getAttributeByExternalIdSpy).toBeCalledTimes(0)
 
-//     expect(getPATenantsSpy).toBeCalledTimes(1)
-//     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+  //     expect(getIVASSTenantsSpy).toBeCalledTimes(0)
+  //     expect(getNonIVASSTenantsSpy).toBeCalledTimes(0)
 
-//     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
-//     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
-//     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
-//   })
+  //     expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
+  //     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
+  //     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
+  //   })
+
+  //   it('should skip CSV file rows with unexpected schema', async () => {
+  //     const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,IVASS_incaricato,IVASS_abilitato,IVASS_in_convalida
+  //     ,Wrong format row,gsp1@pec.it,ipa_code_123,TRUE,TRUE,
+  //     0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE`
+
+  //     const readModelTenants: PersistentTenant[] = [
+  //       {
+  //         ...persistentTenant,
+  //         externalId: { origin: 'IVASS', value: 'ipa_code_123' },
+  //         attributes: [{ ...persistentTenantAttribute, id: ATTRIBUTE_IVASS_ABILITATO_ID }],
+  //       },
+  //     ]
+
+  //     const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
+  //     const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+
+  //     const getIVASSTenantsMock = getTenantsMockGenerator((_) => readModelTenants)
+  //     const getIVASSTenantsSpy = vi.spyOn(readModelQueriesMock, 'getIVASSTenants').mockImplementation(getIVASSTenantsMock)
+
+  //     await run()
+
+  //     expect(downloadCSVSpy).toBeCalledTimes(1)
+  //     expect(getTenantByIdSpy).toBeCalledTimes(1)
+  //     expect(getAttributeByExternalIdSpy).toBeCalledTimes(1)
+
+  //     expect(getIVASSTenantsSpy).toBeCalledTimes(1)
+  //     expect(getNonIVASSTenantsSpy).toBeCalledTimes(0)
+
+  //     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
+  //     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
+  //     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
+  //   })
+
+  // it('should skip CSV file rows with missing Tax Code', async () => {})
 })

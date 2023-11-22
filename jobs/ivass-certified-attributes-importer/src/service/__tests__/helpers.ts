@@ -3,14 +3,13 @@ import { PersistentAttribute } from '../../model/attribute.model.js'
 import { InteropContext } from '../../model/interop-context.model.js'
 import { PersistentTenant, PersistentTenantAttribute } from '../../model/tenant.model.js'
 
-const csvFileContent = `CODICE_IVASS;DATA_ISCRIZIONE_ALBO_ELENCO;DATA_CANCELLAZIONE_ALBO_ELENCO;DENOMINAZIONE_IMPRESA;CODICE_FISCALE
-D975R;2020-12-02;9999-12-31;ACCELERANT INSURANCE EUROPE SA/NV;0000016084711007
-D974R;2020-06-10;9999-12-31;ACCREDITED INSURANCE (EUROPE) LTD;0000097905330151
-D969R;2019-07-19;9999-12-31;ADRIATIC OSIGURANJE D.D.;0000090156860323`
+const csvFileContent = `OTHER_FIELD;CODICE_IVASS;DATA_ISCRIZIONE_ALBO_ELENCO;DATA_CANCELLAZIONE_ALBO_ELENCO;DENOMINAZIONE_IMPRESA;CODICE_FISCALE
+F1;D0001;2020-12-02;9999-12-31;Org1;0000012345678901
+F2;D0002;2020-06-10;9999-12-31;Org2;0000012345678902
+F3;D0003;2019-07-19;9999-12-31;Org3;0000012345678903`
 
 export const ATTRIBUTE_IVASS_INSURANCES_ID = 'b1d64ee0-fda9-48e2-84f8-1b62f1292b47'
 
-// export const downloadCSVMockGenerator = (csvContent: string) => (): Promise<string> => Promise.resolve(csvContent)
 export const downloadCSVMockGenerator = (csvContent: string) => vi.fn().mockImplementation((): Promise<string> => Promise.resolve(csvContent))
 export const getTenantsMockGenerator =
   (f: (codes: string[]) => PersistentTenant[]) =>
@@ -49,7 +48,7 @@ export const getTenantByIdMock = getTenantByIdMockGenerator((tenantId) => ({
 export const getAttributeByExternalIdMock = (origin: string, code: string): Promise<PersistentAttribute> => {
   switch (code) {
     case IVASS_INSURANCES_ATTRIBUTE_CODE:
-      return Promise.resolve({ ...persistentAttribute, id: IVASS_INSURANCES_ATTRIBUTE_CODE, origin, code })
+      return Promise.resolve({ ...persistentAttribute, id: ATTRIBUTE_IVASS_INSURANCES_ID, origin, code })
     default:
       return Promise.reject(new Error('Unexpected attribute code'))
   }
