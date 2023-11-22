@@ -72,26 +72,26 @@ export const TenantSignupsTrendMetric = timedMetricObject(
 export const OnboardedTenantsCountMetric = z.tuple([
   z.object({
     name: z.literal('Totale'),
-    totalTenantsCount: z.number(),
-    lastMonthTenantsCount: z.number(),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
     variation: z.number(),
   }),
   z.object({
     name: z.literal(MACRO_CATEGORIES[2].name),
-    totalTenantsCount: z.number(),
-    lastMonthTenantsCount: z.number(),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
     variation: z.number(),
   }),
   z.object({
     name: z.literal(MACRO_CATEGORIES[6].name),
-    totalTenantsCount: z.number(),
-    lastMonthTenantsCount: z.number(),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
     variation: z.number(),
   }),
   z.object({
     name: z.literal(MACRO_CATEGORIES[9].name),
-    totalTenantsCount: z.number(),
-    lastMonthTenantsCount: z.number(),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
     variation: z.number(),
   }),
 ])

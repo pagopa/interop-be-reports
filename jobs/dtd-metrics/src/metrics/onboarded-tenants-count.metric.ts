@@ -19,14 +19,14 @@ function getMetricData(
   const onboardedTenants =
     name === 'Totale' ? globalStore.onboardedTenants : globalStore.getMacroCategoryByName(name).onboardedTenants
 
-  const totalTenantsCount = onboardedTenants.length
-  const lastMonthTenantsCount = getLastMonthTenantsCount(onboardedTenants)
-  const variation = getVariationCount(onboardedTenants, lastMonthTenantsCount)
+  const totalCount = onboardedTenants.length
+  const lastMonthCount = getLastMonthTenantsCount(onboardedTenants)
+  const variation = getVariationCount(onboardedTenants, lastMonthCount)
 
   return {
     name,
-    totalTenantsCount,
-    lastMonthTenantsCount,
+    totalCount,
+    lastMonthCount,
     variation,
   }
 }
