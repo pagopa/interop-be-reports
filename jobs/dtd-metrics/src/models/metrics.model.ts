@@ -63,6 +63,8 @@ export const TenantOnboardingTrendMetric = timedMetricObject(
       id: z.string(),
       name: z.string(),
       data: z.array(z.object({ date: z.date(), count: z.number() })),
+      totalCount: z.number(),
+      onboardedCount: z.number(),
       startingDate: z.date(),
     })
   )

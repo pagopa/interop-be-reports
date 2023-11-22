@@ -12,6 +12,8 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTr
     return oldestDate
   }, new Date())
 
+  globalStore.macroCategories[0]
+
   const sixMonthsAgoDate = getMonthsAgoDate(6)
   const twelveMonthsAgoDate = getMonthsAgoDate(12)
 
@@ -19,11 +21,13 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTr
   const sixMonthsAgoData = globalStore.macroCategories.map((macroCategory) => ({
     ...macroCategory,
     tenants: macroCategory.tenants.filter(({ createdAt }) => createdAt > sixMonthsAgoDate),
+    onboardedTenants: macroCategory.onboardedTenants.filter(({ createdAt }) => createdAt > twelveMonthsAgoDate),
   }))
   // Filter out tenants that are older than 12 months
   const twelveMonthsAgoData = globalStore.macroCategories.map((macroCategory) => ({
     ...macroCategory,
     tenants: macroCategory.tenants.filter(({ createdAt }) => createdAt > twelveMonthsAgoDate),
+    onboardedTenants: macroCategory.onboardedTenants.filter(({ createdAt }) => createdAt > twelveMonthsAgoDate),
   }))
 
   const fromTheBeginningData = globalStore.macroCategories
@@ -37,6 +41,8 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTr
         { days: 5 },
         macroCategory.tenants.map((tenant) => tenant.createdAt)
       ),
+      totalCount: macroCategory.tenants.length,
+      onboardedCount: macroCategory.onboardedTenants.length,
       startingDate: sixMonthsAgoDate,
     })),
     lastTwelveMonths: twelveMonthsAgoData.map((macroCategory) => ({
@@ -47,6 +53,8 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTr
         { days: 10 },
         macroCategory.tenants.map((tenant) => tenant.createdAt)
       ),
+      totalCount: macroCategory.tenants.length,
+      onboardedCount: macroCategory.onboardedTenants.length,
       startingDate: twelveMonthsAgoDate,
     })),
     fromTheBeginning: fromTheBeginningData.map((macroCategory) => ({
@@ -57,6 +65,8 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTr
         { months: 1 },
         macroCategory.tenants.map((tenant) => tenant.createdAt)
       ),
+      totalCount: macroCategory.tenants.length,
+      onboardedCount: macroCategory.onboardedTenants.length,
       startingDate: oldestTenantDate,
     })),
   })
