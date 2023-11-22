@@ -83,17 +83,6 @@ export const TenantDistributionMetric = z.array(
   })
 )
 
-export const OnboardedTenantsCountByMacroCategoriesMetric = timedMetricObject(
-  z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      onboardedCount: z.number(),
-      totalCount: z.number(),
-    })
-  )
-)
-
 export const TopProducersMetricItem = z.object({
   producerName: z.string(),
   count: z.number(),
@@ -111,11 +100,9 @@ export const MetricsOutput = z.object({
   mostSubscribedEServices: MostSubscribedEServicesMetric,
   topProducersBySubscribers: TopProducersBySubscribersMetric,
   topProducers: TopProducersMetric,
-  // .optional() will be removed once the metric will be implemented
-  onboardedTenantsCount: OnboardedTenantsCountMetric.optional(),
-  tenantDistribution: TenantDistributionMetric.optional(),
-  tenantOnboardingTrend: TenantOnboardingTrendMetric.optional(),
-  onboardedTenantsCountByMacroCategories: OnboardedTenantsCountByMacroCategoriesMetric.optional(),
+  onboardedTenantsCount: OnboardedTenantsCountMetric,
+  tenantDistribution: TenantDistributionMetric,
+  tenantOnboardingTrend: TenantOnboardingTrendMetric,
 })
 
 export type MetricsOutput = z.infer<typeof MetricsOutput>
@@ -128,4 +115,3 @@ export type TopProducersBySubscribersMetric = z.infer<typeof TopProducersBySubsc
 export type OnboardedTenantsCountMetric = z.infer<typeof OnboardedTenantsCountMetric>
 export type TenantDistributionMetric = z.infer<typeof TenantDistributionMetric>
 export type TenantOnboardingTrendMetric = z.infer<typeof TenantOnboardingTrendMetric>
-export type OnboardedTenantsCountByMacroCategoriesMetric = z.infer<typeof OnboardedTenantsCountByMacroCategoriesMetric>
