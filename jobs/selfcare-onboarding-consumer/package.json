@@ -26,7 +26,7 @@
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
     "kafkajs": "^2.2.4",
-    "zod": "^3.21.4",
+    "zod": "^3.22.3",
     "@interop-be-reports/commons": "workspace:*"
   }
 }

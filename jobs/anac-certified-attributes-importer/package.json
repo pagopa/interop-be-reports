@@ -28,7 +28,7 @@
     "dotenv": "^16.3.1",
     "mongodb": "^5.7.0",
     "ssh2-sftp-client": "^9.1.0",
-    "zod": "^3.21.4",
+    "zod": "^3.22.3",
     "@interop-be-reports/commons": "workspace:*"
   }
 }
