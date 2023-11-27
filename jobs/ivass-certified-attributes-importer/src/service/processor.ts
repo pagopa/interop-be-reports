@@ -1,6 +1,6 @@
 import { IVASS_INSURANCES_ATTRIBUTE_CODE } from '../config/constants.js'
 import { parse } from 'csv/sync'
-import { RefreshableInteropToken, logError, logInfo } from '@interop-be-reports/commons'
+import { PersistentTenantFeatureCertifier, RefreshableInteropToken, logError, logInfo } from '@interop-be-reports/commons'
 import crypto from 'crypto'
 import { AttributeIdentifiers, BatchParseResult, IvassAttributes } from '../model/processor.model.js'
 import { TenantProcessService } from './tenant-process.service.js'
@@ -101,7 +101,7 @@ async function getAttributesIdentifiers(readModel: ReadModelQueries, ivassTenant
     throw Error(`Tenant with id ${ivassTenantId} is not a certifier`)
   }
 
-  const ivassInsurances = await readModel.getAttributeByExternalId(certifier.certifierId, IVASS_INSURANCES_ATTRIBUTE_CODE)
+  const ivassInsurances = await readModel.getAttributeByExternalId((certifier as PersistentTenantFeatureCertifier).certifierId, IVASS_INSURANCES_ATTRIBUTE_CODE)
 
   return {
     ivassInsurances: { id: ivassInsurances.id, externalId: { origin: ivassInsurances.origin, value: ivassInsurances.code } },

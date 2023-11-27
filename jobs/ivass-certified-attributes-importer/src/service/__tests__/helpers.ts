@@ -1,7 +1,8 @@
+import { TenantAttribute } from '@interop-be-reports/commons'
 import { IVASS_INSURANCES_ATTRIBUTE_CODE } from '../../config/constants.js'
 import { PersistentAttribute } from '../../model/attribute.model.js'
 import { InteropContext } from '../../model/interop-context.model.js'
-import { PersistentTenant, PersistentTenantAttribute } from '../../model/tenant.model.js'
+import { PersistentTenant } from '../../model/tenant.model.js'
 
 const csvFileContent = `OTHER_FIELD;CODICE_IVASS;DATA_ISCRIZIONE_ALBO_ELENCO;DATA_CANCELLAZIONE_ALBO_ELENCO;DENOMINAZIONE_IMPRESA;CODICE_FISCALE
 F1;D0001;2020-12-02;9999-12-31;Org1;0000012345678901
@@ -68,7 +69,7 @@ export const persistentAttribute: PersistentAttribute = {
   code: 'attributeCode',
 }
 
-export const persistentTenantAttribute: PersistentTenantAttribute = {
+export const persistentTenantAttribute: TenantAttribute = {
   id: '7a04c906-1525-4c68-8a5b-d740d77d9c80',
   type: 'PersistentCertifiedAttribute',
   assignmentTimestamp: new Date(),

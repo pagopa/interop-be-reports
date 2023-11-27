@@ -1,5 +1,5 @@
+import { ExternalId } from '@interop-be-reports/commons'
 import { CsvRow } from './csv-row.model.js'
-import { PersistentExternalId } from './tenant.model.js'
 
 export type BatchParseResult = {
   processedRecordsCount: number
@@ -8,7 +8,7 @@ export type BatchParseResult = {
 
 export type AttributeIdentifiers = {
   id: string
-  externalId: PersistentExternalId
+  externalId: ExternalId
 }
 
 export type IvassAttributes = {
