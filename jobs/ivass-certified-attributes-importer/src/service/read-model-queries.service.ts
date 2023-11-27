@@ -44,6 +44,23 @@ export class ReadModelQueries {
       .toArray()
   }
 
+  async getTenantsWithAttributes(attributeIds: string[]): Promise<PersistentTenant[]> {
+    return await this.readModelClient.tenants
+      .aggregate([
+        {
+          $match: {
+            'data.attributes.id': { $in: attributeIds },
+          },
+        },
+        {
+          $project: projectUnrevokedCertifiedAttributes,
+        },
+      ])
+      .map(({ data }) => PersistentTenant.parse(data))
+      .toArray()
+  }
+
+
   async getTenantById(tenantId: string): Promise<PersistentTenant> {
     const result = await this.readModelClient.tenants
       .aggregate([

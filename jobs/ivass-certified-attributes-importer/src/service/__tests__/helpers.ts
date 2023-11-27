@@ -40,6 +40,7 @@ export const internalRevokeCertifiedAttributeMock = (
 export const getIVASSTenantsMock = getTenantsMockGenerator((taxCodes) =>
   taxCodes.map((c) => ({ ...persistentTenant, externalId: { origin: 'tenantOrigin', value: c } }))
 )
+export const getTenantsWithAttributesMock = (_: string[]) => Promise.resolve([])
 export const getTenantByIdMock = getTenantByIdMockGenerator((tenantId) => ({
   ...persistentTenant,
   id: tenantId,

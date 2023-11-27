@@ -1,6 +1,6 @@
 import { IVASS_INSURANCES_ATTRIBUTE_CODE } from '../config/constants.js'
 import { parse } from 'csv/sync'
-import { RefreshableInteropToken, zipBy, logError, logWarn, logInfo } from '@interop-be-reports/commons'
+import { RefreshableInteropToken, logError, logInfo } from '@interop-be-reports/commons'
 import crypto from 'crypto'
 import { AttributeIdentifiers, BatchParseResult, IvassAttributes } from '../model/processor.model.js'
 import { TenantProcessService } from './tenant-process.service.js'
@@ -21,31 +21,76 @@ export async function importAttributes(
 
   logInfo(jobCorrelationId, "IVASS Certified attributes importer started")
 
-  const batchSize = recordsBatchSize
-
   const fileContent = await csvDownloader()
 
   const attributes: IvassAttributes = await getAttributesIdentifiers(readModel, ivassTenantId)
 
-  const processTenants = prepareTenantsProcessor(tenantProcess, refreshableToken, attributes, jobCorrelationId)
+  const allOrgsInFile = await assignAttributes(readModel, tenantProcess, refreshableToken, attributes, fileContent, recordsBatchSize, jobCorrelationId)
+
+  await unassignAttributes(readModel, tenantProcess, refreshableToken, allOrgsInFile, attributes, jobCorrelationId)
+
+  logInfo(jobCorrelationId, "IVASS Certified attributes importer completed")
+}
+
+async function assignAttributes(
+  readModel: ReadModelQueries, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken, attributes: IvassAttributes, fileContent: string, batchSize: number, jobCorrelationId: string): Promise<string[]> {
 
   let scanComplete = false
   let fromLine = 1
+  let allOrgsInFile: string[] = []
+
+  const now = Date.now()
+
+  logInfo(jobCorrelationId, "Assigning attributes...")
 
   do {
     const batchResult: BatchParseResult = getBatch(fileContent, fromLine, batchSize, jobCorrelationId)
 
-    await processTenants(
-      batchResult.records,
-      (org) => org.CODICE_FISCALE,
-      (codes) => readModel.getIVASSTenants(codes)
-    )
+    const assignments = batchResult.records.filter(record => isAttributeAssigned(record, now))
+
+    if (assignments.length > 0) {
+      const taxCodes = assignments.map(org => org.CODICE_FISCALE)
+
+      const tenants = await readModel.getIVASSTenants(taxCodes)
+
+      await Promise.all(
+        tenants.map(async tenant => {
+          logInfo(jobCorrelationId, `Assigning attribute ${attributes.ivassInsurances.id} to tenant ${tenant.id}`)
+          await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.ivassInsurances)
+        })
+      )
+
+      allOrgsInFile = allOrgsInFile.concat(assignments.map(a => a.CODICE_FISCALE))
+    }
 
     fromLine = fromLine + batchSize
     scanComplete = batchResult.processedRecordsCount === 0
+
   } while (!scanComplete)
 
-  logInfo(jobCorrelationId, "IVASS Certified attributes importer completed")
+  logInfo(jobCorrelationId, "Attributes assignment completed")
+
+  if (allOrgsInFile.length === 0) {
+    throw new Error("File does not contain valid assignments")
+  }
+
+  return allOrgsInFile
+}
+
+async function unassignAttributes(readModel: ReadModelQueries, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken, allOrgsInFile: string[], attributes: IvassAttributes, jobCorrelationId: string) {
+
+  logInfo(jobCorrelationId, "Revoking attributes...")
+
+  const tenantsWithAttribute = await readModel.getTenantsWithAttributes([attributes.ivassInsurances.id])
+  await Promise.all(tenantsWithAttribute
+    .filter(tenant => !allOrgsInFile.includes(tenant.externalId.value))
+    .map(async tenant => {
+      logInfo(jobCorrelationId, `Revoking attribute ${attributes.ivassInsurances.id} to tenant ${tenant.id}`)
+      await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.ivassInsurances)
+    })
+  )
+
+  logInfo(jobCorrelationId, "Attributes revocation completed")
 }
 
 async function getAttributesIdentifiers(readModel: ReadModelQueries, ivassTenantId: string): Promise<IvassAttributes> {
@@ -63,39 +108,9 @@ async function getAttributesIdentifiers(readModel: ReadModelQueries, ivassTenant
   }
 }
 
-const prepareTenantsProcessor =
-  (
-    tenantProcess: TenantProcessService,
-    refreshableToken: RefreshableInteropToken,
-    attributes: IvassAttributes,
-    jobCorrelationId: string
-  ) => async function processTenants<T extends CsvRow>(
-    orgs: T[],
-    extractTenantCode: (org: T) => string,
-    retrieveTenants: (codes: string[]) => Promise<PersistentTenant[]>
-  ): Promise<void> {
-      const validOrgs = orgs.filter(org => org.CODICE_FISCALE)
-      if (validOrgs.length === 0) return
-
-      const codes = validOrgs.map(extractTenantCode)
-
-      const tenants = await retrieveTenants(codes)
-
-      const missingTenants = getMissingTenants(codes, tenants)
-
-      if (missingTenants.length !== 0)
-        logWarn(jobCorrelationId, `Organizations in CSV not found in Tenants for codes: ${missingTenants}`)
-
-      const now = Date.now()
-
-      await Promise.all(
-        zipBy(validOrgs, tenants, extractTenantCode, (tenant) => tenant.externalId.value).map(async ([org, tenant]) => {
-          if (org.DATA_ISCRIZIONE_ALBO_ELENCO.getTime() < now && org.DATA_CANCELLAZIONE_ALBO_ELENCO.getTime() > now)
-            await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.ivassInsurances)
-          else await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.ivassInsurances)
-        })
-      )
-    }
+const isAttributeAssigned = (org: CsvRow, now: number) => {
+  return org.DATA_ISCRIZIONE_ALBO_ELENCO.getTime() < now && org.DATA_CANCELLAZIONE_ALBO_ELENCO.getTime() > now
+}
 
 async function assignAttribute(
   tenantProcess: TenantProcessService,
@@ -143,12 +158,6 @@ async function unassignAttribute(
 
 function tenantContainsAttribute(tenant: PersistentTenant, attributeId: string): boolean {
   return tenant.attributes.find((attribute) => attribute.id === attributeId) !== undefined
-}
-
-function getMissingTenants(expectedExternalId: string[], tenants: PersistentTenant[]): string[] {
-  const existingSet = new Set(tenants.map((t) => t.externalId.value))
-
-  return expectedExternalId.filter((v) => !existingSet.has(v))
 }
 
 function getBatch(
