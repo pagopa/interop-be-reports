@@ -14,7 +14,7 @@ const initBrowser = async () => {
 
 const openPage = async (page: puppeteer.Page, sourceUrl: string): Promise<void> => {
   await page.goto(sourceUrl);
-  await delay(5000); // TODO 10000
+  await delay(10000);
 };
 
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
@@ -61,7 +61,7 @@ const unzipFile = async (zipFileName: string, outputDir: string): Promise<string
 
 const downloadFile = async <T>(csvButton: puppeteer.ElementHandle<T>, outputDir: string): Promise<string> => {
   await csvButton.click();
-  await delay(3000);
+  await delay(5000);
 
   const files = await fs.promises.readdir(outputDir);
   const zipFiles = files.filter(fileName => fileName.endsWith('.zip'));
