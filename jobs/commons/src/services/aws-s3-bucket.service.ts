@@ -36,6 +36,22 @@ export class AwsS3BucketClient {
   }
 
   /**
+   * Uploads a JSON file to an S3 bucket.
+   * @param data The data to be uploaded.
+   * @param path The path in which the data will be stored in the bucket.
+   */
+  public async uploadBinaryData(data: Buffer, path: string): Promise<void> {
+    await this.s3Client.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: path,
+        Body: data,
+        ContentMD5: this.getMD5HashFromFile(data),
+      })
+    )
+  }
+
+  /**
    * Gets the data stored in the specified path.
    * If the path does not exist, `undefined` is returned.
    * @param path The path of the data to be retrieved.

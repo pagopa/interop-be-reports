@@ -2,6 +2,7 @@ import * as puppeteer from "puppeteer";
 import * as fs from "fs"
 import * as zip from "@zip.js/zip.js"
 import { SourceFileConfig } from "../config/sourcefile.config.js";
+import { AwsS3BucketClient } from "@interop-be-reports/commons";
 
 const initBrowser = async () => {
   const browser = await puppeteer.launch({
@@ -70,7 +71,7 @@ const downloadFile = async <T>(csvButton: puppeteer.ElementHandle<T>, outputDir:
   return zipFiles[0]
 };
 
-export const downloadCSV = async (config: SourceFileConfig): Promise<string> => {
+export const downloadCSV = async (awsS3BucketClient: AwsS3BucketClient, config: SourceFileConfig): Promise<string> => {
   const browser = await initBrowser();
   const page = await browser.newPage();
 
@@ -82,6 +83,9 @@ export const downloadCSV = async (config: SourceFileConfig): Promise<string> => 
     throw Error('Download button not found');
 
   const fileName = await downloadFile(csvButton, config.outputDir);
+
+  const zipFile = await fs.promises.readFile(`${config.outputDir}/${fileName}`)
+  await awsS3BucketClient.uploadBinaryData(zipFile, `organizations/${fileName}`)
 
   const csvPath = await unzipFile(fileName, config.outputDir);
   const fileContent = await fs.promises.readFile(csvPath)

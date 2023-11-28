@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 const Env = z.object({
   SOURCE_FILE_DOWNLOAD_DIR: z.string(),
   SOURCE_URL: z.string(),
+  HISTORY_BUCKET_NAME: z.string(),
 
   MONGODB_REPLICA_SET: z.string().optional(),
   MONGODB_DIRECT_CONNECTION: z
