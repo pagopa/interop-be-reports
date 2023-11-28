@@ -42,7 +42,10 @@ export const processMessage = (refreshableToken: RefreshableInteropToken, tenant
           value: institution.origin == ORIGIN_IPA ? institution.subUnitCode || institution.originId : institution.taxCode
         },
         selfcareId: parsed.data.internalIstitutionID,
-        name: institution.description
+        name: institution.description,
+        onbordedAt: parsed.data.createdAt,
+        digitalAddress: institution.digitalAddress,
+        subUnitType: institution.subUnitType
       }
       await tenantProcess.selfcareUpsertTenant(seed, context)
 
