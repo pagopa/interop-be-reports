@@ -2,6 +2,7 @@ import { env } from "./config/env.js";
 import { SourceFileConfig } from "./config/sourcefile.config.js";
 import { downloadCSV } from "./service/file-downloader.js";
 import {
+  AwsS3BucketClient,
   InteropTokenGenerator,
   ReadModelClient,
   ReadModelConfig,
@@ -37,7 +38,9 @@ const tokenGeneratorConfig: TokenGenerationConfig = {
   secondsDuration: env.INTERNAL_JWT_SECONDS_DURATION,
 }
 
-const csvDownloader = () => downloadCSV(sourceFileConfig)
+const awsS3BucketClient = new AwsS3BucketClient(env.HISTORY_BUCKET_NAME)
+
+const csvDownloader = () => downloadCSV(awsS3BucketClient, sourceFileConfig)
 const readModelClient: ReadModelClient = await ReadModelClient.connect(readModelConfig)
 const readModelQueries: ReadModelQueries = new ReadModelQueries(readModelClient)
 
