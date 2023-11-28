@@ -277,7 +277,8 @@ describe('ANAC Certified Attributes Importer', () => {
   it('should skip CSV file rows with unexpected schema', async () => {
     const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,ANAC_incaricato,ANAC_abilitato,ANAC_in_convalida
     ,Wrong format row,gsp1@pec.it,ipa_code_123,TRUE,TRUE,
-    0123456789,Org name in IPA,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE`
+    ,Wrong "quotes" row,gsp1@pec.it,ipa_code_123,TRUE,TRUE,
+    0123456789,"Org name, in IPA",gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE`
 
     const readModelTenants: PersistentTenant[] = [
       {
