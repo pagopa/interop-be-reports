@@ -31,7 +31,9 @@ export class MetricsOutputFormatterService {
   }
 
   /**
-   * Get the JSON files data for a given metric
+   * Get the JSON files data for a given metric.
+   * If the metric is "timed", i.e. it has data for the last 6 and 12 months and from the beginning,
+   * we return 3 files, one for each time period.
    */
   private getMetricJsonFiles(metric: Metric): Array<MetricFile> {
     switch (metric.name) {
@@ -63,7 +65,9 @@ export class MetricsOutputFormatterService {
   }
 
   /**
-   * Get the CSV files data for a given metric
+   * Get the CSV files data for a given metric.
+   * If the metric is "timed", i.e. it has data for the last 6 and 12 months and from the beginning,
+   * we return 3 files, one for each time period.
    */
   private getMetricCSVFiles(metric: Metric): Array<MetricFile> {
     switch (metric.name) {
