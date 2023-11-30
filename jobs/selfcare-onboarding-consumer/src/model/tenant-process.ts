@@ -13,7 +13,7 @@ export const SelfcareTenantSeed = z.object({
   externalId: ExternalId,
   selfcareId: z.string().trim().min(1),
   name: z.string().trim().min(1),
-  onbordedAt: z.string().trim(),
+  onboardedAt: z.string().trim(),
   digitalAddress: z.string().trim().min(1),
   subUnitType: SubUnitType.optional().nullable(),
 });
