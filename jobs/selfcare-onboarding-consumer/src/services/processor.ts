@@ -43,7 +43,7 @@ export const processMessage = (refreshableToken: RefreshableInteropToken, tenant
         },
         selfcareId: parsed.data.internalIstitutionID,
         name: institution.description,
-        onbordedAt: parsed.data.createdAt,
+        onboardedAt: parsed.data.createdAt,
         digitalAddress: institution.digitalAddress,
         subUnitType: institution.subUnitType
       }
