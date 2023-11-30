@@ -26,23 +26,20 @@ export const EServicesByMacroCategoriesMetric = z.array(
 )
 export type EServicesByMacroCategoriesMetric = z.infer<typeof EServicesByMacroCategoriesMetric>
 
-export const MostSubscribedEServices = timedMetricObject(
+export const MostSubscribedEServicesMetric = timedMetricObject(
   z.array(
     z.object({
-      eserviceName: z.string(),
-      producerName: z.string(),
-      subscribersCount: z.number(),
+      id: z.string(),
+      name: z.string(),
+      mostSubscribedEServices: z.array(
+        z.object({
+          eserviceName: z.string(),
+          producerName: z.string(),
+          subscribersCount: z.number(),
+        })
+      ),
     })
   )
-)
-export type MostSubscribedEServices = z.infer<typeof MostSubscribedEServices>
-
-export const MostSubscribedEServicesMetric = z.array(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    mostSubscribedEServices: MostSubscribedEServices,
-  })
 )
 export type MostSubscribedEServicesMetric = z.infer<typeof MostSubscribedEServicesMetric>
 

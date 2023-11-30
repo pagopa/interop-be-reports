@@ -18,14 +18,17 @@ export class MetricsOutputFormatterService {
     )
   }
 
+  /**
+   * Get the JSON files data for a given metric
+   */
   private getMetricJsonFiles(metric: Metric): Array<MetricFile> {
     switch (metric.name) {
       case 'publishedEServices':
       case 'eservicesByMacroCategories':
-      case 'mostSubscribedEServices':
       case 'onboardedTenantsCount':
       case 'tenantDistribution':
         return [{ filename: `${toSnakeCase(metric.name)}.json`, data: JSON.stringify(metric.data) }]
+      case 'mostSubscribedEServices':
       case 'topProducersBySubscribers':
       case 'topProducers':
       case 'tenantSignupsTrend':
