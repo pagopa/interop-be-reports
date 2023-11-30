@@ -28,7 +28,7 @@ export const SelfcareTenantSeed = z.object({
   selfcareId: z.string().trim().min(1),
   name: z.string().trim().min(1),
   onboardedAt: z.string().trim(),
-  digitalAddress: MailSeed.optional().nullable(),
+  digitalAddress: MailSeed.optional(),
   subUnitType: SubUnitType.optional(),
 });
 
