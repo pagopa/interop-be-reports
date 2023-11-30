@@ -158,10 +158,10 @@ export const getMostSubscribedEServicesMetric: MetricFactoryFn<'mostSubscribedES
         subscribersCount: getSubscribersCount(e, date),
       }))
 
-      // Sort the entries by count, and extract the first 10 results (top 10)
       return {
         id: m.id,
         name: m.name,
+        // Sort the entries by count, and extract the first 10 results (top 10)
         mostSubscribedEServices: orderBy(counted, 'subscribersCount', 'desc').slice(0, 10),
       }
     })

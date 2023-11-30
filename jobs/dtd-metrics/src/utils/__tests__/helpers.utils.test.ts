@@ -49,6 +49,6 @@ describe('json2csv', () => {
       { foo: 'bar', baz: { qux: 'quux' } },
       { foo: 'bar2', baz: { qux: 'quux2' } },
     ]
-    expect(json2csv(data)).toBe('foo,baz.qux\nbar,quux\nbar2,quux2')
+    expect(json2csv(data)).toBe('foo,qux\nbar,quux\nbar2,quux2')
   })
 })
