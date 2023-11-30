@@ -10,6 +10,15 @@ export function getVariationPercentage(current: number, previous: number): numbe
   return Number((previous === 0 ? 0 : ((current - previous) / previous) * 100).toFixed(1))
 }
 
+/**
+ * Returns the tenants considered onboarded, i.e. the tenants that have a selfcareId.
+ */
+export function getOnboardedTenants<TTenants extends { selfcareId?: string | undefined }>(
+  tenants: Array<TTenants>
+): Array<TTenants> {
+  return tenants.filter(({ selfcareId }) => !!selfcareId)
+}
+
 const cidJob = randomUUID()
 
 export const log = {

@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 import { URL } from 'url'
-import { log } from '../utils/helpers.utils.js'
+import { getOnboardedTenants, log } from '../utils/helpers.utils.js'
 
 const __dirname = new URL('.', import.meta.url).pathname
 const GLOBAL_STORE_CACHE_PATH = path.join(__dirname, '.global-store-cache')
@@ -53,7 +53,7 @@ export class GlobalStoreService {
 
   private constructor(tenants: Array<GlobalStoreTenant>, macroCategories: MacroCategories) {
     this.tenants = tenants
-    this.onboardedTenants = GlobalStoreService.getOnboardedTenants(tenants)
+    this.onboardedTenants = getOnboardedTenants(tenants)
     this.tenantsMap = new Map(tenants.map((tenant) => [tenant.id, tenant]))
     this.macroCategories = macroCategories
   }
@@ -109,7 +109,7 @@ export class GlobalStoreService {
         ipaCodes: macroCategory.ipaCodes,
         attributes: macroCategoryAttributes,
         tenants: macroCategoryTenants,
-        onboardedTenants: this.getOnboardedTenants(macroCategoryTenants),
+        onboardedTenants: getOnboardedTenants(macroCategoryTenants),
         tenantsIds: Array.from(new Set(macroCategoryTenants.map(({ id }) => id))),
       })
     }
@@ -124,21 +124,19 @@ export class GlobalStoreService {
 
   private static getInitializationDataFromCache(): GlobalStoreCacheObj | undefined {
     const hasCache = existsSync(GLOBAL_STORE_CACHE_PATH)
-    if (hasCache) {
-      log.warn('Using global store cache')
-      const cache = JSON.parse(readFileSync(GLOBAL_STORE_CACHE_PATH, 'utf-8'))
-      const result = GlobalStoreCacheObj.safeParse(cache)
-      if (result.success) return result.data
+    if (!hasCache) return undefined
+
+    log.warn('Using global store cache')
+    const cache = JSON.parse(readFileSync(GLOBAL_STORE_CACHE_PATH, 'utf-8'))
+    const result = GlobalStoreCacheObj.safeParse(cache)
+    if (!result.success) {
       log.warn('Global store cache is corrupted, ignoring it')
+      return undefined
     }
-    return undefined
+    return result.data
   }
 
   private static cacheInitializationData(cache: GlobalStoreCacheObj): void {
     writeFileSync(GLOBAL_STORE_CACHE_PATH, JSON.stringify(cache))
-  }
-
-  private static getOnboardedTenants(tenants: Array<GlobalStoreTenant>): Array<GlobalStoreTenant> {
-    return tenants.filter(({ selfcareId }) => !!selfcareId)
   }
 }
