@@ -1,14 +1,16 @@
 import { z } from 'zod'
 
-function timedMetricObject<T extends z.ZodSchema>(
-  schema: T
-): z.ZodObject<{ lastSixMonths: T; lastTwelveMonths: T; fromTheBeginning: T }> {
-  return z.object({
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const TimedMetric = <T extends z.ZodType>(schema: T) =>
+  z.object({
     lastSixMonths: schema,
     lastTwelveMonths: schema,
     fromTheBeginning: schema,
   })
-}
+
+type TimedMetricType<T extends z.ZodType> = ReturnType<typeof TimedMetric<T>>
+export type TimedMetric<T = unknown> = z.infer<TimedMetricType<z.ZodType<T>>>
+export type TimedMetricKey = keyof TimedMetric
 
 export const PublishedEServicesMetric = z.object({
   count: z.number(),
@@ -26,7 +28,7 @@ export const EServicesByMacroCategoriesMetric = z.array(
 )
 export type EServicesByMacroCategoriesMetric = z.infer<typeof EServicesByMacroCategoriesMetric>
 
-export const MostSubscribedEServicesMetric = timedMetricObject(
+export const MostSubscribedEServicesMetric = TimedMetric(
   z.array(
     z.object({
       id: z.string(),
@@ -43,7 +45,7 @@ export const MostSubscribedEServicesMetric = timedMetricObject(
 )
 export type MostSubscribedEServicesMetric = z.infer<typeof MostSubscribedEServicesMetric>
 
-export const TopProducersBySubscribersMetric = timedMetricObject(
+export const TopProducersBySubscribersMetric = TimedMetric(
   z.array(
     z.object({
       producerName: z.string(),
@@ -74,7 +76,7 @@ export const TenantDistributionMetric = z.array(
 )
 export type TenantDistributionMetric = z.infer<typeof TenantDistributionMetric>
 
-export const TenantSignupsTrendMetric = timedMetricObject(
+export const TenantSignupsTrendMetric = TimedMetric(
   z.array(
     z.object({
       id: z.string(),
@@ -86,7 +88,7 @@ export const TenantSignupsTrendMetric = timedMetricObject(
 )
 export type TenantSignupsTrendMetric = z.infer<typeof TenantSignupsTrendMetric>
 
-export const OnboardedTenantsCountByMacroCategoriesMetric = timedMetricObject(
+export const OnboardedTenantsCountByMacroCategoriesMetric = TimedMetric(
   z.array(
     z.object({
       id: z.string(),
@@ -105,7 +107,7 @@ export const TopProducersMetricItem = z.object({
 
 export type TopProducersMetricItem = z.infer<typeof TopProducersMetricItem>
 
-export const TopProducersMetric = timedMetricObject(z.array(TopProducersMetricItem))
+export const TopProducersMetric = TimedMetric(z.array(TopProducersMetricItem))
 
 export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 

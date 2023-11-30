@@ -56,24 +56,22 @@ try {
       filter: env.METRICS_FILTER,
     })
 
-  log.info(`Uploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
+  log.info(`Uploading files...`)
 
   const metricsOutputFormatter = new MetricsOutputFormatterService(metrics)
 
   const dashboardOuput = metricsOutputFormatter.getMetricsDashboardData()
   const dtdFilesOutput = metricsOutputFormatter.getDtdMetricsFiles()
 
-  // If PRODUCE_OUTPUT_JSON is true, write the dashboard output to a file
   if (env.PRODUCE_OUTPUT_JSON) {
     writeFileSync('dtd-metrics.json', JSON.stringify(dashboardOuput, null, 2))
   }
 
-  // Upload all the DTD files to the GitHub repo
   for (const { filename, data } of dtdFilesOutput) {
     await githubClient.createOrUpdateRepoFile(data, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${filename}`)
+    writeFileSync(`${filename}`, data)
   }
 
-  // Upload the dashboard output to the S3 bucket
   await awsS3BucketClient.uploadData(dashboardOuput, env.FILENAME)
 
   log.info('Done!')
