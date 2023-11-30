@@ -69,7 +69,6 @@ try {
 
   for (const { filename, data } of dtdFilesOutput) {
     await githubClient.createOrUpdateRepoFile(data, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${filename}`)
-    writeFileSync(`${filename}`, data)
   }
 
   await awsS3BucketClient.uploadData(dashboardOuput, env.FILENAME)
