@@ -3,7 +3,7 @@ import { EventPayload } from "../model/institution-event.js";
 import { RefreshableInteropToken, ORIGIN_IPA, logInfo, logWarn, logError } from "@interop-be-reports/commons";
 import { TenantProcessService } from "./tenantProcessService.js";
 import { InteropContext } from "../model/interop-context.js";
-import { SelfcareTenantSeed } from "../model/tenant-process.js";
+import { MailKind, SelfcareTenantSeed } from "../model/tenant-process.js";
 import crypto from "crypto"
 
 export const processMessage = (refreshableToken: RefreshableInteropToken, tenantProcess: TenantProcessService, productName: string) => async (message: KafkaMessage, partition: number): Promise<void> => {
@@ -44,8 +44,12 @@ export const processMessage = (refreshableToken: RefreshableInteropToken, tenant
         selfcareId: parsed.data.internalIstitutionID,
         name: institution.description,
         onboardedAt: parsed.data.createdAt,
-        digitalAddress: institution.digitalAddress,
-        subUnitType: institution.subUnitType
+        digitalAddress: {
+          kind: MailKind.Values.DIGITAL_ADDRESS,
+          description: "Domicilio digitale",
+          address: institution.digitalAddress,
+        },
+        subUnitType: institution.subUnitType || undefined,
       }
       await tenantProcess.selfcareUpsertTenant(seed, context)
 
