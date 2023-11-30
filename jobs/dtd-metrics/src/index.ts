@@ -15,8 +15,9 @@ import {
 import { GithubClient, GlobalStoreService } from './services/index.js'
 import { MetricsProducerService } from './services/metrics-producer.service.js'
 import { log } from './utils/helpers.utils.js'
+import { writeFile } from 'fs/promises'
 
-log.info('Starting program\n')
+log.info('Starting program...')
 
 const readModel = await ReadModelClient.connect({
   mongodbReplicaSet: env.MONGODB_REPLICA_SET,
@@ -36,9 +37,9 @@ try {
 
   log.info('Initializing global store...')
   const globalStore = await GlobalStoreService.init(readModel, { cache: env.CACHE_GLOBAL_STORE })
-  log.info('Global store initialized!\n')
+  log.info('Global store initialized!')
 
-  log.info('Producing metrics...\n')
+  log.info('Producing metrics...')
 
   const output = await new MetricsProducerService(readModel, globalStore)
     .addMetric('publishedEServices', getPublishedEServicesMetric)
@@ -52,17 +53,18 @@ try {
     // .addMetric('onboardedTenantsCountByMacroCategories', getOnboardedTenantsCountByMacroCategoriesMetric)
     .produceOutput({
       filter: env.METRICS_FILTER,
-      produceJSON: env.PRODUCE_OUTPUT_JSON,
     })
 
-  log.info(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
+  log.info(`Uploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
   await Promise.all([
+    // If PRODUCE_OUTPUT_JSON is true, write the output to a local file
+    ...(env.PRODUCE_OUTPUT_JSON ? [writeFile('dtd-metrics.json', JSON.stringify(output, null, 2))] : []),
     githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${env.FILENAME}`),
     awsS3BucketClient.uploadData(output, env.FILENAME),
   ])
 
-  log.info('Done!\n')
+  log.info('Done!')
 } catch (err) {
   log.error('An error occurred while producing metrics:', err as Error)
 } finally {

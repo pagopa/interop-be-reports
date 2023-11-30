@@ -1,7 +1,6 @@
 import { ReadModelClient } from '@interop-be-reports/commons'
 import { MetricsOutput } from '../models/metrics.model.js'
 import { GlobalStoreService } from './global-store.service.js'
-import { writeFileSync } from 'fs'
 import { log, timer } from '../utils/helpers.utils.js'
 
 export type MetricFactoryFn<TMetricKey extends keyof MetricsOutput> = (
@@ -15,7 +14,6 @@ type MetricObj<TMetricKey extends keyof MetricsOutput> = {
 }
 
 type ProduceOutputOptions = {
-  produceJSON?: boolean
   filter?: string
 }
 
@@ -47,10 +45,7 @@ export class MetricsProducerService {
    * If a filter is specified, only the metrics whose name includes the filter will be executed.
    * If produceJSON is true, the output will be written to a file named `dtd-metrics.json`.
    */
-  public async produceOutput({
-    produceJSON,
-    filter,
-  }: ProduceOutputOptions): Promise<MetricsOutput | Partial<MetricsOutput>> {
+  public async produceOutput({ filter }: ProduceOutputOptions): Promise<MetricsOutput | Partial<MetricsOutput>> {
     const metricsOutput: Record<string, unknown> = {}
 
     for (const metricObj of this.metrics) {
@@ -60,10 +55,6 @@ export class MetricsProducerService {
     }
 
     const output = filter ? MetricsOutput.partial().parse(metricsOutput) : MetricsOutput.parse(metricsOutput)
-
-    if (produceJSON) {
-      writeFileSync('dtd-metrics.json', JSON.stringify(output, null, 2))
-    }
 
     return output
   }
