@@ -37,3 +37,7 @@ export const timer = {
     return Number(((timeEnd - this.timeStart) / 1000).toFixed(2))
   },
 }
+
+export function toSnakeCase(str: string): string {
+  return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+}
