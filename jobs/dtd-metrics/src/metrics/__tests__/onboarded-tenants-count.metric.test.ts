@@ -38,12 +38,7 @@ describe('getOnboardedTenantsCountMetric', () => {
     const globalStore = await GlobalStoreService.init(readModelMock)
     const result = await getOnboardedTenantsCountMetric(readModelMock, globalStore)
 
-<<<<<<<< HEAD:jobs/dtd-metrics/src/metrics/__tests__/onboarded-tenants-count.metric.test.ts
     expect(result[0].totalCount).toBe(onboardedTenants.length + onboardedLastMonthTenants.length)
     expect(result[0].lastMonthCount).toBe(onboardedLastMonthTenants.length)
-========
-    expect(result?.totalTenantsCount).toBe(onboardedTenants.length + onboardedLastMonthTenants.length)
-    expect(result?.lastMonthTenantsCount).toBe(onboardedLastMonthTenants.length)
->>>>>>>> 1.0.x:jobs/dtd-metrics/src/metrics/__tests__/total-tenants-count.metric.test.ts
   })
 })
