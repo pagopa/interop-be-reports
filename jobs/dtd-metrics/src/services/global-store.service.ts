@@ -3,7 +3,7 @@ import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import {
   MacroCategories,
   MacroCategory,
-  MacroCategoryOnboardeTenant,
+  MacroCategoryOnboardedTenant,
   MacroCategoryTenant,
 } from '../models/macro-categories.model.js'
 import { z } from 'zod'
@@ -19,7 +19,7 @@ const GLOBAL_STORE_CACHE_PATH = path.join(__dirname, '.global-store-cache')
 const GlobalStoreTenant = MacroCategoryTenant
 export type GlobalStoreTenant = z.infer<typeof GlobalStoreTenant>
 
-const GlobalStoreOnboardedTenant = MacroCategoryOnboardeTenant
+const GlobalStoreOnboardedTenant = MacroCategoryOnboardedTenant
 export type GlobalStoreOnboardedTenant = z.infer<typeof GlobalStoreOnboardedTenant>
 
 const GlobalStoreCacheObj = z.object({

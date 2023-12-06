@@ -15,12 +15,12 @@ export const MacroCategoryTenant = z.object({
   onboardedAt: z.coerce.date().optional(),
 })
 
-export const MacroCategoryOnboardeTenant = MacroCategoryTenant.extend({
+export const MacroCategoryOnboardedTenant = MacroCategoryTenant.extend({
   onboardedAt: z.coerce.date(),
 })
 
 export type MacroCategoryTenant = z.infer<typeof MacroCategoryTenant>
-export type MacroCategoryOnboardeTenant = z.infer<typeof MacroCategoryOnboardeTenant>
+export type MacroCategoryOnboardedTenant = z.infer<typeof MacroCategoryOnboardedTenant>
 
 export const MacroCategory = z.object({
   id: z.string(),
@@ -28,7 +28,7 @@ export const MacroCategory = z.object({
   ipaCodes: z.array(z.string()),
   attributes: z.array(MacroCategoryAttribute),
   tenants: z.array(MacroCategoryTenant),
-  onboardedTenants: z.array(MacroCategoryOnboardeTenant),
+  onboardedTenants: z.array(MacroCategoryOnboardedTenant),
   tenantsIds: z.array(z.string()),
 })
 
