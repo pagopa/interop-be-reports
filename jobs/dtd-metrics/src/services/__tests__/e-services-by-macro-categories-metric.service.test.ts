@@ -1,8 +1,8 @@
 import { getAttributeMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
+import { getEServicesByMacroCategoriesMetric } from '../e-services-by-macro-categories-metric.service.js'
+import { GlobalStoreService } from '../global-store.service.js'
 import { randomUUID } from 'crypto'
-import { GlobalStoreService } from '../../services/global-store.service.js'
-import { getEServicesByMacroCategoriesMetric } from '../e-services-by-macro-categories.metric.js'
 
 const comuniTenantUUID = randomUUID()
 const aziendaOspedalieraTenantUUID = randomUUID()

@@ -1,7 +1,10 @@
-import { MetricFactoryFn } from '../services/metrics-producer.service.js'
+import { OnboardedTenantsCountMetric } from '../models/metrics.model.js'
 import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
+import { GlobalStoreService } from './global-store.service.js'
 
-export const getOnboardedTenantsCountMetric: MetricFactoryFn<'onboardedTenantsCount'> = (_readModel, globalStore) => {
+export async function getOnboardedTenantsCountMetric(
+  globalStore: GlobalStoreService
+): Promise<OnboardedTenantsCountMetric> {
   const oneMonthAgoDate = getMonthsAgoDate(1)
   const twoMonthsAgoDate = getMonthsAgoDate(2)
 

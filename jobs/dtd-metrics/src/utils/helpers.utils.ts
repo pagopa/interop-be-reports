@@ -1,5 +1,3 @@
-import { logInfo, logWarn, logError } from '@interop-be-reports/commons'
-import { randomUUID } from 'crypto'
 import { sub } from 'date-fns'
 
 export function getMonthsAgoDate(numMonths: number): Date {
@@ -10,30 +8,18 @@ export function getVariationPercentage(current: number, previous: number): numbe
   return Number((previous === 0 ? 0 : ((current - previous) / previous) * 100).toFixed(1))
 }
 
-/**
- * Returns the tenants considered onboarded, i.e. the tenants that have a selfcareId.
- */
-export function getOnboardedTenants<TTenants extends { selfcareId?: string | undefined }>(
-  tenants: Array<TTenants>
-): Array<TTenants> {
-  return tenants.filter(({ selfcareId }) => !!selfcareId)
-}
+export async function wrapPromiseWithLogs<T>(promise: Promise<T>, name: string): Promise<T> {
+  console.log(`> Starting ${name}...`)
 
-const cidJob = randomUUID()
+  const timeLog = `> Done! ${name} finished executing in`
+  console.time(timeLog)
 
-export const log = {
-  info: logInfo.bind(null, cidJob),
-  warn: logWarn.bind(null, cidJob),
-  error: logError.bind(null, cidJob),
-}
-
-export const timer = {
-  timeStart: 0,
-  start(): void {
-    this.timeStart = performance.now()
-  },
-  stop(): number {
-    const timeEnd = performance.now()
-    return Number(((timeEnd - this.timeStart) / 1000).toFixed(2))
-  },
+  try {
+    const result = await promise
+    console.timeEnd(timeLog)
+    return result
+  } catch (e) {
+    console.error(`Error while executing ${name}`)
+    throw e
+  }
 }

@@ -1,6 +1,7 @@
 import { ReadPreferenceMode } from 'mongodb'
-import { AwsS3BucketClient, ReadModelClient } from '@interop-be-reports/commons'
+import { AwsS3BucketClient, ReadModelClient, withExecutionTime } from '@interop-be-reports/commons'
 import { env } from './configs/env.js'
+import { MetricsOutput } from './models/metrics.model.js'
 import {
   getPublishedEServicesMetric,
   getEServicesByMacroCategoriesMetric,
@@ -11,62 +12,81 @@ import {
   // getTenantDistributionMetric,
   // getTenantSignupsTrendMetric,
   // getOnboardedTenantsCountByMacroCategoriesMetric,
-} from './metrics/index.js'
-import { GithubClient, GlobalStoreService } from './services/index.js'
-import { MetricsProducerService } from './services/metrics-producer.service.js'
-import { log } from './utils/helpers.utils.js'
-import { writeFile } from 'fs/promises'
+} from './services/index.js'
+import { GithubClient } from './services/github-client.service.js'
+import { wrapPromiseWithLogs } from './utils/helpers.utils.js'
+import { GlobalStoreService } from './services/global-store.service.js'
 
-log.info('Starting program...')
+const log = console.log
 
-const readModel = await ReadModelClient.connect({
-  mongodbReplicaSet: env.MONGODB_REPLICA_SET,
-  mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
-  mongodbReadPreference: env.MONGODB_READ_PREFERENCE as ReadPreferenceMode,
-  mongodbRetryWrites: env.MONGODB_RETRY_WRITES,
-  readModelDbHost: env.READ_MODEL_DB_HOST,
-  readModelDbPort: env.READ_MODEL_DB_PORT,
-  readModelDbUser: env.READ_MODEL_DB_USER,
-  readModelDbPassword: env.READ_MODEL_DB_PASSWORD,
-  readModelDbName: env.READ_MODEL_DB_NAME,
-})
+let readModel: ReadModelClient
 
-try {
+async function main(): Promise<void> {
+  log('Starting program\n')
+
+  readModel = await ReadModelClient.connect({
+    mongodbReplicaSet: env.MONGODB_REPLICA_SET,
+    mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
+    mongodbReadPreference: env.MONGODB_READ_PREFERENCE as ReadPreferenceMode,
+    mongodbRetryWrites: env.MONGODB_RETRY_WRITES,
+    readModelDbHost: env.READ_MODEL_DB_HOST,
+    readModelDbPort: env.READ_MODEL_DB_PORT,
+    readModelDbUser: env.READ_MODEL_DB_USER,
+    readModelDbPassword: env.READ_MODEL_DB_PASSWORD,
+    readModelDbName: env.READ_MODEL_DB_NAME,
+  })
+
   const githubClient = new GithubClient(env.GITHUB_ACCESS_TOKEN)
   const awsS3BucketClient = new AwsS3BucketClient(env.STORAGE_BUCKET)
 
-  log.info('Initializing global store...')
-  const globalStore = await GlobalStoreService.init(readModel, { cache: env.CACHE_GLOBAL_STORE })
-  log.info('Global store initialized!')
+  log('Retrieving metrics...')
 
-  log.info('Producing metrics...')
+  log('Initializing global store...')
+  const globalStore = await GlobalStoreService.init(readModel)
+  log('Global store initialized!\n')
 
-  const output = await new MetricsProducerService(readModel, globalStore)
-    .addMetric('publishedEServices', getPublishedEServicesMetric)
-    .addMetric('eservicesByMacroCategories', getEServicesByMacroCategoriesMetric)
-    .addMetric('mostSubscribedEServices', getMostSubscribedEServicesMetric)
-    .addMetric('topProducersBySubscribers', getTopProducersBySubscribersMetric)
-    .addMetric('topProducers', getTopProducersMetric)
-    // .addMetric('onboardedTenantsCount', getOnboardedTenantsCountMetric)
-    // .addMetric('tenantDistribution', getTenantDistributionMetric)
-    // .addMetric('tenantSignupsTrend', getTenantSignupsTrendMetric)
-    // .addMetric('onboardedTenantsCountByMacroCategories', getOnboardedTenantsCountByMacroCategoriesMetric)
-    .produceOutput({
-      filter: env.METRICS_FILTER,
-    })
+  const output = MetricsOutput.parse({
+    // --- FIRST BATCH ---
+    publishedEServices: await wrapPromiseWithLogs(getPublishedEServicesMetric(readModel), 'publishedEServices'),
+    eservicesByMacroCategories: await wrapPromiseWithLogs(
+      getEServicesByMacroCategoriesMetric(readModel, globalStore),
+      'eservicesByMacroCategories'
+    ),
+    mostSubscribedEServices: await wrapPromiseWithLogs(
+      getMostSubscribedEServicesMetric(readModel, globalStore),
+      'mostSubscribedEServices'
+    ),
+    topProducersBySubscribers: await wrapPromiseWithLogs(
+      getTopProducersBySubscribersMetric(readModel, globalStore),
+      'topProducersBySubscribers'
+    ),
+    topProducers: await wrapPromiseWithLogs(getTopProducersMetric(readModel), 'topProducers'),
+    // --- SECOND BATCH ---
+    // onboardedTenantsCount: await wrapPromiseWithLogs(
+    //   getOnboardedTenantsCountMetric(globalStore),
+    //   'onboardedTenantsCount'
+    // ),
+    // onboardedTenantsCount: await wrapPromiseWithLogs(
+    //   getTenantDistributionMetric(readModel, globalStore),
+    //   'tenantDistribution'
+    // ),
+    // tenantSignupsTrend: await wrapPromiseWithLogs(getTenantSignupsTrendMetric(globalStore), 'tenantSignupsTrend'),
+    // onboardedTenantsCountByMacroCategories: await wrapPromiseWithLogs(
+    //   getOnboardedTenantsCountByMacroCategoriesMetric(globalStore),
+    //   'onboardedTenantsCountByMacroCategories'
+    // ),
+  } satisfies MetricsOutput)
 
-  log.info(`Uploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
+  log(`\nUploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
 
   await Promise.all([
-    // If PRODUCE_OUTPUT_JSON is true, write the output to a local file
-    ...(env.PRODUCE_OUTPUT_JSON ? [writeFile('dtd-metrics.json', JSON.stringify(output, null, 2))] : []),
     githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${env.FILENAME}`),
     awsS3BucketClient.uploadData(output, env.FILENAME),
   ])
 
-  log.info('Done!')
-} catch (err) {
-  log.error('An error occurred while producing metrics:', err as Error)
-} finally {
-  await readModel.close()
+  log('Done!\n')
 }
+
+withExecutionTime(main).finally(async () => {
+  if (readModel) await readModel.close()
+})

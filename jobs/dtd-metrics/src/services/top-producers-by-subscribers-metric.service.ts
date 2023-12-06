@@ -1,8 +1,8 @@
-import { AgreementState, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
+import { AgreementState, ReadModelClient, TENANTS_COLLECTION_NAME } from '@interop-be-reports/commons'
 import { TopProducersBySubscribersMetric } from '../models/metrics.model.js'
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { z } from 'zod'
-import { MetricFactoryFn } from '../services/metrics-producer.service.js'
+import { GlobalStoreService } from './global-store.service.js'
 
 const ProducerAgreement = z.object({
   consumerId: z.string(),
@@ -17,10 +17,10 @@ const ProducerAgreements = z.object({
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3747
  */
-export const getTopProducersBySubscribersMetric: MetricFactoryFn<'topProducersBySubscribers'> = async (
-  readModel,
-  globalStore
-) => {
+export async function getTopProducersBySubscribersMetric(
+  readModel: ReadModelClient,
+  globalStore: GlobalStoreService
+): Promise<TopProducersBySubscribersMetric> {
   const sixMonthsAgoDate = getMonthsAgoDate(6)
   const twelveMonthsAgoDate = getMonthsAgoDate(12)
   const fromTheBeginningDate = undefined
@@ -82,7 +82,7 @@ export const getTopProducersBySubscribersMetric: MetricFactoryFn<'topProducersBy
                  * created after the given date
                  */
                 const macroCategoryAgreements = producer.agreements.filter((agreement) => {
-                  const isInMacroCategory = macroCategory.tenantsIds.includes(agreement.consumerId)
+                  const isInMacroCategory = macroCategory.tenantsIds.has(agreement.consumerId)
                   const isCreatedAfterDate = date ? agreement.createdAt >= date : true
 
                   return isInMacroCategory && isCreatedAfterDate
