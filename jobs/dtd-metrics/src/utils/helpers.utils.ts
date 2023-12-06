@@ -11,12 +11,13 @@ export function getVariationPercentage(current: number, previous: number): numbe
 }
 
 /**
- * Returns the tenants considered onboarded, i.e. the tenants that have a selfcareId.
+ * Returns the tenants considered onboarded, i.e. the tenants that have an onboardedAt date
  */
-export function getOnboardedTenants<TTenants extends { selfcareId?: string | undefined }>(
+export function getOnboardedTenants<TTenants extends { onboardedAt?: Date | undefined }>(
   tenants: Array<TTenants>
-): Array<TTenants> {
-  return tenants.filter(({ selfcareId }) => !!selfcareId)
+): Array<TTenants & { onboardedAt: Date }> {
+  const isOnboarded = (tenant: TTenants): tenant is TTenants & { onboardedAt: Date } => !!tenant.onboardedAt
+  return tenants.filter(isOnboarded)
 }
 
 const cidJob = randomUUID()

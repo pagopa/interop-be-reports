@@ -1,5 +1,5 @@
 import { OnboardedTenantsCountByMacroCategoriesMetric } from '../models/metrics.model.js'
-import { getMonthsAgoDate, getOnboardedTenants } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { MacroCategory } from '../models/macro-categories.model.js'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
@@ -16,11 +16,12 @@ export const getOnboardedTenantsCountByMacroCategoriesMetric: MetricFactoryFn<
     macroCategory: MacroCategory,
     date: Date | undefined
   ): OnboardedTenantsCountByMacroCategoriesMetricItem {
-    //TODO eventually the createdAt field will be substituted by the onboardedAt field once it will be available
-    const tenants = date ? macroCategory.tenants.filter((t) => t.createdAt >= date) : macroCategory.tenants
+    const onboardedTenants = date
+      ? macroCategory.onboardedTenants.filter((t) => t.onboardedAt >= date)
+      : macroCategory.onboardedTenants
 
-    const onboardedCount = getOnboardedTenants(tenants).length
-    const totalCount = tenants.length
+    const onboardedCount = onboardedTenants.length
+    const totalCount = macroCategory.tenants.length
 
     return { id: macroCategory.id, name: macroCategory.name, onboardedCount, totalCount }
   }

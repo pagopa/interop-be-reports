@@ -1,5 +1,5 @@
 import { OnboardedTenantsCountMetric } from '../models/metrics.model.js'
-import { GlobalStoreService, GlobalStoreTenant } from '../services/global-store.service.js'
+import { GlobalStoreService, GlobalStoreOnboardedTenant } from '../services/global-store.service.js'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
 
@@ -31,17 +31,17 @@ function getMetricData(
   }
 }
 
-function getLastMonthTenantsCount(tenants: Array<GlobalStoreTenant>): number {
+function getLastMonthTenantsCount(tenants: Array<GlobalStoreOnboardedTenant>): number {
   const oneMonthAgoDate = getMonthsAgoDate(1)
-  return tenants.filter((tenant) => tenant.createdAt >= oneMonthAgoDate).length
+  return tenants.filter((tenant) => tenant.onboardedAt >= oneMonthAgoDate).length
 }
 
-function getVariationCount(tenants: Array<GlobalStoreTenant>, lastMonthTenantsCount: number): number {
+function getVariationCount(tenants: Array<GlobalStoreOnboardedTenant>, lastMonthTenantsCount: number): number {
   const oneMonthAgoDate = getMonthsAgoDate(1)
   const twoMonthsAgoDate = getMonthsAgoDate(2)
 
   const twoMonthsAgoTenantsCount = tenants.filter(
-    (tenant) => tenant.createdAt >= twoMonthsAgoDate && tenant.createdAt <= oneMonthAgoDate
+    (tenant) => tenant.onboardedAt >= twoMonthsAgoDate && tenant.onboardedAt <= oneMonthAgoDate
   ).length
 
   return getVariationPercentage(lastMonthTenantsCount, twoMonthsAgoTenantsCount)

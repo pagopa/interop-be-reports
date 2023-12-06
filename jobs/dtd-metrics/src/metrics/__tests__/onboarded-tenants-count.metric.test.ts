@@ -11,17 +11,17 @@ describe('getOnboardedTenantsCountMetric', () => {
   it('should return the correct metrics', async () => {
     const onboardedTenant = getTenantMock({
       selfcareId: randomUUID(),
-      createdAt: getMonthsAgoDate(6),
+      onboardedAt: getMonthsAgoDate(6),
       attributes: [{ id: comuniAttributeId }],
     })
     const onboardedTenants = repeatObjInArray({ data: onboardedTenant, attributes: [{ id: comuniAttributeId }] }, 10)
 
     const notOnboardedTenant = getTenantMock<Tenant>({ attributes: [{ id: comuniAttributeId }] })
-    delete notOnboardedTenant.selfcareId
+    delete notOnboardedTenant.onboardedAt
     const notOnboardedTenants = repeatObjInArray({ data: notOnboardedTenant }, 10)
 
     const onboardedLastMonthTenant = getTenantMock({
-      selfcareId: randomUUID(),
+      onboardedAt: new Date(),
       attributes: [{ id: comuniAttributeId }],
     })
     const onboardedLastMonthTenants = repeatObjInArray({ data: onboardedLastMonthTenant }, 2)

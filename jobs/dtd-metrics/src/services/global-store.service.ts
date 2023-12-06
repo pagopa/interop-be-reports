@@ -1,6 +1,11 @@
 import { Attribute, ReadModelClient } from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
-import { MacroCategories, MacroCategory } from '../models/macro-categories.model.js'
+import {
+  MacroCategories,
+  MacroCategory,
+  MacroCategoryOnboardeTenant,
+  MacroCategoryTenant,
+} from '../models/macro-categories.model.js'
 import { z } from 'zod'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
@@ -11,14 +16,11 @@ import { MacroCategoryName } from '../utils/tests.utils.js'
 const __dirname = new URL('.', import.meta.url).pathname
 const GLOBAL_STORE_CACHE_PATH = path.join(__dirname, '.global-store-cache')
 
-const GlobalStoreTenant = z.object({
-  id: z.string(),
-  name: z.string(),
-  createdAt: z.coerce.date(),
-  selfcareId: z.string().optional(),
-  macroCategoryId: z.string(),
-})
+const GlobalStoreTenant = MacroCategoryTenant
 export type GlobalStoreTenant = z.infer<typeof GlobalStoreTenant>
+
+const GlobalStoreOnboardedTenant = MacroCategoryOnboardeTenant
+export type GlobalStoreOnboardedTenant = z.infer<typeof GlobalStoreOnboardedTenant>
 
 const GlobalStoreCacheObj = z.object({
   macroCategories: MacroCategories,
@@ -40,7 +42,7 @@ type GlobalStoreInitConfig = {
  */
 export class GlobalStoreService {
   tenants: Array<GlobalStoreTenant>
-  onboardedTenants: Array<GlobalStoreTenant>
+  onboardedTenants: Array<GlobalStoreOnboardedTenant>
   tenantsMap: Map<string, GlobalStoreTenant>
   macroCategories: MacroCategories
 
@@ -102,13 +104,14 @@ export class GlobalStoreService {
               _id: 0,
               'data.id': 1,
               'data.name': 1,
-              'data.createdAt': 1,
-              'data.selfcareId': 1,
+              'data.onboardedAt': 1,
             },
           }
         )
         .map(({ data }) => GlobalStoreTenant.parse({ ...data, macroCategoryId: macroCategory.id }))
         .toArray()
+
+      console.log(JSON.stringify(macroCategoryTenants, null, 2))
 
       return MacroCategory.parse({
         id: macroCategory.id,
