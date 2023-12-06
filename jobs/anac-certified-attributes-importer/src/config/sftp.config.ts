@@ -3,5 +3,7 @@ export type SftpConfig = {
   port: number
   username: string
   password: string
-  filePath: string
+  fileNamePrefix: string
+  folderPath: string
+  forceFileName?: string
 }

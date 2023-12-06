@@ -6,7 +6,9 @@ export const sftpConfigTest: SftpConfig = {
   port: 1,
   username: 'user',
   password: 'password',
-  filePath: '/',
+  fileNamePrefix: 'test',
+  folderPath: '/',
+  forceFileName: 'test-file.csv',
 }
 
 const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,ANAC_incaricato,ANAC_abilitato,ANAC_in_convalida

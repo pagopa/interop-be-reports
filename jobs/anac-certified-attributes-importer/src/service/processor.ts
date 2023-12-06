@@ -28,7 +28,7 @@ export async function importAttributes(
 
   const batchSize = recordsBatchSize
 
-  const fileContent = await sftpClient.downloadCSV()
+  const fileContent = await sftpClient.downloadCSV(jobCorrelationId)
 
   const attributes: AnacAttributes = await getAttributesIdentifiers(readModel, anacTenantId)
 
@@ -198,6 +198,7 @@ function getBatch(
   const rawRecords = parse(fileContent, {
     trim: true,
     columns: true,
+    relax_quotes: true,
     from: fromLine,
     to: fromLine + batchSize - 1,
   }) as Array<object>
