@@ -111,8 +111,6 @@ export class GlobalStoreService {
         .map(({ data }) => GlobalStoreTenant.parse({ ...data, macroCategoryId: macroCategory.id }))
         .toArray()
 
-      console.log(JSON.stringify(macroCategoryTenants, null, 2))
-
       return MacroCategory.parse({
         id: macroCategory.id,
         name: macroCategory.name,
