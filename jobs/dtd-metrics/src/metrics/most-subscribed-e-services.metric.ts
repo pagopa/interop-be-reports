@@ -1,10 +1,10 @@
-import { Agreement, AgreementState, ESERVICES_COLLECTION_NAME, ReadModelClient } from '@interop-be-reports/commons'
+import { Agreement, AgreementState, ESERVICES_COLLECTION_NAME } from '@interop-be-reports/commons'
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { z } from 'zod'
 import orderBy from 'lodash/orderBy.js'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 import { MostSubscribedEServicesMetric } from '../models/metrics.model.js'
-import { GlobalStoreService } from './global-store.service.js'
+import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
 type RelevantAgreementInfo = { macrocategoryId: string; consumerName: string; consumerId: string; createdAt: Date }
 type EServiceMap = Record<
@@ -24,10 +24,10 @@ type EServiceCollectionItem = {
   agreements: Array<RelevantAgreementInfo>
 }
 
-export async function getMostSubscribedEServicesMetric(
-  readModel: ReadModelClient,
-  globalStore: GlobalStoreService
-): Promise<MostSubscribedEServicesMetric> {
+export const getMostSubscribedEServicesMetric: MetricFactoryFn<'mostSubscribedEServices'> = async (
+  readModel,
+  globalStore
+) => {
   /*
    * We retrieve all the agreement data we need (eserviceId, consumerId, producerId, eserviceName).
    * The state of the agreement must be Active or Suspended.

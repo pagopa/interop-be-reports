@@ -1,12 +1,13 @@
-import { EServiceDescriptor, ReadModelClient } from '@interop-be-reports/commons'
+import { EServiceDescriptor } from '@interop-be-reports/commons'
 import { PublishedEServicesMetric } from '../models/metrics.model.js'
 import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
 import { Document } from 'mongodb'
+import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3744
  **/
-export async function getPublishedEServicesMetric(readModel: ReadModelClient): Promise<PublishedEServicesMetric> {
+export const getPublishedEServicesMetric: MetricFactoryFn<'publishedEServices'> = async (readModel) => {
   const oneMonthAgoDate = getMonthsAgoDate(1)
   const twoMonthsAgoDate = getMonthsAgoDate(2)
 

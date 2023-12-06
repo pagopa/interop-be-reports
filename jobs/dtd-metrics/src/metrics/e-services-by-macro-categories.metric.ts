@@ -1,16 +1,16 @@
-import { EServiceDescriptor, ReadModelClient } from '@interop-be-reports/commons'
+import { EServiceDescriptor } from '@interop-be-reports/commons'
 import { EServicesByMacroCategoriesMetric } from '../models/metrics.model.js'
-import { GlobalStoreService } from './global-store.service.js'
 import { MacroCategory } from '../models/macro-categories.model.js'
 import { z } from 'zod'
+import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3745
  */
-export async function getEServicesByMacroCategoriesMetric(
-  readModel: ReadModelClient,
-  globalStore: GlobalStoreService
-): Promise<EServicesByMacroCategoriesMetric> {
+export const getEServicesByMacroCategoriesMetric: MetricFactoryFn<'eservicesByMacroCategories'> = async (
+  readModel,
+  globalStore
+) => {
   const eservices = await readModel.eservices
     .aggregate([
       {
@@ -32,7 +32,7 @@ export async function getEServicesByMacroCategoriesMetric(
 
   const getMacroCategoryPublishedEServicesCount = (macroCategory: MacroCategory): number =>
     eservices.reduce((count, eservice) => {
-      if (macroCategory.tenantsIds.has(eservice.producerId)) return count + 1
+      if (macroCategory.tenantsIds.includes(eservice.producerId)) return count + 1
       else return count
     }, 0)
 

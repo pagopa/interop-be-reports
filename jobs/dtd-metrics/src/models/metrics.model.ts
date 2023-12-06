@@ -76,7 +76,7 @@ export const OnboardedTenantsCountMetric = z.object({
 
 export const TenantDistributionMetric = z.array(
   z.object({
-    label: z.enum(['Solo fruitore', 'Solo erogatore', 'Sia fruitore che erogatore', 'Solo primo accesso']),
+    activity: z.enum(['Solo fruitore', 'Solo erogatore', 'Sia fruitore che erogatore', 'Solo accesso']),
     count: z.number(),
   })
 )
@@ -109,10 +109,11 @@ export const MetricsOutput = z.object({
   mostSubscribedEServices: MostSubscribedEServicesMetric,
   topProducersBySubscribers: TopProducersBySubscribersMetric,
   topProducers: TopProducersMetric,
-  // onboardedTenantsCount: metrics[5],
-  // tenantDistribution: metrics[6],
-  // tenantSignupsTrend: metrics[7],
-  // onboardedTenantsCountByMacroCategories: metrics[8],
+  // .optional() will be removed once the metric will be implemented
+  onboardedTenantsCount: OnboardedTenantsCountMetric.optional(),
+  tenantDistribution: TenantDistributionMetric.optional(),
+  tenantSignupsTrend: TenantSignupsTrendMetric.optional(),
+  onboardedTenantsCountByMacroCategories: OnboardedTenantsCountByMacroCategoriesMetric.optional(),
 })
 
 export type MetricsOutput = z.infer<typeof MetricsOutput>

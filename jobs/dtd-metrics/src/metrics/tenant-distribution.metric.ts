@@ -1,12 +1,9 @@
-import { AgreementState, ReadModelClient } from '@interop-be-reports/commons'
+import { AgreementState } from '@interop-be-reports/commons'
 import { TenantDistributionMetric } from '../models/metrics.model.js'
 import { z } from 'zod'
-import { GlobalStoreService } from './global-store.service.js'
+import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
-export async function getTenantDistributionMetric(
-  readModel: ReadModelClient,
-  globalStore: GlobalStoreService
-): Promise<TenantDistributionMetric> {
+export const getTenantDistributionMetric: MetricFactoryFn<'tenantDistribution'> = async (readModel, globalStore) => {
   const activeAgreements = await readModel.agreements
     .find(
       { 'data.state': { $in: ['Active', 'Suspended'] satisfies Array<AgreementState> } },
@@ -42,23 +39,22 @@ export async function getTenantDistributionMetric(
   type TenantDistributionItem = TenantDistributionMetric[number]
 
   const onlyConsumers: TenantDistributionItem = {
-    label: 'Solo fruitore',
+    activity: 'Solo fruitore',
     count: 0,
   }
 
   const onlyProducers: TenantDistributionItem = {
-    label: 'Solo erogatore',
+    activity: 'Solo erogatore',
     count: 0,
   }
 
   const bothConsumersAndProducers: TenantDistributionItem = {
-    label: 'Sia fruitore che erogatore',
+    activity: 'Sia fruitore che erogatore',
     count: 0,
   }
 
-  // The label is misleading, this is actually the number of onboarded tenants that are neither consumers nor producers
-  const onlyFirstAccess: TenantDistributionItem = {
-    label: 'Solo primo accesso',
+  const onlyAccess: TenantDistributionItem = {
+    activity: 'Solo accesso',
     count: 0,
   }
 
@@ -69,10 +65,10 @@ export async function getTenantDistributionMetric(
     if (isTenantProducer && isTenantConsumer) bothConsumersAndProducers.count++
     else if (isTenantProducer) onlyProducers.count++
     else if (isTenantConsumer) onlyConsumers.count++
-    else onlyFirstAccess.count++
+    else onlyAccess.count++
   }
 
   globalStore.onboardedTenants.forEach(resolveTenantDistribution)
 
-  return [onlyConsumers, onlyProducers, bothConsumersAndProducers, onlyFirstAccess]
+  return [onlyConsumers, onlyProducers, bothConsumersAndProducers, onlyAccess]
 }

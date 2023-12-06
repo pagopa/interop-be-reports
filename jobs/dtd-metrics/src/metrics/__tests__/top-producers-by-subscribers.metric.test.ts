@@ -1,8 +1,8 @@
 import { getAgreementMock, getAttributeMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
-import { getTopProducersBySubscribersMetric } from '../top-producers-by-subscribers-metric.service.js'
 import { randomUUID } from 'crypto'
-import { GlobalStoreService } from '../global-store.service.js'
+import { GlobalStoreService } from '../../services/global-store.service.js'
+import { getTopProducersBySubscribersMetric } from '../top-producers-by-subscribers.metric.js'
 
 const producer1Uuid = randomUUID()
 const producer2Uuid = randomUUID()

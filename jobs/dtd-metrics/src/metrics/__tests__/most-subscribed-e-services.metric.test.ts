@@ -1,8 +1,8 @@
 import { getAgreementMock, getAttributeMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
-import { getMostSubscribedEServicesMetric } from '../most-subscribed-e-services-metric.service.js'
 import { randomUUID } from 'crypto'
-import { GlobalStoreService } from '../global-store.service.js'
+import { GlobalStoreService } from '../../services/global-store.service.js'
+import { getMostSubscribedEServicesMetric } from '../most-subscribed-e-services.metric.js'
 
 const eservice1Uuid = randomUUID()
 const eservice2Uuid = randomUUID()
