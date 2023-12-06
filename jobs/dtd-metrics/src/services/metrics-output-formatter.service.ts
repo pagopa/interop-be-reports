@@ -2,14 +2,14 @@ import { GetMetricData, MetricName, Metric, TimedMetricKey } from '../models/met
 import { json2csv, toSnakeCase } from '../utils/helpers.utils.js'
 
 type MetricsDashboardData = { [TMetricName in MetricName]: GetMetricData<TMetricName> }
-type MetricFile = { filename: string; data: string }
+type MetricFile = { metricName: MetricName; filename: string; data: string }
 
 /**
  * This service is responsible for formatting the metrics data into the format
  * expected by DtD and the metrics frontend dashboard.
  */
 export class MetricsOutputFormatterService {
-  constructor(private metrics: Array<Metric>) {}
+  constructor(private readonly metrics: Array<Metric>) {}
 
   /**
    * The metrics dashboard expects the data as an object with the metric name as key
@@ -41,7 +41,13 @@ export class MetricsOutputFormatterService {
       case 'eservicesByMacroCategories':
       case 'onboardedTenantsCount':
       case 'tenantDistribution':
-        return [{ filename: this.getFilename(metric.name, 'json'), data: JSON.stringify(metric.data) }]
+        return [
+          {
+            metricName: metric.name,
+            filename: this.getFilename(metric.name, 'json'),
+            data: JSON.stringify(metric.data),
+          },
+        ]
       case 'mostSubscribedEServices':
       case 'topProducersBySubscribers':
       case 'topProducers':
@@ -49,14 +55,17 @@ export class MetricsOutputFormatterService {
       case 'onboardedTenantsCountByMacroCategories':
         return [
           {
+            metricName: metric.name,
             filename: this.getFilename(metric.name, 'json', 'fromTheBeginning'),
             data: JSON.stringify(metric.data.fromTheBeginning),
           },
           {
+            metricName: metric.name,
             filename: this.getFilename(metric.name, 'json', 'lastSixMonths'),
             data: JSON.stringify(metric.data.lastSixMonths),
           },
           {
+            metricName: metric.name,
             filename: this.getFilename(metric.name, 'json', 'lastTwelveMonths'),
             data: JSON.stringify(metric.data.lastTwelveMonths),
           },
@@ -74,9 +83,13 @@ export class MetricsOutputFormatterService {
       case 'publishedEServices':
       case 'onboardedTenantsCount':
       case 'tenantDistribution':
-        return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv([metric.data]) }]
+        return [
+          { metricName: metric.name, filename: this.getFilename(metric.name, 'csv'), data: json2csv([metric.data]) },
+        ]
       case 'eservicesByMacroCategories':
-        return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv(metric.data) }]
+        return [
+          { metricName: metric.name, filename: this.getFilename(metric.name, 'csv'), data: json2csv(metric.data) },
+        ]
       case 'mostSubscribedEServices':
       case 'topProducersBySubscribers':
       case 'topProducers':
@@ -84,14 +97,17 @@ export class MetricsOutputFormatterService {
       case 'onboardedTenantsCountByMacroCategories':
         return [
           {
+            metricName: metric.name,
             filename: this.getFilename(metric.name, 'csv', 'fromTheBeginning'),
             data: json2csv(metric.data.fromTheBeginning),
           },
           {
+            metricName: metric.name,
             filename: this.getFilename(metric.name, 'csv', 'lastSixMonths'),
             data: json2csv(metric.data.lastSixMonths),
           },
           {
+            metricName: metric.name,
             filename: this.getFilename(metric.name, 'csv', 'lastTwelveMonths'),
             data: json2csv(metric.data.lastTwelveMonths),
           },
