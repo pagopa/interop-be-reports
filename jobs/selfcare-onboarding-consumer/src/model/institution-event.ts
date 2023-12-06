@@ -10,6 +10,7 @@ const InstitutionEvent = z.object({
   taxCode: z.string().trim().min(1),
   subUnitCode: z.string().optional().nullable(), // AOO/UO ID
   subUnitType: SubUnitType.optional().nullable(),
+  digitalAddress: z.string().trim().min(1),
 });
 export type InstitutionEvent = z.infer<typeof InstitutionEvent>
 
@@ -19,5 +20,6 @@ export const EventPayload = z.object({
   product: z.string().trim().min(1),
   onboardingTokenId: z.string(),
   institution: InstitutionEvent,
+  createdAt: z.string(),
 });
 export type EventPayload = z.infer<typeof EventPayload>
