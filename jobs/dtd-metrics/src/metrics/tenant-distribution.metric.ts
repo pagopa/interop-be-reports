@@ -3,7 +3,10 @@ import { TenantDistributionMetric } from '../models/metrics.model.js'
 import { z } from 'zod'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
-export const getTenantDistributionMetric: MetricFactoryFn<'tenantDistribution'> = async (readModel, globalStore) => {
+export const getTenantDistributionMetric: MetricFactoryFn<'distribuzioneDegliEntiPerAttivita'> = async (
+  readModel,
+  globalStore
+) => {
   const activeAgreements = await readModel.agreements
     .find(
       { 'data.state': { $in: ['Active', 'Suspended'] satisfies Array<AgreementState> } },
