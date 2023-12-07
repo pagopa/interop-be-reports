@@ -9,7 +9,7 @@ type MetricFile = { filename: string; data: string }
  * expected by DtD and the metrics frontend dashboard.
  */
 export class MetricsOutputFormatterService {
-  constructor(private metrics: Array<Metric>) {}
+  constructor(private readonly metrics: Array<Metric>) {}
 
   /**
    * The metrics dashboard expects the data as an object with the metric name as key

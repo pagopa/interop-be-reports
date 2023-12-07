@@ -11,10 +11,14 @@ import {
   getTenantDistributionMetric,
   getTenantOnboardingTrendMetric,
 } from './metrics/index.js'
-import { GithubClient, GlobalStoreService } from './services/index.js'
-import { MetricsProducerService } from './services/metrics-producer.service.js'
+import {
+  GithubClient,
+  GlobalStoreService,
+  MetricsProducerService,
+  MetricsOutputFormatterService,
+  MetricsOpenDataRdfGenerator,
+} from './services/index.js'
 import { log } from './utils/helpers.utils.js'
-import { MetricsOutputFormatterService } from './services/metrics-output-formatter.service.js'
 import { writeFileSync } from 'fs'
 
 log.info('Starting program...')
@@ -70,6 +74,15 @@ try {
   }
 
   await awsS3BucketClient.uploadData(dashboardOuput, env.FILENAME)
+
+  log.info('Generating and uploading rdf opendata file...')
+  const rdfFileOutput = new MetricsOpenDataRdfGenerator().produceOpenDataRDF()
+  await githubClient.createOrUpdateRepoFile(
+    rdfFileOutput,
+    env.GITHUB_REPO_OWNER,
+    env.GITHUB_REPO,
+    `metadata/pdnd-opendata.rdf`
+  )
 
   log.info('Done!')
 } catch (err) {

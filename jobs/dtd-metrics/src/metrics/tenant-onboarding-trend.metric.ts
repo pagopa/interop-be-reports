@@ -1,7 +1,7 @@
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { add } from 'date-fns'
-import { TenantOnboardingTrendMetric } from '../models/metrics.model.js'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
+import { TenantOnboardingTrendMetric } from '../models/metrics.model.js'
 
 export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTrend'> = (_readModel, globalStore) => {
   // Get the oldest tenant date, which will be used as the starting point for the timeseries
