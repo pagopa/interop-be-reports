@@ -3,7 +3,7 @@ import { GlobalStoreService, GlobalStoreOnboardedTenant } from '../services/glob
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
 
-export const getOnboardedTenantsCountMetric: MetricFactoryFn<'onboardedTenantsCount'> = (_readModel, globalStore) => {
+export const getOnboardedTenantsCountMetric: MetricFactoryFn<'totaleEnti'> = (_readModel, globalStore) => {
   return OnboardedTenantsCountMetric.parse([
     getMetricData('Totale', globalStore),
     getMetricData('Comuni', globalStore),

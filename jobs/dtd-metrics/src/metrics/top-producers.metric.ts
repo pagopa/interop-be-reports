@@ -6,7 +6,7 @@ import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-4215
  */
-export const getTopProducersMetric: MetricFactoryFn<'topProducers'> = async (readModel) => {
+export const getTopProducersMetric: MetricFactoryFn<'entiChePubblicanoPiuEService'> = async (readModel) => {
   const sixMonthsAgoDate = getMonthsAgoDate(6)
   const twelveMonthsAgoDate = getMonthsAgoDate(12)
   const fromTheBeginningDate = undefined

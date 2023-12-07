@@ -3,7 +3,10 @@ import { add } from 'date-fns'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { TenantOnboardingTrendMetric } from '../models/metrics.model.js'
 
-export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTrend'> = (_readModel, globalStore) => {
+export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamentoAdesioni'> = (
+  _readModel,
+  globalStore
+) => {
   // Get the oldest tenant date, which will be used as the starting point for the timeseries
   const oldestTenantDate = globalStore.onboardedTenants.reduce((oldestDate, tenant) => {
     if (tenant.onboardedAt < oldestDate) {

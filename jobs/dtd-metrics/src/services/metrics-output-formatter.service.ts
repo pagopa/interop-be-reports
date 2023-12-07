@@ -37,15 +37,15 @@ export class MetricsOutputFormatterService {
    */
   private getMetricJsonFiles(metric: Metric): Array<MetricFile> {
     switch (metric.name) {
-      case 'publishedEServices':
-      case 'eservicesByMacroCategories':
-      case 'onboardedTenantsCount':
-      case 'tenantDistribution':
+      case 'eservicePubblicati':
+      case 'entiErogatoriDiEService':
+      case 'totaleEnti':
+      case 'distribuzioneDegliEntiPerAttivita':
         return [{ filename: this.getFilename(metric.name, 'json'), data: JSON.stringify(metric.data) }]
-      case 'mostSubscribedEServices':
-      case 'topProducersBySubscribers':
-      case 'topProducers':
-      case 'tenantOnboardingTrend':
+      case 'eserviceConPiuEntiAbilitati':
+      case 'entiErogatoriEdEntiAbilitatiAllaFruizione':
+      case 'entiChePubblicanoPiuEService':
+      case 'statoDiCompletamentoAdesioni':
         return [
           {
             filename: this.getFilename(metric.name, 'json', 'fromTheBeginning'),
@@ -70,16 +70,16 @@ export class MetricsOutputFormatterService {
    */
   private getMetricCSVFiles(metric: Metric): Array<MetricFile> {
     switch (metric.name) {
-      case 'publishedEServices':
+      case 'eservicePubblicati':
         return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv([metric.data]) }]
-      case 'onboardedTenantsCount':
-      case 'tenantDistribution':
-      case 'eservicesByMacroCategories':
+      case 'totaleEnti':
+      case 'distribuzioneDegliEntiPerAttivita':
+      case 'entiErogatoriDiEService':
         return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv(metric.data) }]
-      case 'mostSubscribedEServices':
-      case 'topProducersBySubscribers':
-      case 'topProducers':
-      case 'tenantOnboardingTrend':
+      case 'eserviceConPiuEntiAbilitati':
+      case 'entiErogatoriEdEntiAbilitatiAllaFruizione':
+      case 'entiChePubblicanoPiuEService':
+      case 'statoDiCompletamentoAdesioni':
         return [
           {
             filename: this.getFilename(metric.name, 'csv', 'fromTheBeginning'),

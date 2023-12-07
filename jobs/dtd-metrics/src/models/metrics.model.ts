@@ -123,14 +123,14 @@ export const TopProducersMetric = TimedMetric(z.array(TopProducersMetricItem))
 export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 
 export const Metric = z.union([
-  z.object({ name: z.literal('publishedEServices'), data: PublishedEServicesMetric }),
-  z.object({ name: z.literal('eservicesByMacroCategories'), data: EServicesByMacroCategoriesMetric }),
-  z.object({ name: z.literal('mostSubscribedEServices'), data: MostSubscribedEServicesMetric }),
-  z.object({ name: z.literal('topProducersBySubscribers'), data: TopProducersBySubscribersMetric }),
-  z.object({ name: z.literal('topProducers'), data: TopProducersMetric }),
-  z.object({ name: z.literal('onboardedTenantsCount'), data: OnboardedTenantsCountMetric }),
-  z.object({ name: z.literal('tenantDistribution'), data: TenantDistributionMetric }),
-  z.object({ name: z.literal('tenantOnboardingTrend'), data: TenantOnboardingTrendMetric }),
+  z.object({ name: z.literal('totaleEnti'), data: OnboardedTenantsCountMetric }),
+  z.object({ name: z.literal('statoDiCompletamentoAdesioni'), data: TenantOnboardingTrendMetric }),
+  z.object({ name: z.literal('distribuzioneDegliEntiPerAttivita'), data: TenantDistributionMetric }),
+  z.object({ name: z.literal('eservicePubblicati'), data: PublishedEServicesMetric }),
+  z.object({ name: z.literal('entiErogatoriDiEService'), data: EServicesByMacroCategoriesMetric }),
+  z.object({ name: z.literal('entiChePubblicanoPiuEService'), data: TopProducersMetric }),
+  z.object({ name: z.literal('entiErogatoriEdEntiAbilitatiAllaFruizione'), data: TopProducersBySubscribersMetric }),
+  z.object({ name: z.literal('eserviceConPiuEntiAbilitati'), data: MostSubscribedEServicesMetric }),
 ])
 
 export type Metric = z.infer<typeof Metric>

@@ -7,7 +7,7 @@ import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3744
  **/
-export const getPublishedEServicesMetric: MetricFactoryFn<'publishedEServices'> = async (readModel) => {
+export const getPublishedEServicesMetric: MetricFactoryFn<'eservicePubblicati'> = async (readModel) => {
   const oneMonthAgoDate = getMonthsAgoDate(1)
   const twoMonthsAgoDate = getMonthsAgoDate(2)
 

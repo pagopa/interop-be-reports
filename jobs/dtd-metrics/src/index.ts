@@ -46,14 +46,14 @@ try {
   log.info('Producing metrics...')
 
   const metrics = await new MetricsProducerService(readModel, globalStore)
-    .addMetric('publishedEServices', getPublishedEServicesMetric)
-    .addMetric('eservicesByMacroCategories', getEServicesByMacroCategoriesMetric)
-    .addMetric('mostSubscribedEServices', getMostSubscribedEServicesMetric)
-    .addMetric('topProducersBySubscribers', getTopProducersBySubscribersMetric)
-    .addMetric('topProducers', getTopProducersMetric)
-    .addMetric('onboardedTenantsCount', getOnboardedTenantsCountMetric)
-    .addMetric('tenantDistribution', getTenantDistributionMetric)
-    .addMetric('tenantOnboardingTrend', getTenantOnboardingTrendMetric)
+    .addMetric('totaleEnti', getOnboardedTenantsCountMetric)
+    .addMetric('statoDiCompletamentoAdesioni', getTenantOnboardingTrendMetric)
+    .addMetric('distribuzioneDegliEntiPerAttivita', getTenantDistributionMetric)
+    .addMetric('eservicePubblicati', getPublishedEServicesMetric)
+    .addMetric('entiErogatoriDiEService', getEServicesByMacroCategoriesMetric)
+    .addMetric('entiChePubblicanoPiuEService', getTopProducersMetric)
+    .addMetric('entiErogatoriEdEntiAbilitatiAllaFruizione', getTopProducersBySubscribersMetric)
+    .addMetric('eserviceConPiuEntiAbilitati', getMostSubscribedEServicesMetric)
     .produceMetrics({
       filter: env.METRICS_FILTER,
     })
