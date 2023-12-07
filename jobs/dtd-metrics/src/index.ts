@@ -14,7 +14,8 @@ import {
 import { GithubClient, GlobalStoreService } from './services/index.js'
 import { MetricsProducerService } from './services/metrics-producer.service.js'
 import { log } from './utils/helpers.utils.js'
-import { writeFile } from 'fs/promises'
+import { MetricsOutputFormatterService } from './services/metrics-output-formatter.service.js'
+import { writeFileSync } from 'fs'
 
 log.info('Starting program...')
 
@@ -40,7 +41,7 @@ try {
 
   log.info('Producing metrics...')
 
-  const output = await new MetricsProducerService(readModel, globalStore)
+  const metrics = await new MetricsProducerService(readModel, globalStore)
     .addMetric('publishedEServices', getPublishedEServicesMetric)
     .addMetric('eservicesByMacroCategories', getEServicesByMacroCategoriesMetric)
     .addMetric('mostSubscribedEServices', getMostSubscribedEServicesMetric)
@@ -49,18 +50,26 @@ try {
     .addMetric('onboardedTenantsCount', getOnboardedTenantsCountMetric)
     .addMetric('tenantDistribution', getTenantDistributionMetric)
     .addMetric('tenantOnboardingTrend', getTenantOnboardingTrendMetric)
-    .produceOutput({
+    .produceMetrics({
       filter: env.METRICS_FILTER,
     })
 
-  log.info(`Uploading to ${env.STORAGE_BUCKET}/${env.FILENAME}...`)
+  log.info(`Uploading files...`)
 
-  await Promise.all([
-    // If PRODUCE_OUTPUT_JSON is true, write the output to a local file
-    ...(env.PRODUCE_OUTPUT_JSON ? [writeFile('dtd-metrics.json', JSON.stringify(output, null, 2))] : []),
-    githubClient.createOrUpdateRepoFile(output, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${env.FILENAME}`),
-    awsS3BucketClient.uploadData(output, env.FILENAME),
-  ])
+  const metricsOutputFormatter = new MetricsOutputFormatterService(metrics)
+
+  const dashboardOuput = metricsOutputFormatter.getMetricsDashboardData()
+  const dtdFilesOutput = metricsOutputFormatter.getDtdMetricsFiles()
+
+  if (env.PRODUCE_OUTPUT_JSON) {
+    writeFileSync('dtd-metrics.json', JSON.stringify(dashboardOuput, null, 2))
+  }
+
+  for (const { filename, data } of dtdFilesOutput) {
+    await githubClient.createOrUpdateRepoFile(data, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${filename}`)
+  }
+
+  await awsS3BucketClient.uploadData(dashboardOuput, env.FILENAME)
 
   log.info('Done!')
 } catch (err) {

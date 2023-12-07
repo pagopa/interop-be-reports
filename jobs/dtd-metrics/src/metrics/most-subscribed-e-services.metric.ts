@@ -126,48 +126,46 @@ export const getMostSubscribedEServicesMetric: MetricFactoryFn<'mostSubscribedES
   const twelveMonthsAgoDate = getMonthsAgoDate(12)
   const fromTheBeginningDate = undefined
 
-  const result = [{ id: '0', name: 'Tutte' }, ...MACRO_CATEGORIES].map((m) => {
-    const getSubscribersCount = (eservice: EServiceCollectionItem, date: Date | undefined): number => {
-      const agreements = date ? eservice.agreements.filter((a) => a.createdAt >= date) : eservice.agreements
+  const [lastSixMonths, lastTwelveMonths, fromTheBeginning] = [
+    sixMonthsAgoDate,
+    twelveMonthsAgoDate,
+    fromTheBeginningDate,
+  ].map((date) => {
+    return [{ id: '0', name: 'Tutte' }, ...MACRO_CATEGORIES].map((m) => {
+      const getSubscribersCount = (eservice: EServiceCollectionItem, date: Date | undefined): number => {
+        const agreements = date ? eservice.agreements.filter((a) => a.createdAt >= date) : eservice.agreements
 
-      // Some subscribers can have more than one agreement, we want to count them only once
-      const activeSubscribers = agreements.reduce<Array<RelevantAgreementInfo>>((acc, next) => {
-        if (!acc.some((a) => a.consumerId === next.consumerId)) {
-          acc.push(next)
+        // Some subscribers can have more than one agreement, we want to count them only once
+        const activeSubscribers = agreements.reduce<Array<RelevantAgreementInfo>>((acc, next) => {
+          if (!acc.some((a) => a.consumerId === next.consumerId)) {
+            acc.push(next)
+          }
+          return acc
+        }, [])
+
+        // If the macrocategory id is 0, we count all the active subscribers
+        if (m.id === '0') {
+          return activeSubscribers.length
         }
-        return acc
-      }, [])
 
-      // If the macrocategory id is 0, we count all the active subscribers
-      if (m.id === '0') {
-        return activeSubscribers.length
+        // Otherwise, we count the active subscribers that belong to the macrocategory
+        return activeSubscribers.filter((a) => a.macrocategoryId === m.id).length
       }
 
-      // Otherwise, we count the active subscribers that belong to the macrocategory
-      return activeSubscribers.filter((a) => a.macrocategoryId === m.id).length
-    }
-
-    const [lastSixMonths, lastTwelveMonths, fromTheBeginning] = [
-      sixMonthsAgoDate,
-      twelveMonthsAgoDate,
-      fromTheBeginningDate,
-    ].map((date) => {
       const counted = eserviceCollection.map((e) => ({
         eserviceName: e.eserviceName,
         producerName: e.producerName,
         subscribersCount: getSubscribersCount(e, date),
       }))
 
-      // Sort the entries by count, and extract the first 10 results (top 10)
-      return orderBy(counted, 'subscribersCount', 'desc').slice(0, 10)
+      return {
+        id: m.id,
+        name: m.name,
+        // Sort the entries by count, and extract the first 10 results (top 10)
+        mostSubscribedEServices: orderBy(counted, 'subscribersCount', 'desc').slice(0, 10),
+      }
     })
-
-    return {
-      id: m.id,
-      name: m.name,
-      mostSubscribedEServices: { lastSixMonths, lastTwelveMonths, fromTheBeginning },
-    }
   })
 
-  return MostSubscribedEServicesMetric.parse(result)
+  return MostSubscribedEServicesMetric.parse({ lastSixMonths, lastTwelveMonths, fromTheBeginning })
 }

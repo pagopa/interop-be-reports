@@ -1,16 +1,17 @@
 import { ReadModelClient } from '@interop-be-reports/commons'
-import { MetricsOutput } from '../models/metrics.model.js'
 import { GlobalStoreService } from './global-store.service.js'
 import { log, timer } from '../utils/helpers.utils.js'
+import { GetMetricData, MetricName, Metric } from '../models/metrics.model.js'
+import { z } from 'zod'
 
-export type MetricFactoryFn<TMetricKey extends keyof MetricsOutput> = (
-  readModel: ReadModelClient,
-  globalStore: GlobalStoreService
-) => Promise<MetricsOutput[TMetricKey]> | MetricsOutput[TMetricKey]
+export type MetricFactoryFn<
+  TMetricName extends MetricName,
+  TDataMetricData extends GetMetricData<TMetricName> = GetMetricData<TMetricName>,
+> = (readModel: ReadModelClient, globalStore: GlobalStoreService) => Promise<TDataMetricData> | TDataMetricData
 
-type MetricObj<TMetricKey extends keyof MetricsOutput> = {
-  name: TMetricKey
-  factoryFn: MetricFactoryFn<TMetricKey>
+type MetricObj<TMetricName extends MetricName> = {
+  name: TMetricName
+  factoryFn: MetricFactoryFn<TMetricName>
 }
 
 type ProduceOutputOptions = {
@@ -18,7 +19,7 @@ type ProduceOutputOptions = {
 }
 
 export class MetricsProducerService {
-  private metrics: Array<MetricObj<keyof MetricsOutput>> = []
+  private metrics: Array<MetricObj<MetricName>> = []
 
   constructor(
     private readModel: ReadModelClient,
@@ -28,8 +29,8 @@ export class MetricsProducerService {
   /**
    * Adds a metric to the metrics list.
    */
-  public addMetric<TMetricKey extends keyof MetricsOutput, TMetricFactoryFn extends MetricFactoryFn<TMetricKey>>(
-    metricName: TMetricKey,
+  public addMetric<TMetricName extends MetricName, TMetricFactoryFn extends MetricFactoryFn<TMetricName>>(
+    metricName: TMetricName,
     metricFactory: TMetricFactoryFn
   ): MetricsProducerService {
     this.metrics.push({
@@ -41,31 +42,30 @@ export class MetricsProducerService {
   }
 
   /**
-   * Executes all the metrics sequentially and returns a MetricsOutput object.
+   * Executes all the metrics sequentially and returns Metrics array.
    * If a filter is specified, only the metrics whose name includes the filter will be executed.
-   * If produceJSON is true, the output will be written to a file named `dtd-metrics.json`.
    */
-  public async produceOutput({ filter }: ProduceOutputOptions): Promise<MetricsOutput | Partial<MetricsOutput>> {
-    const metricsOutput: Record<string, unknown> = {}
+  public async produceMetrics({ filter }: ProduceOutputOptions): Promise<Array<Metric>> {
+    const metricsOutput: Array<unknown> = []
 
     for (const metricObj of this.metrics) {
       // If a filter is specified, skip the metric if its name does not include the filter
       if (filter && !metricObj.name.includes(filter)) continue
-      metricsOutput[metricObj.name] = await metricObj.factoryFn(this.readModel, this.globalStore)
+
+      const metricData = await metricObj.factoryFn(this.readModel, this.globalStore)
+      metricsOutput.push({ name: metricObj.name, data: metricData })
     }
 
-    const output = filter ? MetricsOutput.partial().parse(metricsOutput) : MetricsOutput.parse(metricsOutput)
-
-    return output
+    return z.array(Metric).parse(metricsOutput)
   }
 
   /**
    * Wraps a metric factory function with logs
    */
-  private wrapFactoryFnWithLogs<
-    TMetricKey extends keyof MetricsOutput,
-    TMetricFactoryFn extends MetricFactoryFn<TMetricKey>,
-  >(metricName: TMetricKey, metricFactory: TMetricFactoryFn): MetricFactoryFn<TMetricKey> {
+  private wrapFactoryFnWithLogs<TMetricName extends MetricName, TMetricFactoryFn extends MetricFactoryFn<TMetricName>>(
+    metricName: TMetricName,
+    metricFactory: TMetricFactoryFn
+  ): MetricFactoryFn<TMetricName> {
     return async (readModel, globalStore) => {
       log.info(`> Starting ${metricName}...`)
 

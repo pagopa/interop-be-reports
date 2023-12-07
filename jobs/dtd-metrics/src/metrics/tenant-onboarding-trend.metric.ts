@@ -6,13 +6,11 @@ import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTrend'> = (_readModel, globalStore) => {
   // Get the oldest tenant date, which will be used as the starting point for the timeseries
   const oldestTenantDate = globalStore.onboardedTenants.reduce((oldestDate, tenant) => {
-    if (tenant.createdAt < oldestDate) {
-      return tenant.createdAt
+    if (tenant.onboardedAt < oldestDate) {
+      return tenant.onboardedAt
     }
     return oldestDate
   }, new Date())
-
-  globalStore.macroCategories[0]
 
   const sixMonthsAgoDate = getMonthsAgoDate(6)
   const twelveMonthsAgoDate = getMonthsAgoDate(12)
@@ -20,14 +18,12 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTr
   // Filter out tenants that are older than 6 months
   const sixMonthsAgoData = globalStore.macroCategories.map((macroCategory) => ({
     ...macroCategory,
-    tenants: macroCategory.tenants.filter(({ createdAt }) => createdAt > sixMonthsAgoDate),
-    onboardedTenants: macroCategory.onboardedTenants.filter(({ createdAt }) => createdAt > twelveMonthsAgoDate),
+    onboardedTenants: macroCategory.onboardedTenants.filter(({ onboardedAt }) => onboardedAt > sixMonthsAgoDate),
   }))
   // Filter out tenants that are older than 12 months
   const twelveMonthsAgoData = globalStore.macroCategories.map((macroCategory) => ({
     ...macroCategory,
-    tenants: macroCategory.tenants.filter(({ createdAt }) => createdAt > twelveMonthsAgoDate),
-    onboardedTenants: macroCategory.onboardedTenants.filter(({ createdAt }) => createdAt > twelveMonthsAgoDate),
+    onboardedTenants: macroCategory.onboardedTenants.filter(({ onboardedAt }) => onboardedAt > twelveMonthsAgoDate),
   }))
 
   const fromTheBeginningData = globalStore.macroCategories
@@ -39,7 +35,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTr
       data: toTimeseriesSequenceData(
         sixMonthsAgoDate,
         { days: 5 },
-        macroCategory.tenants.map((tenant) => tenant.createdAt)
+        macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt)
       ),
       totalCount: macroCategory.tenants.length,
       onboardedCount: macroCategory.onboardedTenants.length,
@@ -51,7 +47,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTr
       data: toTimeseriesSequenceData(
         twelveMonthsAgoDate,
         { days: 10 },
-        macroCategory.tenants.map((tenant) => tenant.createdAt)
+        macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt)
       ),
       totalCount: macroCategory.tenants.length,
       onboardedCount: macroCategory.onboardedTenants.length,
@@ -63,7 +59,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTr
       data: toTimeseriesSequenceData(
         oldestTenantDate,
         { months: 1 },
-        macroCategory.tenants.map((tenant) => tenant.createdAt)
+        macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt)
       ),
       totalCount: macroCategory.tenants.length,
       onboardedCount: macroCategory.onboardedTenants.length,
