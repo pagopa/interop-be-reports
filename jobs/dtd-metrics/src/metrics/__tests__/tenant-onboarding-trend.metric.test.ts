@@ -3,11 +3,7 @@ import { randomUUID } from 'crypto'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { sub } from 'date-fns'
 import { GlobalStoreService } from '../../services/global-store.service.js'
-<<<<<<<< HEAD:jobs/dtd-metrics/src/metrics/__tests__/tenant-signups-trend.metric.test.ts
-import { getTenantSignupsTrendMetric } from '../tenant-signups-trend.metric.js'
-========
 import { getTenantOnboardingTrendMetric } from '../tenant-onboarding-trend.metric.js'
->>>>>>>> 1.0.x:jobs/dtd-metrics/src/metrics/__tests__/tenant-onboarding-trend.metric.test.ts
 
 const comuneAttributeUuid = randomUUID()
 const aziendaOspedalieraAttributeUuid = randomUUID()
@@ -70,11 +66,7 @@ describe('getTenantOnboardingTrendMetric', () => {
     await seedCollection('attributes', attributes)
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-<<<<<<<< HEAD:jobs/dtd-metrics/src/metrics/__tests__/tenant-signups-trend.metric.test.ts
-    const result = await getTenantSignupsTrendMetric(readModelMock, globalStore)
-========
     const result = await getTenantOnboardingTrendMetric(readModelMock, globalStore)
->>>>>>>> 1.0.x:jobs/dtd-metrics/src/metrics/__tests__/tenant-onboarding-trend.metric.test.ts
 
     const comuniMetric = result?.fromTheBeginning.find(
       (metric) => metric.name === ('Comuni' satisfies MacroCategoryName)

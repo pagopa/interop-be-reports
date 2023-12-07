@@ -1,16 +1,9 @@
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { add } from 'date-fns'
-<<<<<<<< HEAD:jobs/dtd-metrics/src/metrics/tenant-signups-trend.metric.ts
-import { TenantSignupsTrendMetric } from '../models/metrics.model.js'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
-
-export const getTenantSignupsTrendMetric: MetricFactoryFn<'tenantSignupsTrend'> = (_readModel, globalStore) => {
-========
 import { TenantOnboardingTrendMetric } from '../models/metrics.model.js'
-import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 
 export const getTenantOnboardingTrendMetric: MetricFactoryFn<'tenantOnboardingTrend'> = (_readModel, globalStore) => {
->>>>>>>> 1.0.x:jobs/dtd-metrics/src/metrics/tenant-onboarding-trend.metric.ts
   // Get the oldest tenant date, which will be used as the starting point for the timeseries
   const oldestTenantDate = globalStore.onboardedTenants.reduce((oldestDate, tenant) => {
     if (tenant.onboardedAt < oldestDate) {
