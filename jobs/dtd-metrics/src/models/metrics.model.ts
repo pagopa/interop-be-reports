@@ -1,10 +1,23 @@
 import { z } from 'zod'
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const TimedMetric = <T extends z.ZodType>(schema: T) =>
+  z.object({
+    lastSixMonths: schema,
+    lastTwelveMonths: schema,
+    fromTheBeginning: schema,
+  })
+
+type TimedMetricType<T extends z.ZodType> = ReturnType<typeof TimedMetric<T>>
+export type TimedMetric<T = unknown> = z.infer<TimedMetricType<z.ZodType<T>>>
+export type TimedMetricKey = keyof TimedMetric
+
 export const PublishedEServicesMetric = z.object({
   count: z.number(),
   lastMonthCount: z.number(),
   variation: z.number(),
 })
+export type PublishedEServicesMetric = z.infer<typeof PublishedEServicesMetric>
 
 export const EServicesByMacroCategoriesMetric = z.array(
   z.object({
@@ -13,36 +26,26 @@ export const EServicesByMacroCategoriesMetric = z.array(
     count: z.number(),
   })
 )
+export type EServicesByMacroCategoriesMetric = z.infer<typeof EServicesByMacroCategoriesMetric>
 
-function timedMetricObject<T extends z.ZodSchema>(
-  schema: T
-): z.ZodObject<{ lastSixMonths: T; lastTwelveMonths: T; fromTheBeginning: T }> {
-  return z.object({
-    lastSixMonths: schema,
-    lastTwelveMonths: schema,
-    fromTheBeginning: schema,
-  })
-}
-
-export const MostSubscribedEServices = timedMetricObject(
+export const MostSubscribedEServicesMetric = TimedMetric(
   z.array(
     z.object({
-      eserviceName: z.string(),
-      producerName: z.string(),
-      subscribersCount: z.number(),
+      id: z.string(),
+      name: z.string(),
+      mostSubscribedEServices: z.array(
+        z.object({
+          eserviceName: z.string(),
+          producerName: z.string(),
+          subscribersCount: z.number(),
+        })
+      ),
     })
   )
 )
+export type MostSubscribedEServicesMetric = z.infer<typeof MostSubscribedEServicesMetric>
 
-export const MostSubscribedEServicesMetric = z.array(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    mostSubscribedEServices: MostSubscribedEServices,
-  })
-)
-
-export const TopProducersBySubscribersMetric = timedMetricObject(
+export const TopProducersBySubscribersMetric = TimedMetric(
   z.array(
     z.object({
       producerName: z.string(),
@@ -56,8 +59,24 @@ export const TopProducersBySubscribersMetric = timedMetricObject(
     })
   )
 )
+export type TopProducersBySubscribersMetric = z.infer<typeof TopProducersBySubscribersMetric>
 
-export const TenantSignupsTrendMetric = timedMetricObject(
+export const OnboardedTenantsCountMetric = z.object({
+  totalTenantsCount: z.number(),
+  lastMonthTenantsCount: z.number(),
+  variation: z.number(),
+})
+export type OnboardedTenantsCountMetric = z.infer<typeof OnboardedTenantsCountMetric>
+
+export const TenantDistributionMetric = z.array(
+  z.object({
+    activity: z.enum(['Solo fruitore', 'Solo erogatore', 'Sia fruitore che erogatore', 'Solo accesso']),
+    count: z.number(),
+  })
+)
+export type TenantDistributionMetric = z.infer<typeof TenantDistributionMetric>
+
+export const TenantSignupsTrendMetric = TimedMetric(
   z.array(
     z.object({
       id: z.string(),
@@ -67,21 +86,9 @@ export const TenantSignupsTrendMetric = timedMetricObject(
     })
   )
 )
+export type TenantSignupsTrendMetric = z.infer<typeof TenantSignupsTrendMetric>
 
-export const OnboardedTenantsCountMetric = z.object({
-  totalTenantsCount: z.number(),
-  lastMonthTenantsCount: z.number(),
-  variation: z.number(),
-})
-
-export const TenantDistributionMetric = z.array(
-  z.object({
-    activity: z.enum(['Solo fruitore', 'Solo erogatore', 'Sia fruitore che erogatore', 'Solo accesso']),
-    count: z.number(),
-  })
-)
-
-export const OnboardedTenantsCountByMacroCategoriesMetric = timedMetricObject(
+export const OnboardedTenantsCountByMacroCategoriesMetric = TimedMetric(
   z.array(
     z.object({
       id: z.string(),
@@ -91,6 +98,7 @@ export const OnboardedTenantsCountByMacroCategoriesMetric = timedMetricObject(
     })
   )
 )
+export type OnboardedTenantsCountByMacroCategoriesMetric = z.infer<typeof OnboardedTenantsCountByMacroCategoriesMetric>
 
 export const TopProducersMetricItem = z.object({
   producerName: z.string(),
@@ -99,31 +107,26 @@ export const TopProducersMetricItem = z.object({
 
 export type TopProducersMetricItem = z.infer<typeof TopProducersMetricItem>
 
-export const TopProducersMetric = timedMetricObject(z.array(TopProducersMetricItem))
+export const TopProducersMetric = TimedMetric(z.array(TopProducersMetricItem))
 
 export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 
-export const MetricsOutput = z.object({
-  publishedEServices: PublishedEServicesMetric,
-  eservicesByMacroCategories: EServicesByMacroCategoriesMetric,
-  mostSubscribedEServices: MostSubscribedEServicesMetric,
-  topProducersBySubscribers: TopProducersBySubscribersMetric,
-  topProducers: TopProducersMetric,
-  // .optional() will be removed once the metric will be implemented
-  onboardedTenantsCount: OnboardedTenantsCountMetric.optional(),
-  tenantDistribution: TenantDistributionMetric.optional(),
-  tenantSignupsTrend: TenantSignupsTrendMetric.optional(),
-  onboardedTenantsCountByMacroCategories: OnboardedTenantsCountByMacroCategoriesMetric.optional(),
-})
+export const Metric = z.union([
+  z.object({ name: z.literal('publishedEServices'), data: PublishedEServicesMetric }),
+  z.object({ name: z.literal('eservicesByMacroCategories'), data: EServicesByMacroCategoriesMetric }),
+  z.object({ name: z.literal('mostSubscribedEServices'), data: MostSubscribedEServicesMetric }),
+  z.object({ name: z.literal('topProducersBySubscribers'), data: TopProducersBySubscribersMetric }),
+  z.object({ name: z.literal('topProducers'), data: TopProducersMetric }),
+  z.object({ name: z.literal('onboardedTenantsCount'), data: OnboardedTenantsCountMetric }),
+  z.object({ name: z.literal('tenantDistribution'), data: TenantDistributionMetric }),
+  z.object({ name: z.literal('tenantSignupsTrend'), data: TenantSignupsTrendMetric }),
+  z.object({
+    name: z.literal('onboardedTenantsCountByMacroCategories'),
+    data: OnboardedTenantsCountByMacroCategoriesMetric,
+  }),
+])
 
-export type MetricsOutput = z.infer<typeof MetricsOutput>
-
-export type PublishedEServicesMetric = z.infer<typeof PublishedEServicesMetric>
-export type EServicesByMacroCategoriesMetric = z.infer<typeof EServicesByMacroCategoriesMetric>
-export type MostSubscribedEServices = z.infer<typeof MostSubscribedEServices>
-export type MostSubscribedEServicesMetric = z.infer<typeof MostSubscribedEServicesMetric>
-export type TopProducersBySubscribersMetric = z.infer<typeof TopProducersBySubscribersMetric>
-export type OnboardedTenantsCountMetric = z.infer<typeof OnboardedTenantsCountMetric>
-export type TenantDistributionMetric = z.infer<typeof TenantDistributionMetric>
-export type TenantSignupsTrendMetric = z.infer<typeof TenantSignupsTrendMetric>
-export type OnboardedTenantsCountByMacroCategoriesMetric = z.infer<typeof OnboardedTenantsCountByMacroCategoriesMetric>
+export type Metric = z.infer<typeof Metric>
+export type MetricName = Metric['name']
+export type MetricData = Metric['data']
+export type GetMetricData<T extends MetricName> = Extract<Metric, { name: T }>['data']
