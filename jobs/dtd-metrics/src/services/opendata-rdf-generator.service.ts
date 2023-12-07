@@ -53,11 +53,11 @@ type MetricFile = {
   rightsHolder: string
   publisherName: string
   keywords: ReadonlyArray<string>
-  modified: string
-  issued: string
+  modified: string // yyyy-mm-gg
+  issued: string // yyyy-mm-gg
 }
 
-const getFilename = (fileKey: MetricFileKey): string => `${toSnakeCase(fileKey)}`
+const getFilename = (fileKey: MetricFileKey): string => toSnakeCase(fileKey)
 
 const METRICS_FILES = [
   {
@@ -300,7 +300,7 @@ export class MetricsOpenDataRdfGenerator {
   </dct:publisher>
   <dct:description>${OPENDATA_RDF_METADATA.DESCRIPTION}</dct:description>
   <dct:language>it</dct:language>
-  <foaf:homepage rdf:resource="${GITHUB_REPO_URL}#"/>
+  <foaf:homepage rdf:resource="${GITHUB_REPO_URL}"/>
   <dcat:themeTaxonomy>
     <skos:ConceptScheme rdf:about="http://publications.europa.eu/resource/authority/data-theme">
       <dct:title>Data Theme Vocabulary</dct:title>
