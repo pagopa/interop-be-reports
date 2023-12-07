@@ -2,9 +2,27 @@ import { env } from '../configs/env.js'
 import { Metric, MetricName, TimedMetricKey } from '../models/metrics.model.js'
 import { toSnakeCase } from '../utils/helpers.utils.js'
 
+/**
+ * skos:Concept
+ */
+type SkosConcept = {
+  about: string
+  prefLabel?: string
+  lang?: string
+}
+
+/**
+ * dcatapit:Organization
+ */
+type Organization = {
+  name: string
+  email?: string
+  url?: string
+}
+
 const GITHUB_REPO_URL = `https://github.com/${env.GITHUB_REPO_OWNER}/${env.GITHUB_REPO}/tree/main/data#`
 const GITHUB_RAW_CONTENT_URL = `https://raw.githubusercontent.com/${env.GITHUB_REPO_OWNER}/${env.GITHUB_REPO}/main/data`
-const METRICS_FRONTEND_URL = `https://TODO`
+const CHARTS_PAGE = `https://www.interop.pagopa.it/numeri`
 
 const OPENDATA_RDF_METADATA = {
   TITLE: 'PDND - Interoperabilità',
@@ -12,6 +30,14 @@ const OPENDATA_RDF_METADATA = {
   ISSUED: '2021-09-01',
   MODIFIED: '2021-09-01',
 } as const
+
+const SKOS_CONCEPT = [] as const satisfies ReadonlyArray<SkosConcept>
+
+const ORGANIZATION = {
+  name: 'PagoPA S.p.A.',
+  email: undefined,
+  url: CHARTS_PAGE,
+} as const satisfies Organization
 
 type MetricFileKey = {
   [TMetricName in MetricName]: Extract<Metric, { name: TMetricName }>['data'] extends Record<TimedMetricKey, unknown>
@@ -253,6 +279,8 @@ export class MetricsOpenDataRdfGenerator {
   ${this.produceRDFCatalog()}
   ${METRICS_FILES.map(this.produceRDFDataset).join('\n')}
   ${METRICS_FILES.map(this.produdeRDFDistribution).join('\n')}
+  ${SKOS_CONCEPT.map(this.produceRDFConcept).join('\n')}
+  ${this.produceRDFOrganization()}
 </rdf:RDF>
 `
   }
@@ -303,7 +331,7 @@ export class MetricsOpenDataRdfGenerator {
   <dct:description>${description}</dct:description>
   <dct:identifier>mint:${fileKey}</dct:identifier>
   <dct:accrualPeriodicity rdf:resource="http://publications.europa.eu/resource/authority/frequency/DAILY"/>
-  <dcat:contactPoint rdf:resource="${METRICS_FRONTEND_URL}"/>
+  <dcat:contactPoint rdf:resource="${CHARTS_PAGE}"/>
   <dct:rightsHolder>
     <dcatapit:Agent rdf:about="mint">
       <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Agent"/>
@@ -324,7 +352,7 @@ export class MetricsOpenDataRdfGenerator {
   <dct:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
   <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">${modified}</dct:modified>
   <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">${issued}</dct:issued>
-  <dcat:contactPoint rdf:resource="${METRICS_FRONTEND_URL}"/>
+  <dcat:contactPoint rdf:resource="${CHARTS_PAGE}"/>
   ${keywords.map((keyword) => `<dcat:keyword>${keyword}</dcat:keyword>`).join('\n')}
   <dcat:distribution rdf:resource="${GITHUB_REPO_URL}/${fileKey}/csv${index + 2}"/>
   <dcat:distribution rdf:resource="${GITHUB_REPO_URL}/${fileKey}/json${index + 3}"/>
@@ -368,6 +396,31 @@ export class MetricsOpenDataRdfGenerator {
   <rdf:type rdf:resource="http://www.w3.org/ns/dcat#Distribution"/>
 </dcatapit:Distribution>
 
+`
+  }
+
+  private produceRDFConcept({ about, prefLabel, lang }: SkosConcept): string {
+    return `
+<skos:Concept rdf:about="${about}">
+  ${prefLabel && lang ? `<skos:prefLabel xml:lang="${lang}">${prefLabel}</skos:prefLabel>` : ''}
+  ${prefLabel && !lang ? `<skos:prefLabel>${prefLabel}</skos:prefLabel>` : ''}
+  ${!prefLabel && lang ? `<skos:prefLabel xml:lang="${lang}"/>` : ''}
+</skos:Concept>`
+  }
+
+  private produceRDFOrganization(): string {
+    const { name, url, email } = ORGANIZATION
+    return `
+<dcatapit:Organization rdf:about="${url}">
+  <rdf:type rdf:resource="vcard:Organization"/>
+  <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
+  <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Kind"/>
+  <rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Organization"/>
+  <rdf:type rdf:resource="vcard:Kind"/>
+  <vcard:fn>${name}</vcard:fn>
+  <vcard:hasEmail rdf:resource="${email}"/>
+  <vcard:hasURL rdf:resource="${url}"/>
+</dcatapit:Organization>
 `
   }
 }
