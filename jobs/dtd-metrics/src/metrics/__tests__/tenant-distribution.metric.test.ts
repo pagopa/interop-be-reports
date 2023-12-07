@@ -13,10 +13,34 @@ const comuniAttributeUUID = randomUUID()
 describe('getTenantDistributionMetric', () => {
   it('should return the correct metrics', async () => {
     await seedCollection('tenants', [
-      { data: getTenantMock({ id: producerUUID, attributes: [{ id: comuniAttributeUUID }] }) },
-      { data: getTenantMock({ id: consumerUUID, attributes: [{ id: comuniAttributeUUID }] }) },
-      { data: getTenantMock({ id: bothUUID, attributes: [{ id: comuniAttributeUUID }] }) },
-      { data: getTenantMock({ id: firstAccessUUID, attributes: [{ id: comuniAttributeUUID }] }) },
+      {
+        data: getTenantMock({
+          id: producerUUID,
+          attributes: [{ id: comuniAttributeUUID }],
+          onboardedAt: new Date().toISOString(),
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: consumerUUID,
+          attributes: [{ id: comuniAttributeUUID }],
+          onboardedAt: new Date().toISOString(),
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: bothUUID,
+          attributes: [{ id: comuniAttributeUUID }],
+          onboardedAt: new Date().toISOString(),
+        }),
+      },
+      {
+        data: getTenantMock({
+          id: firstAccessUUID,
+          attributes: [{ id: comuniAttributeUUID }],
+          onboardedAt: new Date().toISOString(),
+        }),
+      },
     ])
 
     await seedCollection('agreements', [

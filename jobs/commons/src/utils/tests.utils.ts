@@ -107,6 +107,7 @@ export const getTenantMock = createMockFactory<Tenant>({
   selfcareId: randomUUID(),
   attributes: [],
   createdAt: new Date(),
+  onboardedAt: new Date(),
   externalId: {
     origin: 'origin',
     value: 'value',

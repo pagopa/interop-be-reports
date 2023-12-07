@@ -11,18 +11,19 @@ describe('getVariationPercentage', () => {
 
 describe('getOnboardedTenants', () => {
   it('should return the correct onboarded tenants', () => {
+    const todayDate = new Date()
     const tenants = [
-      { selfcareId: '1' },
-      { selfcareId: '2' },
-      { selfcareId: '3' },
-      { selfcareId: undefined },
-      { selfcareId: '5' },
+      { onboardedAt: todayDate },
+      { onboardedAt: todayDate },
+      { onboardedAt: todayDate },
+      { onboardedAt: undefined },
+      { onboardedAt: todayDate },
     ]
     expect(getOnboardedTenants(tenants)).toEqual([
-      { selfcareId: '1' },
-      { selfcareId: '2' },
-      { selfcareId: '3' },
-      { selfcareId: '5' },
+      { onboardedAt: todayDate },
+      { onboardedAt: todayDate },
+      { onboardedAt: todayDate },
+      { onboardedAt: todayDate },
     ])
   })
 })

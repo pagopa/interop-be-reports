@@ -17,48 +17,48 @@ describe('getOnboardedTenantsCountByMacroCategoriesMetric', () => {
     const oboardedTenants = [
       {
         data: getTenantMock({
-          createdAt: oneMonthAgoDate,
+          onboardedAt: oneMonthAgoDate,
           attributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
-          createdAt: oneMonthAgoDate,
+          onboardedAt: oneMonthAgoDate,
           attributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
-          createdAt: sixMonthsAgoDate,
+          onboardedAt: sixMonthsAgoDate,
           attributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
-          createdAt: sixMonthsAgoDate,
+          onboardedAt: sixMonthsAgoDate,
           attributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
-          createdAt: oneYearAgoDate,
+          onboardedAt: oneYearAgoDate,
           attributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
-          createdAt: oneYearAgoDate,
+          onboardedAt: oneYearAgoDate,
           attributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
       },
     ]
 
-    const getNotOnboardedTenantMock = (createdAt: string, attributeId: string): Tenant => {
+    const getNotOnboardedTenantMock = (onboardedAt: string, attributeId: string): Tenant => {
       const tenant = getTenantMock<Tenant>({
-        createdAt,
+        onboardedAt,
         attributes: [{ id: attributeId }],
       })
-      delete tenant.selfcareId
+      delete tenant.onboardedAt
       return tenant
     }
 

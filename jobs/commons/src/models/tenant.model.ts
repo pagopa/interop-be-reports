@@ -71,6 +71,7 @@ export const Tenant = z.object({
   attributes: z.array(TenantAttribute),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date().optional(),
+  onboardedAt: z.coerce.date().optional(),
   mails: z.array(TenantMail),
   name: z.string(),
 })
