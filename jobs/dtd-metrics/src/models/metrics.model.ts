@@ -70,17 +70,19 @@ export const TenantDistributionMetric = z.array(
 )
 export type TenantDistributionMetric = z.infer<typeof TenantDistributionMetric>
 
-export const TenantSignupsTrendMetric = TimedMetric(
+export const TenantOnboardingTrendMetric = TimedMetric(
   z.array(
     z.object({
       id: z.string(),
       name: z.string(),
       data: z.array(z.object({ date: z.date(), count: z.number() })),
+      totalCount: z.number(),
+      onboardedCount: z.number(),
       startingDate: z.date(),
     })
   )
 )
-export type TenantSignupsTrendMetric = z.infer<typeof TenantSignupsTrendMetric>
+export type TenantOnboardingTrendMetric = z.infer<typeof TenantOnboardingTrendMetric>
 
 export const OnboardedTenantsCountMetric = z.tuple([
   z.object({
@@ -110,18 +112,6 @@ export const OnboardedTenantsCountMetric = z.tuple([
 ])
 export type OnboardedTenantsCountMetric = z.infer<typeof OnboardedTenantsCountMetric>
 
-export const OnboardedTenantsCountByMacroCategoriesMetric = TimedMetric(
-  z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      onboardedCount: z.number(),
-      totalCount: z.number(),
-    })
-  )
-)
-export type OnboardedTenantsCountByMacroCategoriesMetric = z.infer<typeof OnboardedTenantsCountByMacroCategoriesMetric>
-
 export const TopProducersMetricItem = z.object({
   producerName: z.string(),
   count: z.number(),
@@ -140,11 +130,7 @@ export const Metric = z.union([
   z.object({ name: z.literal('topProducers'), data: TopProducersMetric }),
   z.object({ name: z.literal('onboardedTenantsCount'), data: OnboardedTenantsCountMetric }),
   z.object({ name: z.literal('tenantDistribution'), data: TenantDistributionMetric }),
-  z.object({ name: z.literal('tenantSignupsTrend'), data: TenantSignupsTrendMetric }),
-  z.object({
-    name: z.literal('onboardedTenantsCountByMacroCategories'),
-    data: OnboardedTenantsCountByMacroCategoriesMetric,
-  }),
+  z.object({ name: z.literal('tenantOnboardingTrend'), data: TenantOnboardingTrendMetric }),
 ])
 
 export type Metric = z.infer<typeof Metric>

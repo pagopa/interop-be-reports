@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto'
 import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { sub } from 'date-fns'
 import { GlobalStoreService } from '../../services/global-store.service.js'
-import { getTenantSignupsTrendMetric } from '../tenant-signups-trend.metric.js'
+import { getTenantOnboardingTrendMetric } from '../tenant-onboarding-trend.metric.js'
 
 const comuneAttributeUuid = randomUUID()
 const aziendaOspedalieraAttributeUuid = randomUUID()
@@ -11,7 +11,7 @@ const aziendaOspedalieraAttributeUuid = randomUUID()
 const oneMonthAgoDate = sub(new Date(), { months: 1 }).toISOString()
 const sixMonthsAgoDate = sub(new Date(), { months: 6 }).toISOString()
 const oneYearAgoDate = sub(new Date(), { years: 1 }).toISOString()
-describe('getTenantSignupsTrendMetric', () => {
+describe('getTenantOnboardingTrendMetric', () => {
   it('should return the correct metrics', async () => {
     const oboardedTenants = [
       {
@@ -66,7 +66,7 @@ describe('getTenantSignupsTrendMetric', () => {
     await seedCollection('attributes', attributes)
 
     const globalStore = await GlobalStoreService.init(readModelMock)
-    const result = await getTenantSignupsTrendMetric(readModelMock, globalStore)
+    const result = await getTenantOnboardingTrendMetric(readModelMock, globalStore)
 
     const comuniMetric = result?.fromTheBeginning.find(
       (metric) => metric.name === ('Comuni' satisfies MacroCategoryName)

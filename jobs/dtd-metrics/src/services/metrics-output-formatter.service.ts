@@ -45,8 +45,7 @@ export class MetricsOutputFormatterService {
       case 'mostSubscribedEServices':
       case 'topProducersBySubscribers':
       case 'topProducers':
-      case 'tenantSignupsTrend':
-      case 'onboardedTenantsCountByMacroCategories':
+      case 'tenantOnboardingTrend':
         return [
           {
             filename: this.getFilename(metric.name, 'json', 'fromTheBeginning'),
@@ -72,16 +71,15 @@ export class MetricsOutputFormatterService {
   private getMetricCSVFiles(metric: Metric): Array<MetricFile> {
     switch (metric.name) {
       case 'publishedEServices':
-      case 'onboardedTenantsCount':
         return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv([metric.data]) }]
+      case 'onboardedTenantsCount':
       case 'tenantDistribution':
       case 'eservicesByMacroCategories':
         return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv(metric.data) }]
       case 'mostSubscribedEServices':
       case 'topProducersBySubscribers':
       case 'topProducers':
-      case 'tenantSignupsTrend':
-      case 'onboardedTenantsCountByMacroCategories':
+      case 'tenantOnboardingTrend':
         return [
           {
             filename: this.getFilename(metric.name, 'csv', 'fromTheBeginning'),

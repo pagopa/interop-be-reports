@@ -8,9 +8,8 @@ import {
   getTopProducersBySubscribersMetric,
   getTopProducersMetric,
   getOnboardedTenantsCountMetric,
-  // getTenantDistributionMetric,
-  // getTenantSignupsTrendMetric,
-  // getOnboardedTenantsCountByMacroCategoriesMetric,
+  getTenantDistributionMetric,
+  getTenantOnboardingTrendMetric,
 } from './metrics/index.js'
 import { GithubClient, GlobalStoreService } from './services/index.js'
 import { MetricsProducerService } from './services/metrics-producer.service.js'
@@ -49,9 +48,8 @@ try {
     .addMetric('topProducersBySubscribers', getTopProducersBySubscribersMetric)
     .addMetric('topProducers', getTopProducersMetric)
     .addMetric('onboardedTenantsCount', getOnboardedTenantsCountMetric)
-    // .addMetric('tenantDistribution', getTenantDistributionMetric)
-    // .addMetric('tenantSignupsTrend', getTenantSignupsTrendMetric)
-    // .addMetric('onboardedTenantsCountByMacroCategories', getOnboardedTenantsCountByMacroCategoriesMetric)
+    .addMetric('tenantDistribution', getTenantDistributionMetric)
+    .addMetric('tenantOnboardingTrend', getTenantOnboardingTrendMetric)
     .produceMetrics({
       filter: env.METRICS_FILTER,
     })
