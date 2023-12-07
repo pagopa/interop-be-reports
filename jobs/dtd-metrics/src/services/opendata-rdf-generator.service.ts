@@ -47,6 +47,10 @@ const ORGANIZATION = {
   url: CHARTS_PAGE,
 } as const satisfies Organization
 
+/**
+ * In the rdf file we count the timed metrics as three different metrics, one for each time period.
+ * This type is used to make sure that we are counting all
+ */
 type MetricFileKey = {
   [TMetricName in MetricName]: Extract<Metric, { name: TMetricName }>['data'] extends Record<TimedMetricKey, unknown>
     ? `${TMetricName}${Capitalize<TimedMetricKey>}`

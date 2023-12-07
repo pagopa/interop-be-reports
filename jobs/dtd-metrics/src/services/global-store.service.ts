@@ -67,12 +67,17 @@ export class GlobalStoreService {
     this.macroCategories = macroCategories
   }
 
+  /**
+   * Initialize the service by querying the read model for the needed data.
+   */
   static async init(readModel: ReadModelClient, config?: GlobalStoreInitConfig): Promise<GlobalStoreService> {
+    // If cache is enabled, try to get the initialization data from the cache
     if (config?.cache) {
       const cache = this.getInitializationDataFromCache()
       if (cache) return new GlobalStoreService(cache.tenants, cache.macroCategories)
     }
 
+    // Get all the attributes with at least one of the ipa codes of the macro categories
     const attributes = await readModel.attributes
       .find({
         'data.code': {
@@ -89,9 +94,12 @@ export class GlobalStoreService {
 
     const enrichMacroCategory = async (macroCategory: (typeof MACRO_CATEGORIES)[number]): Promise<MacroCategory> => {
       const macroCategoryAttributes = attributes
+        // Filter out attributes that are not part of the macro category
         .filter(({ code }) => (macroCategory.ipaCodes as ReadonlyArray<string | undefined>).includes(code))
+        // Add macro category id to attributes
         .map((attribute) => ({ ...attribute, macroCategoryId: macroCategory.id }))
 
+      // Get tenants that have at least one attribute of the macro category
       const macroCategoryTenants = await readModel.tenants
         .find(
           {
@@ -122,7 +130,9 @@ export class GlobalStoreService {
       })
     }
 
+    // Enrich macro categories in the MACRO_CATEGORIES constant with attributes and tenants
     const macroCategories = MacroCategories.parse(await Promise.all(MACRO_CATEGORIES.map(enrichMacroCategory)))
+    // Get all the tenants from all the macro categories
     const tenants = macroCategories.flatMap(({ tenants }) => tenants)
 
     if (config?.cache) this.cacheInitializationData({ macroCategories, tenants })

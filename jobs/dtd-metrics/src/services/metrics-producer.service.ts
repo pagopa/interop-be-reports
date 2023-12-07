@@ -33,11 +33,13 @@ export class MetricsProducerService {
     metricName: TMetricName,
     metricFactory: TMetricFactoryFn
   ): MetricsProducerService {
+    // Wrap the metric factory function with logs and add it to the metrics list
     this.metrics.push({
       name: metricName,
       factoryFn: this.wrapFactoryFnWithLogs(metricName, metricFactory),
     })
 
+    // Return this to allow chaining
     return this
   }
 
