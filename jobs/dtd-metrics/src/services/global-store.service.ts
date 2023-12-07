@@ -1,23 +1,26 @@
 import { Attribute, ReadModelClient } from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
-import { MacroCategories, MacroCategory } from '../models/macro-categories.model.js'
+import {
+  MacroCategories,
+  MacroCategory,
+  MacroCategoryOnboardedTenant,
+  MacroCategoryTenant,
+} from '../models/macro-categories.model.js'
 import { z } from 'zod'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 import { URL } from 'url'
 import { getOnboardedTenants, log } from '../utils/helpers.utils.js'
+import { MacroCategoryName } from '../utils/tests.utils.js'
 
 const __dirname = new URL('.', import.meta.url).pathname
 const GLOBAL_STORE_CACHE_PATH = path.join(__dirname, '.global-store-cache')
 
-const GlobalStoreTenant = z.object({
-  id: z.string(),
-  name: z.string(),
-  createdAt: z.coerce.date(),
-  selfcareId: z.string().optional(),
-  macroCategoryId: z.string(),
-})
-type GlobalStoreTenant = z.infer<typeof GlobalStoreTenant>
+const GlobalStoreTenant = MacroCategoryTenant
+export type GlobalStoreTenant = z.infer<typeof GlobalStoreTenant>
+
+const GlobalStoreOnboardedTenant = MacroCategoryOnboardedTenant
+export type GlobalStoreOnboardedTenant = z.infer<typeof GlobalStoreOnboardedTenant>
 
 const GlobalStoreCacheObj = z.object({
   macroCategories: MacroCategories,
@@ -39,7 +42,7 @@ type GlobalStoreInitConfig = {
  */
 export class GlobalStoreService {
   tenants: Array<GlobalStoreTenant>
-  onboardedTenants: Array<GlobalStoreTenant>
+  onboardedTenants: Array<GlobalStoreOnboardedTenant>
   tenantsMap: Map<string, GlobalStoreTenant>
   macroCategories: MacroCategories
 
@@ -49,6 +52,12 @@ export class GlobalStoreService {
 
   public getTenantFromId(tenantId: string): GlobalStoreTenant | undefined {
     return this.tenantsMap.get(tenantId)
+  }
+
+  public getMacroCategoryByName(name: MacroCategoryName): MacroCategory {
+    const macroCategory = this.macroCategories.find(({ name: macroCategoryName }) => macroCategoryName === name)
+    if (!macroCategory) throw new Error(`Macro category ${name} not found`)
+    return macroCategory
   }
 
   private constructor(tenants: Array<GlobalStoreTenant>, macroCategories: MacroCategories) {
@@ -95,8 +104,7 @@ export class GlobalStoreService {
               _id: 0,
               'data.id': 1,
               'data.name': 1,
-              'data.createdAt': 1,
-              'data.selfcareId': 1,
+              'data.onboardedAt': 1,
             },
           }
         )

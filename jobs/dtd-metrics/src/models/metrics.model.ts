@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const TimedMetric = <T extends z.ZodType>(schema: T) =>
@@ -61,13 +62,6 @@ export const TopProducersBySubscribersMetric = TimedMetric(
 )
 export type TopProducersBySubscribersMetric = z.infer<typeof TopProducersBySubscribersMetric>
 
-export const OnboardedTenantsCountMetric = z.object({
-  totalTenantsCount: z.number(),
-  lastMonthTenantsCount: z.number(),
-  variation: z.number(),
-})
-export type OnboardedTenantsCountMetric = z.infer<typeof OnboardedTenantsCountMetric>
-
 export const TenantDistributionMetric = z.array(
   z.object({
     activity: z.enum(['Solo fruitore', 'Solo erogatore', 'Sia fruitore che erogatore', 'Solo accesso']),
@@ -76,29 +70,47 @@ export const TenantDistributionMetric = z.array(
 )
 export type TenantDistributionMetric = z.infer<typeof TenantDistributionMetric>
 
-export const TenantSignupsTrendMetric = TimedMetric(
+export const TenantOnboardingTrendMetric = TimedMetric(
   z.array(
     z.object({
       id: z.string(),
       name: z.string(),
       data: z.array(z.object({ date: z.date(), count: z.number() })),
+      totalCount: z.number(),
+      onboardedCount: z.number(),
       startingDate: z.date(),
     })
   )
 )
-export type TenantSignupsTrendMetric = z.infer<typeof TenantSignupsTrendMetric>
+export type TenantOnboardingTrendMetric = z.infer<typeof TenantOnboardingTrendMetric>
 
-export const OnboardedTenantsCountByMacroCategoriesMetric = TimedMetric(
-  z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      onboardedCount: z.number(),
-      totalCount: z.number(),
-    })
-  )
-)
-export type OnboardedTenantsCountByMacroCategoriesMetric = z.infer<typeof OnboardedTenantsCountByMacroCategoriesMetric>
+export const OnboardedTenantsCountMetric = z.tuple([
+  z.object({
+    name: z.literal('Totale'),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
+    variation: z.number(),
+  }),
+  z.object({
+    name: z.literal(MACRO_CATEGORIES[2].name),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
+    variation: z.number(),
+  }),
+  z.object({
+    name: z.literal(MACRO_CATEGORIES[6].name),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
+    variation: z.number(),
+  }),
+  z.object({
+    name: z.literal(MACRO_CATEGORIES[9].name),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
+    variation: z.number(),
+  }),
+])
+export type OnboardedTenantsCountMetric = z.infer<typeof OnboardedTenantsCountMetric>
 
 export const TopProducersMetricItem = z.object({
   producerName: z.string(),
@@ -108,7 +120,6 @@ export const TopProducersMetricItem = z.object({
 export type TopProducersMetricItem = z.infer<typeof TopProducersMetricItem>
 
 export const TopProducersMetric = TimedMetric(z.array(TopProducersMetricItem))
-
 export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 
 export const Metric = z.union([
@@ -119,11 +130,7 @@ export const Metric = z.union([
   z.object({ name: z.literal('topProducers'), data: TopProducersMetric }),
   z.object({ name: z.literal('onboardedTenantsCount'), data: OnboardedTenantsCountMetric }),
   z.object({ name: z.literal('tenantDistribution'), data: TenantDistributionMetric }),
-  z.object({ name: z.literal('tenantSignupsTrend'), data: TenantSignupsTrendMetric }),
-  z.object({
-    name: z.literal('onboardedTenantsCountByMacroCategories'),
-    data: OnboardedTenantsCountByMacroCategoriesMetric,
-  }),
+  z.object({ name: z.literal('tenantOnboardingTrend'), data: TenantOnboardingTrendMetric }),
 ])
 
 export type Metric = z.infer<typeof Metric>
