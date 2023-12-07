@@ -193,22 +193,24 @@ describe('getMostSubscribedEServicesMetric', () => {
     const globalStore = await GlobalStoreService.init(readModelMock)
     const result = await getMostSubscribedEServicesMetric(readModelMock, globalStore)
 
-    const comuniTop10 = result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')
-      ?.mostSubscribedEServices
+    const comuniTop10 = result.fromTheBeginning.find(
+      (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
+    )?.mostSubscribedEServices
 
-    expect(comuniTop10?.fromTheBeginning?.[0].eserviceName).toStrictEqual('eservice-3')
-    expect(comuniTop10?.fromTheBeginning?.[0].producerName).toStrictEqual('Producer')
-    expect(comuniTop10?.fromTheBeginning?.[0].subscribersCount).toStrictEqual(3)
+    expect(comuniTop10?.[0].eserviceName).toStrictEqual('eservice-3')
+    expect(comuniTop10?.[0].producerName).toStrictEqual('Producer')
+    expect(comuniTop10?.[0].subscribersCount).toStrictEqual(3)
 
-    expect(comuniTop10?.fromTheBeginning?.[1].eserviceName).toStrictEqual('eservice-1')
-    expect(comuniTop10?.fromTheBeginning?.[1].producerName).toStrictEqual('Producer')
-    expect(comuniTop10?.fromTheBeginning?.[1].subscribersCount).toStrictEqual(1)
+    expect(comuniTop10?.[1].eserviceName).toStrictEqual('eservice-1')
+    expect(comuniTop10?.[1].producerName).toStrictEqual('Producer')
+    expect(comuniTop10?.[1].subscribersCount).toStrictEqual(1)
 
-    const aziendeOspedaliereTop10 = result.find((a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL')
-      ?.mostSubscribedEServices
+    const aziendeOspedaliereTop10 = result.fromTheBeginning.find(
+      (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
+    )?.mostSubscribedEServices
 
-    expect(aziendeOspedaliereTop10?.fromTheBeginning?.[0].eserviceName).toStrictEqual('eservice-3')
-    expect(aziendeOspedaliereTop10?.fromTheBeginning?.[0].producerName).toStrictEqual('Producer')
-    expect(aziendeOspedaliereTop10?.fromTheBeginning?.[0].subscribersCount).toStrictEqual(3)
+    expect(aziendeOspedaliereTop10?.[0].eserviceName).toStrictEqual('eservice-3')
+    expect(aziendeOspedaliereTop10?.[0].producerName).toStrictEqual('Producer')
+    expect(aziendeOspedaliereTop10?.[0].subscribersCount).toStrictEqual(3)
   })
 })

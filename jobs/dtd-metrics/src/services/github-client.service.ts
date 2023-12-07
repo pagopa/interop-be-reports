@@ -8,7 +8,7 @@ export class GithubClient {
   }
 
   async createOrUpdateRepoFile(
-    content: unknown,
+    content: string,
     owner: string,
     repo: string,
     path: string,
@@ -22,7 +22,7 @@ export class GithubClient {
       repo,
       path,
       message: message ?? `Update ${path}`,
-      content: Buffer.from(JSON.stringify(content)).toString('base64'),
+      content: Buffer.from(content).toString('base64'),
       sha,
     })
   }
