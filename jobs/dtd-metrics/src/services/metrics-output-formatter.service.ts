@@ -73,8 +73,8 @@ export class MetricsOutputFormatterService {
     switch (metric.name) {
       case 'publishedEServices':
       case 'onboardedTenantsCount':
-      case 'tenantDistribution':
         return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv([metric.data]) }]
+      case 'tenantDistribution':
       case 'eservicesByMacroCategories':
         return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv(metric.data) }]
       case 'mostSubscribedEServices':
