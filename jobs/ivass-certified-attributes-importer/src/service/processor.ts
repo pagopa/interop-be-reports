@@ -169,6 +169,7 @@ function getBatch(
   const rawRecords = parse(fileContent, {
     trim: true,
     columns: true,
+    relax_quotes: true,
     from: fromLine,
     to: fromLine + batchSize - 1,
     delimiter: ';'
