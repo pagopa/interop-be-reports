@@ -89,6 +89,47 @@ describe('IVASS Certified Attributes Importer', () => {
     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
   })
 
+  it('should succeed with fields starting with quotes', async () => {
+    const csvFileContent = `CODICE_IVASS;DATA_ISCRIZIONE_ALBO_ELENCO;DATA_CANCELLAZIONE_ALBO_ELENCO;DENOMINAZIONE_IMPRESA;CODICE_FISCALE
+    D0001;2020-12-02;9999-12-31;"DE ROTTERDAM" BUILDING, 29TH FLOOR, EAST TOWER, WILHELMINAKADE 149A (3072 AP)  ROTTERDAM PAESI BASSI;0000012345678901
+    `
+
+    const readModelTenants: PersistentTenant[] = [
+      {
+        ...persistentTenant,
+        externalId: { origin: 'IVASS', value: '12345678901' },
+        attributes: [],
+      },
+    ]
+
+    const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
+
+    const getIVASSTenantsMock = getTenantsMockGenerator((_) => readModelTenants)
+    const getIVASSTenantsSpy = vi.spyOn(readModelQueriesMock, 'getIVASSTenants').mockImplementation(getIVASSTenantsMock)
+
+    await importAttributes(
+      localDownloadCSVMock,
+      readModelQueriesMock,
+      tenantProcessMock,
+      refreshableTokenMock,
+      10,
+      'ivass-tenant-id'
+    )
+
+    expect(localDownloadCSVMock).toBeCalledTimes(1)
+    expect(getTenantByIdSpy).toBeCalledTimes(1)
+    expect(getAttributeByExternalIdSpy).toBeCalledTimes(1)
+
+    expect(getIVASSTenantsSpy).toHaveBeenCalledWith(readModelTenants.map(t => t.externalId.value))
+    expect(getIVASSTenantsSpy).toBeCalledTimes(1)
+    expect(getTenantsWithAttributesSpy).toBeCalledTimes(1)
+
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(1)
+    expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(1)
+    expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
+
+  })
+
   it('should succeed, assigning only missing attributes', async () => {
     const csvFileContent = `CODICE_IVASS;DATA_ISCRIZIONE_ALBO_ELENCO;DATA_CANCELLAZIONE_ALBO_ELENCO;DENOMINAZIONE_IMPRESA;CODICE_FISCALE
     D0001;2020-12-02;9999-12-31;Org1;0000012345678901

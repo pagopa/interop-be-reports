@@ -167,7 +167,7 @@ function getBatch(
   jobCorrelationId: string
 ): BatchParseResult {
   const rawRecords = parse(fileContent, {
-    trim: true,
+    ltrim: true,
     columns: true,
     relax_quotes: true,
     from: fromLine,
