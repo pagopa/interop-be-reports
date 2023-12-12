@@ -166,7 +166,7 @@ function getBatch(
   batchSize: number,
   jobCorrelationId: string
 ): BatchParseResult {
-  const rawRecords = parse(fileContent, {
+  const rawRecords = parse(fileContent.trim(), {
     ltrim: true,
     columns: true,
     relax_quotes: true,
@@ -180,7 +180,7 @@ function getBatch(
       const result = RawCsvRow.safeParse(value)
       if (result.success) return result.data
       else {
-        logError(jobCorrelationId, `Error parsing row ${fromLine + index}`, result.error)
+        logError(jobCorrelationId, `Error parsing row ${fromLine + index}. Row: ${JSON.stringify(value)}`, result.error)
         return null
       }
     })
