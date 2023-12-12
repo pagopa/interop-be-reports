@@ -25,16 +25,13 @@ export class ReadModelQueries {
   constructor(private readModelClient: ReadModelClient) { }
 
   /**
-   * Retrieve all non-PA tenants that matches the given tax codes, with their unrevoked certified attribute
+   * Retrieve tenants that match the given tax codes, with their unrevoked certified attribute
    */
   async getIVASSTenants(taxCodes: string[]): Promise<PersistentTenant[]> {
     return await this.readModelClient.tenants
       .aggregate([
         {
-          $match: {
-            'data.externalId.origin': { $ne: 'IVASS' },
-            'data.externalId.value': { $in: taxCodes },
-          },
+          $match: { 'data.externalId.value': { $in: taxCodes }, },
         },
         {
           $project: projectUnrevokedCertifiedAttributes,
