@@ -55,7 +55,6 @@ async function assignAttributes(
 
       await Promise.all(
         tenants.map(async tenant => {
-          console.log(JSON.stringify(tenant))
           await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.ivassInsurances, jobCorrelationId)
         })
       )
