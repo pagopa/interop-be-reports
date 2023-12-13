@@ -55,8 +55,8 @@ async function assignAttributes(
 
       await Promise.all(
         tenants.map(async tenant => {
-          logInfo(jobCorrelationId, `Assigning attribute ${attributes.ivassInsurances.id} to tenant ${tenant.id}`)
-          await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.ivassInsurances)
+          console.log(JSON.stringify(tenant))
+          await assignAttribute(tenantProcess, refreshableToken, tenant, attributes.ivassInsurances, jobCorrelationId)
         })
       )
 
@@ -85,8 +85,7 @@ async function unassignAttributes(readModel: ReadModelQueries, tenantProcess: Te
   await Promise.all(tenantsWithAttribute
     .filter(tenant => !allOrgsInFile.includes(tenant.externalId.value))
     .map(async tenant => {
-      logInfo(jobCorrelationId, `Revoking attribute ${attributes.ivassInsurances.id} to tenant ${tenant.id}`)
-      await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.ivassInsurances)
+      await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.ivassInsurances, jobCorrelationId)
     })
   )
 
@@ -116,9 +115,12 @@ async function assignAttribute(
   tenantProcess: TenantProcessService,
   refreshableToken: RefreshableInteropToken,
   tenant: PersistentTenant,
-  attribute: AttributeIdentifiers
+  attribute: AttributeIdentifiers,
+  jobCorrelationId: string
 ): Promise<void> {
   if (!tenantContainsAttribute(tenant, attribute.id)) {
+    logInfo(jobCorrelationId, `Assigning attribute ${attribute.id} to tenant ${tenant.id}`)
+
     const token = await refreshableToken.get()
     const context: InteropContext = {
       correlationId: crypto.randomUUID(),
@@ -138,9 +140,12 @@ async function unassignAttribute(
   tenantProcess: TenantProcessService,
   refreshableToken: RefreshableInteropToken,
   tenant: PersistentTenant,
-  attribute: AttributeIdentifiers
+  attribute: AttributeIdentifiers,
+  jobCorrelationId: string
 ): Promise<void> {
   if (tenantContainsAttribute(tenant, attribute.id)) {
+    logInfo(jobCorrelationId, `Revoking attribute ${attribute.id} to tenant ${tenant.id}`)
+
     const token = await refreshableToken.get()
     const context: InteropContext = {
       correlationId: crypto.randomUUID(),

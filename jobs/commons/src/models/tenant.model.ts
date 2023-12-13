@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const TenantCertifiedAttribute = z.object({
   assignmentTimestamp: z.string().pipe(z.coerce.date()),
+  revocationTimestamp: z.string().pipe(z.coerce.date()).optional(),
   id: z.string().uuid(),
   type: z.literal('PersistentCertifiedAttribute'),
 })
@@ -33,6 +34,7 @@ export const TenantVerifiedAttribute = z.object({
 
 export const TenantDeclaredAttribute = z.object({
   assignmentTimestamp: z.string().pipe(z.coerce.date()),
+  revocationTimestamp: z.string().pipe(z.coerce.date()).optional(),
   id: z.string().uuid(),
   type: z.literal('PersistentDeclaredAttribute'),
 })
