@@ -100,12 +100,14 @@ export class GlobalStoreService {
         .map((attribute) => ({ ...attribute, macroCategoryId: macroCategory.id }))
 
       // Get tenants that have at least one attribute of the macro category
+      // and are not AO/UOO
       const macroCategoryTenants = await readModel.tenants
         .find(
           {
             'data.attributes': {
               $elemMatch: { id: { $in: macroCategoryAttributes.map((a) => a.id) } },
             },
+            'data.subUnitType': { $exists: false },
           },
           {
             projection: {
