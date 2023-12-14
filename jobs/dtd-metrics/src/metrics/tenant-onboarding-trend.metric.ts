@@ -2,6 +2,7 @@ import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { add } from 'date-fns'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { TenantOnboardingTrendMetric } from '../models/metrics.model.js'
+import { MACRO_CATEGORIES_COUNTS } from '../configs/macro-categories.js'
 
 export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamentoAdesioni'> = (
   _readModel,
@@ -40,7 +41,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
         { days: 5 },
         macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt)
       ),
-      totalCount: macroCategory.tenants.length,
+      totalCount: MACRO_CATEGORIES_COUNTS[macroCategory.id as keyof typeof MACRO_CATEGORIES_COUNTS],
       onboardedCount: macroCategory.onboardedTenants.length,
       startingDate: sixMonthsAgoDate,
     })),
@@ -52,7 +53,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
         { days: 10 },
         macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt)
       ),
-      totalCount: macroCategory.tenants.length,
+      totalCount: MACRO_CATEGORIES_COUNTS[macroCategory.id as keyof typeof MACRO_CATEGORIES_COUNTS],
       onboardedCount: macroCategory.onboardedTenants.length,
       startingDate: twelveMonthsAgoDate,
     })),
@@ -64,7 +65,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
         { months: 1 },
         macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt)
       ),
-      totalCount: macroCategory.tenants.length,
+      totalCount: MACRO_CATEGORIES_COUNTS[macroCategory.id as keyof typeof MACRO_CATEGORIES_COUNTS],
       onboardedCount: macroCategory.onboardedTenants.length,
       startingDate: oldestTenantDate,
     })),

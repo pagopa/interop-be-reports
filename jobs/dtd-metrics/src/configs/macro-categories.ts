@@ -58,7 +58,7 @@ export const MACRO_CATEGORIES = [
   },
   {
     id: '7',
-    name: 'Regioni',
+    name: 'Regioni e Province Autonome',
     ipaCodes: ['L4999'],
   },
   {
@@ -87,3 +87,18 @@ export const MACRO_CATEGORIES = [
     ipaCodes: ['SAG', 'L37', 'S01', 'SA'],
   },
 ] as const
+
+export const MACRO_CATEGORIES_COUNTS = {
+  '1': 4201,
+  '2': 245,
+  '3': 8546,
+  '4': 102,
+  '5': 47,
+  '6': 22,
+  '7': 0,
+  '8': 53,
+  '9': 8367,
+  '10': 207,
+  '11': 89,
+  '12': 1128,
+} as const
