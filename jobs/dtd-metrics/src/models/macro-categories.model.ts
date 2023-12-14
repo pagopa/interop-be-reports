@@ -13,6 +13,7 @@ export const MacroCategoryTenant = z.object({
   name: z.string(),
   macroCategoryId: z.string(),
   onboardedAt: z.coerce.date().optional(),
+  'externalId.value': z.string().optional(),
 })
 
 export const MacroCategoryOnboardedTenant = MacroCategoryTenant.extend({

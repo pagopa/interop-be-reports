@@ -1,5 +1,5 @@
-import { Attribute, ReadModelClient } from '@interop-be-reports/commons'
-import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
+import { Attribute, ReadModelClient, Tenant } from '@interop-be-reports/commons'
+import { MACRO_CATEGORIES, REGIONI_E_PROVINCE_AUTONOME } from '../configs/macro-categories.js'
 import {
   MacroCategories,
   MacroCategory,
@@ -92,6 +92,15 @@ export class GlobalStoreService {
       .map(({ data }) => Attribute.pick({ id: true, code: true }).parse(data))
       .toArray()
 
+    function assignMacrocategoryId(data: Partial<Tenant>, macroCategoryId: MacroCategory['id']): MacroCategory['id'] {
+      // If we are in a safe macrocategory, just assign it
+      if (!['7', '8'].includes(macroCategoryId)) return macroCategoryId
+      // If the Tenant is a Region or an Autonomy, assign the "Regioni e Province Autonome" macrocategory id
+      if (REGIONI_E_PROVINCE_AUTONOME.includes(data.externalId!.value)) return '7'
+      // Assign the "Consorzi e associazioni regionali" to all others
+      return '8'
+    }
+
     const enrichMacroCategory = async (macroCategory: (typeof MACRO_CATEGORIES)[number]): Promise<MacroCategory> => {
       const macroCategoryAttributes = attributes
         // Filter out attributes that are not part of the macro category
@@ -99,7 +108,8 @@ export class GlobalStoreService {
         // Add macro category id to attributes
         .map((attribute) => ({ ...attribute, macroCategoryId: macroCategory.id }))
 
-      // Get tenants that have at least one attribute of the macro category
+      // Get tenants that are onboarded,
+      // have at least one attribute of the macro category,
       // and are not AO/UOO
       const macroCategoryTenants = await readModel.tenants
         .find(
@@ -108,6 +118,7 @@ export class GlobalStoreService {
               $elemMatch: { id: { $in: macroCategoryAttributes.map((a) => a.id) } },
             },
             'data.subUnitType': { $exists: false },
+            'data.onboardedAt': { $exists: true },
           },
           {
             projection: {
@@ -115,10 +126,13 @@ export class GlobalStoreService {
               'data.id': 1,
               'data.name': 1,
               'data.onboardedAt': 1,
+              'data.externalId.value': 1,
             },
           }
         )
-        .map(({ data }) => GlobalStoreTenant.parse({ ...data, macroCategoryId: macroCategory.id }))
+        .map(({ data }) =>
+          GlobalStoreTenant.parse({ ...data, macroCategoryId: assignMacrocategoryId(data, macroCategory.id) })
+        )
         .toArray()
 
       return MacroCategory.parse({

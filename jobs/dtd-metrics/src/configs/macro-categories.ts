@@ -59,7 +59,7 @@ export const MACRO_CATEGORIES = [
   {
     id: '7',
     name: 'Regioni e Province Autonome',
-    ipaCodes: ['L4999'],
+    ipaCodes: ['L4'],
   },
   {
     id: '8',
@@ -95,10 +95,38 @@ export const MACRO_CATEGORIES_COUNTS = {
   '4': 102,
   '5': 47,
   '6': 22,
-  '7': 0,
-  '8': 53,
+  '7': 21, // 19 Regioni + 2 Province autonome (TN + BZ)
+  // Categoria IPA L4 meno i 21 enti in macrocategoria 7
+  // meno la Regione Trentino/Sudtirol che di fatto non esiste
+  '8': 53 - 21 - 1,
   '9': 8367,
   '10': 207,
   '11': 89,
   '12': 1128,
 } as const
+
+// Attenzione: la Regione Trentino (r_trenti) non va considerata,
+// si considerano le due province autonome Trento e Bolzano
+export const REGIONI_E_PROVINCE_AUTONOME: Array<string> = [
+  'p_bz',
+  'p_TN',
+  'r_abruzz',
+  'r_basili',
+  'r_campan',
+  'r_emiro',
+  'r_friuve',
+  'r_lazio',
+  'r_liguri',
+  'r_lombar',
+  'r_marche',
+  'r_molise',
+  'r_piemon',
+  'r_puglia',
+  'r_sardeg',
+  'r_sicili',
+  'r_toscan',
+  'r_umbria',
+  'r_vda',
+  'r_veneto',
+  'regcal',
+]
