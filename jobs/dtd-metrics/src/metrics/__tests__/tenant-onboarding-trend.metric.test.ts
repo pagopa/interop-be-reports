@@ -16,36 +16,42 @@ describe('getTenantOnboardingTrendMetric', () => {
     const oboardedTenants = [
       {
         data: getTenantMock({
+          id: randomUUID(),
           onboardedAt: oneMonthAgoDate,
           attributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
+          id: randomUUID(),
           onboardedAt: oneMonthAgoDate,
           attributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
+          id: randomUUID(),
           onboardedAt: sixMonthsAgoDate,
           attributes: [{ id: comuneAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
+          id: randomUUID(),
           onboardedAt: sixMonthsAgoDate,
           attributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
+          id: randomUUID(),
           onboardedAt: oneYearAgoDate,
           attributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),
       },
       {
         data: getTenantMock({
+          id: randomUUID(),
           onboardedAt: oneYearAgoDate,
           attributes: [{ id: aziendaOspedalieraAttributeUuid }],
         }),

@@ -149,7 +149,12 @@ export class GlobalStoreService {
     // Enrich macro categories in the MACRO_CATEGORIES constant with attributes and tenants
     const macroCategories = MacroCategories.parse(await Promise.all(MACRO_CATEGORIES.map(enrichMacroCategory)))
     // Get all the tenants from all the macro categories
-    const tenants = macroCategories.flatMap(({ tenants }) => tenants)
+    const t = macroCategories.flatMap(({ tenants }) => tenants)
+    // Surprise! There are duplicates! Remove them for now
+    const tenants = t.reduce<Array<MacroCategoryTenant>>((acc, next) => {
+      if (acc.some((i) => i.id === next.id)) return acc
+      return [...acc, next]
+    }, [])
 
     if (config?.cache) this.cacheInitializationData({ macroCategories, tenants })
 
