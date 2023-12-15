@@ -5,6 +5,8 @@ import { getMonthsAgoDate } from '../../utils/helpers.utils.js'
 import { GlobalStoreService } from '../../services/global-store.service.js'
 import { getOnboardedTenantsCountMetric } from '../onboarded-tenants-count.metric.js'
 
+type TenantMockArray = Array<{ data: Tenant }>
+
 const comuniAttributeId = randomUUID()
 
 describe('getOnboardedTenantsCountMetric', () => {
@@ -14,17 +16,25 @@ describe('getOnboardedTenantsCountMetric', () => {
       onboardedAt: getMonthsAgoDate(6),
       attributes: [{ id: comuniAttributeId }],
     })
-    const onboardedTenants = repeatObjInArray({ data: onboardedTenant, attributes: [{ id: comuniAttributeId }] }, 10)
+    const _onboardedTenants = repeatObjInArray({ data: onboardedTenant, attributes: [{ id: comuniAttributeId }] }, 10)
 
     const notOnboardedTenant = getTenantMock<Tenant>({ attributes: [{ id: comuniAttributeId }] })
     delete notOnboardedTenant.onboardedAt
-    const notOnboardedTenants = repeatObjInArray({ data: notOnboardedTenant }, 10)
+    const _notOnboardedTenants = repeatObjInArray({ data: notOnboardedTenant }, 10)
 
     const onboardedLastMonthTenant = getTenantMock({
       onboardedAt: new Date(),
       attributes: [{ id: comuniAttributeId }],
     })
-    const onboardedLastMonthTenants = repeatObjInArray({ data: onboardedLastMonthTenant }, 2)
+    const _onboardedLastMonthTenants = repeatObjInArray({ data: onboardedLastMonthTenant }, 2)
+
+    const withRandomIds = (tenants: TenantMockArray): TenantMockArray => {
+      return tenants.map((t) => ({ ...t, data: { ...t.data, id: randomUUID() } }))
+    }
+
+    const onboardedTenants = withRandomIds(_onboardedTenants as TenantMockArray)
+    const notOnboardedTenants = withRandomIds(_notOnboardedTenants as TenantMockArray)
+    const onboardedLastMonthTenants = withRandomIds(_onboardedLastMonthTenants as TenantMockArray)
 
     await Promise.all([
       seedCollection('tenants', onboardedTenants),
