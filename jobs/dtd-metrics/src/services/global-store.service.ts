@@ -25,6 +25,7 @@ export type GlobalStoreOnboardedTenant = z.infer<typeof GlobalStoreOnboardedTena
 const GlobalStoreCacheObj = z.object({
   macroCategories: MacroCategories,
   tenants: z.array(GlobalStoreTenant),
+  noIpaTenantsCount: z.number(),
 })
 
 type GlobalStoreCacheObj = z.infer<typeof GlobalStoreCacheObj>
@@ -45,6 +46,7 @@ export class GlobalStoreService {
   onboardedTenants: Array<GlobalStoreOnboardedTenant>
   tenantsMap: Map<string, GlobalStoreTenant>
   macroCategories: MacroCategories
+  noIpaTenantsCount: number
 
   public getMacroCategoryFromTenantId(tenantId: string): MacroCategory | undefined {
     return this.macroCategories.find(({ tenantsIds }) => tenantsIds.includes(tenantId))
@@ -60,11 +62,12 @@ export class GlobalStoreService {
     return macroCategory
   }
 
-  private constructor(tenants: Array<GlobalStoreTenant>, macroCategories: MacroCategories) {
+  private constructor(tenants: Array<GlobalStoreTenant>, macroCategories: MacroCategories, noIpaTenantsCount: number) {
     this.tenants = tenants
     this.onboardedTenants = getOnboardedTenants(tenants)
     this.tenantsMap = new Map(tenants.map((tenant) => [tenant.id, tenant]))
     this.macroCategories = macroCategories
+    this.noIpaTenantsCount = noIpaTenantsCount
   }
 
   /**
@@ -74,7 +77,7 @@ export class GlobalStoreService {
     // If cache is enabled, try to get the initialization data from the cache
     if (config?.cache) {
       const cache = this.getInitializationDataFromCache()
-      if (cache) return new GlobalStoreService(cache.tenants, cache.macroCategories)
+      if (cache) return new GlobalStoreService(cache.tenants, cache.macroCategories, cache.noIpaTenantsCount)
     }
 
     // Get all the attributes with at least one of the ipa codes of the macro categories
@@ -146,14 +149,25 @@ export class GlobalStoreService {
       })
     }
 
+    // Count non IPA Tenants
+    const noIpaTenantsCount = await readModel.tenants.countDocuments({
+      'data.externalId.origin': { $ne: 'IPA' },
+      'data.onboardedAt': { $exists: true },
+    })
+
     // Enrich macro categories in the MACRO_CATEGORIES constant with attributes and tenants
     const macroCategories = MacroCategories.parse(await Promise.all(MACRO_CATEGORIES.map(enrichMacroCategory)))
     // Get all the tenants from all the macro categories
-    const tenants = macroCategories.flatMap(({ tenants }) => tenants)
+    const t = macroCategories.flatMap(({ tenants }) => tenants)
+    // Surprise! There are duplicates! Remove them for now
+    const tenants = t.reduce<Array<MacroCategoryTenant>>((acc, next) => {
+      if (acc.some((i) => i.id === next.id)) return acc
+      return [...acc, next]
+    }, [])
 
-    if (config?.cache) this.cacheInitializationData({ macroCategories, tenants })
+    if (config?.cache) this.cacheInitializationData({ macroCategories, tenants, noIpaTenantsCount })
 
-    return new GlobalStoreService(tenants, macroCategories)
+    return new GlobalStoreService(tenants, macroCategories, noIpaTenantsCount)
   }
 
   private static getInitializationDataFromCache(): GlobalStoreCacheObj | undefined {
