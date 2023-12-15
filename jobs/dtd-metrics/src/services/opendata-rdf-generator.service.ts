@@ -42,9 +42,9 @@ const SKOS_CONCEPT = [
 ] as const satisfies ReadonlyArray<SkosConcept>
 
 const ORGANIZATION = {
-  name: 'PagoPA S.p.A.',
+  name: 'PCM – Dipartimento per la trasformazione digitale',
   email: undefined,
-  url: CHARTS_PAGE,
+  url: 'https://innovazione.gov.it',
 } as const satisfies Organization
 
 /**
@@ -62,8 +62,10 @@ type MetricFile = {
   filename: string
   title: string
   description: string
-  rightsHolder: string
+  rightsHolderName: string
+  rightsHolderCode: string
   publisherName: string
+  publisherCode: string
   keywords: ReadonlyArray<string>
   modified: string // yyyy-mm-gg
   issued: string // yyyy-mm-gg
@@ -77,9 +79,11 @@ const METRICS_FILES = [
     filename: getFilename('entiErogatoriDiEService'),
     title: 'Enti erogatori di e-service',
     description: 'Numero di e-service pubblicati suddivisi per categorie di enti erogatori',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -89,9 +93,11 @@ const METRICS_FILES = [
     title: 'E-service con più enti abilitati',
     description:
       'I 10 e-service con più enti abilitati, filtrabili per ente erogatore e categoria di ente fruitore (ultimi sei mesi)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -101,9 +107,11 @@ const METRICS_FILES = [
     title: 'E-service con più enti abilitati',
     description:
       'I 10 e-service con più enti abilitati, filtrabili per ente erogatore e categoria di ente fruitore (ultimi dodici mesi)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -113,9 +121,11 @@ const METRICS_FILES = [
     title: 'E-service con più enti abilitati',
     description:
       'I 10 e-service con più enti abilitati, filtrabili per ente erogatore e categoria di ente fruitore (dall’inizio del servizio)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -124,9 +134,11 @@ const METRICS_FILES = [
     filename: getFilename('totaleEnti'),
     title: 'Totale enti e suddivisione per macro-categorie',
     description: 'Il totale degli enti che hanno aderito a PDND Interoperabilità',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -135,9 +147,11 @@ const METRICS_FILES = [
     filename: getFilename('eservicePubblicati'),
     title: 'E-service pubblicati',
     description: "Numero di e-service pubblicati e variazione nell'ultimo mese",
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -147,9 +161,11 @@ const METRICS_FILES = [
     title: 'Distribuzione degli enti per attività',
     description:
       'Numero di: enti erogatori che mettono a disposizione e-service; enti fruitori che li utilizzano; enti sia erogatori che fruitori; enti che effettuano solo l’accesso alla piattaforma',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -158,9 +174,11 @@ const METRICS_FILES = [
     filename: getFilename('statoDiCompletamentoAdesioniLastSixMonths'),
     title: 'Stato di completamento delle adesioni per categoria di ente pubblico',
     description: 'Percentuale di adesione degli enti sul totale della categoria (ultimi sei mesi)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -169,9 +187,11 @@ const METRICS_FILES = [
     filename: getFilename('statoDiCompletamentoAdesioniLastTwelveMonths'),
     title: 'Stato di completamento delle adesioni per categoria di ente pubblico',
     description: 'Percentuale di adesione degli enti sul totale della categoria (ultimi dodici mesi)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -180,9 +200,11 @@ const METRICS_FILES = [
     filename: getFilename('statoDiCompletamentoAdesioniFromTheBeginning'),
     title: 'Stato di completamento delle adesioni per categoria di ente pubblico',
     description: 'Percentuale di adesione degli enti sul totale della categoria (dall’inizio del servizio)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -191,9 +213,11 @@ const METRICS_FILES = [
     filename: getFilename('entiChePubblicanoPiuEServiceLastSixMonths'),
     title: 'Enti che pubblicano più e-service',
     description: 'I 10 enti erogatori con più e-service pubblicati (ultimi sei mesi)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -202,9 +226,11 @@ const METRICS_FILES = [
     filename: getFilename('entiChePubblicanoPiuEServiceLastTwelveMonths'),
     title: 'Enti che pubblicano più e-service',
     description: 'I 10 enti erogatori con più e-service pubblicati (ultimi dodici mesi)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -213,9 +239,11 @@ const METRICS_FILES = [
     filename: getFilename('entiChePubblicanoPiuEServiceFromTheBeginning'),
     title: 'Enti che pubblicano più e-service',
     description: 'I 10 enti erogatori con più e-service pubblicati (dall’inizio del servizio)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -224,9 +252,11 @@ const METRICS_FILES = [
     filename: getFilename('entiErogatoriEdEntiAbilitatiAllaFruizioneLastSixMonths'),
     title: 'Enti erogatori ed enti abilitati alla fruizione (ultimi sei mesi)',
     description: 'I 10 enti erogatori che hanno abilitato più enti fruitori (ultimi sei mesi)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -235,9 +265,11 @@ const METRICS_FILES = [
     filename: getFilename('entiErogatoriEdEntiAbilitatiAllaFruizioneLastTwelveMonths'),
     title: 'Enti erogatori ed enti abilitati alla fruizione',
     description: 'I 10 enti erogatori che hanno abilitato più enti fruitori (ultimi dodici mesi)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -246,9 +278,11 @@ const METRICS_FILES = [
     filename: getFilename('entiErogatoriEdEntiAbilitatiAllaFruizioneFromTheBeginning'),
     title: 'Enti erogatori ed enti abilitati alla fruizione',
     description: 'I 10 enti erogatori che hanno abilitato più enti fruitori (dall’inizio del servizio)',
-    rightsHolder: 'Dipartimento per la trasformazione digitale',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
     publisherName: 'PagoPA S.p.A.',
-    keywords: ['PDND'],
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
     modified: TODAY_DATE,
     issued: TODAY_DATE,
   },
@@ -302,12 +336,23 @@ export class MetricsOpenDataRdfGenerator {
   }
 
   private produceRDFDataset(metricFile: MetricFile): string {
-    const { filename, title, description, rightsHolder, publisherName, modified, issued, keywords } = metricFile
+    const {
+      filename,
+      title,
+      description,
+      rightsHolderName,
+      rightsHolderCode,
+      publisherName,
+      publisherCode,
+      modified,
+      issued,
+      keywords,
+    } = metricFile
 
     return `
 <dcatapit:Dataset rdf:about="${GITHUB_REPO_URL}/${filename}.csv">
   <rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/>
-  <dcat:theme rdf:resource="http://publications.europa.eu/resource/authority/data-theme/SOCI"/>
+  <dcat:theme rdf:resource="http://publications.europa.eu/resource/authority/data-theme/GOVE"/>
   <dct:license/>
   <dct:title>${title}</dct:title>
   <dct:landingpage>${GITHUB_REPO_URL}/${filename}.csv</dct:landingpage>
@@ -316,14 +361,14 @@ export class MetricsOpenDataRdfGenerator {
   <dct:accrualPeriodicity rdf:resource="http://publications.europa.eu/resource/authority/frequency/DAILY"/>
   <dcat:contactPoint rdf:resource="${CHARTS_PAGE}"/>
   <dct:rightsHolder>
-    <dcatapit:Agent rdf:about="mint">
+    <dcatapit:Agent rdf:about="${rightsHolderCode}">
       <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Agent"/>
       <dct:identifier>mint</dct:identifier>
-      <foaf:name>${rightsHolder}</foaf:name>
+      <foaf:name>${rightsHolderName}</foaf:name>
     </dcatapit:Agent>
   </dct:rightsHolder>
   <dct:publisher>
-    <dcatapit:Agent rdf:nodeID="Nd117aa7f2e7b47fb9481d4a8aca59c7d">
+    <dcatapit:Agent rdf:about="${publisherCode}">
       <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
       <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Agent"/>
       <dct:identifier>mint</dct:identifier>

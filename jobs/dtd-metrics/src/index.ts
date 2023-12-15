@@ -66,7 +66,7 @@ try {
   const dtdFilesOutput = metricsOutputFormatter.getDtdMetricsFiles()
 
   if (env.PRODUCE_OUTPUT_JSON) {
-    writeFileSync('dtd-metrics.json', JSON.stringify(dashboardOuput, null, 2))
+    writeFileSync('dtd-metrics.json', JSON.stringify({ ...dashboardOuput, dataDiPubblicazione: new Date() }, null, 2))
   }
 
   for (const { filename, data } of dtdFilesOutput) {
