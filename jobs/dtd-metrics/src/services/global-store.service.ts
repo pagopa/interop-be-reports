@@ -115,7 +115,10 @@ export class GlobalStoreService {
         .find(
           {
             'data.attributes': {
-              $elemMatch: { id: { $in: macroCategoryAttributes.map((a) => a.id) } },
+              $elemMatch: {
+                id: { $in: macroCategoryAttributes.map((a) => a.id) },
+                revocationTimestamp: { $exists: false },
+              },
             },
             'data.subUnitType': { $exists: false },
             'data.onboardedAt': { $exists: true },
@@ -150,7 +153,8 @@ export class GlobalStoreService {
     const macroCategories = MacroCategories.parse(await Promise.all(MACRO_CATEGORIES.map(enrichMacroCategory)))
     // Get all the tenants from all the macro categories
     const t = macroCategories.flatMap(({ tenants }) => tenants)
-    // Surprise! There are duplicates! Remove them for now
+    // Temporary fix: this should be fixed by IPA
+    // Surprise! Regioni and Province Autonome are duplicates! Remove them for now
     const tenants = t.reduce<Array<MacroCategoryTenant>>((acc, next) => {
       if (acc.some((i) => i.id === next.id)) return acc
       return [...acc, next]
