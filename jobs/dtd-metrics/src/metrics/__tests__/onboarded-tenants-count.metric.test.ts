@@ -1,9 +1,9 @@
 import { Tenant, getAttributeMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, readModelMock, repeatObjInArray, seedCollection } from '../../utils/tests.utils.js'
 import { randomUUID } from 'crypto'
-import { getMonthsAgoDate } from '../../utils/helpers.utils.js'
 import { GlobalStoreService } from '../../services/global-store.service.js'
 import { getOnboardedTenantsCountMetric } from '../onboarded-tenants-count.metric.js'
+import { getMonthsAgoDate } from '../../utils/helpers.utils.js'
 
 type TenantMockArray = Array<{ data: Tenant }>
 
@@ -11,33 +11,38 @@ const comuniAttributeId = randomUUID()
 
 describe('getOnboardedTenantsCountMetric', () => {
   it('should return the correct metrics', async () => {
-    const onboardedTenant = getTenantMock({
-      selfcareId: randomUUID(),
-      onboardedAt: getMonthsAgoDate(6),
-      attributes: [{ id: comuniAttributeId }],
-    })
-    const _onboardedTenants = repeatObjInArray({ data: onboardedTenant, attributes: [{ id: comuniAttributeId }] }, 10)
+    const _onboardedSixMonthsAgoTenants = repeatObjInArray(
+      {
+        data: getTenantMock({
+          selfcareId: randomUUID(),
+          onboardedAt: getMonthsAgoDate(6),
+          attributes: [{ id: comuniAttributeId }],
+        }),
+        attributes: [{ id: comuniAttributeId }],
+      },
+      10
+    )
 
-    const notOnboardedTenant = getTenantMock<Tenant>({ attributes: [{ id: comuniAttributeId }] })
-    delete notOnboardedTenant.onboardedAt
-    const _notOnboardedTenants = repeatObjInArray({ data: notOnboardedTenant }, 10)
+    const _notOnboardedTenant = getTenantMock<Tenant>({ attributes: [{ id: comuniAttributeId }] })
+    delete _notOnboardedTenant.onboardedAt
+    const _notOnboardedTenants = repeatObjInArray({ data: _notOnboardedTenant }, 10)
 
-    const onboardedLastMonthTenant = getTenantMock({
+    const _onboardedLastMonthTenant = getTenantMock({
       onboardedAt: new Date(),
       attributes: [{ id: comuniAttributeId }],
     })
-    const _onboardedLastMonthTenants = repeatObjInArray({ data: onboardedLastMonthTenant }, 2)
+    const _onboardedLastMonthTenants = repeatObjInArray({ data: _onboardedLastMonthTenant }, 2)
 
     const withRandomIds = (tenants: TenantMockArray): TenantMockArray => {
       return tenants.map((t) => ({ ...t, data: { ...t.data, id: randomUUID() } }))
     }
 
-    const onboardedTenants = withRandomIds(_onboardedTenants as TenantMockArray)
+    const onboardedSixMonthsAgoTenants = withRandomIds(_onboardedSixMonthsAgoTenants as TenantMockArray)
     const notOnboardedTenants = withRandomIds(_notOnboardedTenants as TenantMockArray)
     const onboardedLastMonthTenants = withRandomIds(_onboardedLastMonthTenants as TenantMockArray)
 
     await Promise.all([
-      seedCollection('tenants', onboardedTenants),
+      seedCollection('tenants', onboardedSixMonthsAgoTenants),
       seedCollection('tenants', notOnboardedTenants),
       seedCollection('tenants', onboardedLastMonthTenants),
       seedCollection('attributes', [
@@ -48,7 +53,8 @@ describe('getOnboardedTenantsCountMetric', () => {
     const globalStore = await GlobalStoreService.init(readModelMock)
     const result = await getOnboardedTenantsCountMetric(readModelMock, globalStore)
 
-    expect(result[0].totalCount).toBe(onboardedTenants.length + onboardedLastMonthTenants.length)
+    const allOnboardedTenants = onboardedSixMonthsAgoTenants.length + onboardedLastMonthTenants.length
+    expect(result[0].totalCount).toBe(allOnboardedTenants)
     expect(result[0].lastMonthCount).toBe(onboardedLastMonthTenants.length)
   })
 })

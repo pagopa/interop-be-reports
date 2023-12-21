@@ -21,7 +21,7 @@ function getMetricData(
 
   const totalCount = onboardedTenants.length
   const lastMonthCount = getLastMonthTenantsCount(onboardedTenants)
-  const variation = getVariationCount(onboardedTenants, lastMonthCount)
+  const variation = getVariationPercentage(lastMonthCount, totalCount)
 
   return {
     name,
@@ -34,15 +34,4 @@ function getMetricData(
 function getLastMonthTenantsCount(tenants: Array<GlobalStoreOnboardedTenant>): number {
   const oneMonthAgoDate = getMonthsAgoDate(1)
   return tenants.filter((tenant) => tenant.onboardedAt >= oneMonthAgoDate).length
-}
-
-function getVariationCount(tenants: Array<GlobalStoreOnboardedTenant>, lastMonthTenantsCount: number): number {
-  const oneMonthAgoDate = getMonthsAgoDate(1)
-  const twoMonthsAgoDate = getMonthsAgoDate(2)
-
-  const twoMonthsAgoTenantsCount = tenants.filter(
-    (tenant) => tenant.onboardedAt >= twoMonthsAgoDate && tenant.onboardedAt <= oneMonthAgoDate
-  ).length
-
-  return getVariationPercentage(lastMonthTenantsCount, twoMonthsAgoTenantsCount)
 }
