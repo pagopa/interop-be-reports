@@ -62,11 +62,11 @@ try {
 
   const metricsOutputFormatter = new MetricsOutputFormatterService(metrics)
 
-  const dashboardOuput = metricsOutputFormatter.getMetricsDashboardData()
+  const dashboardOuput = { ...metricsOutputFormatter.getMetricsDashboardData(), dataDiPubblicazione: new Date() }
   const dtdFilesOutput = metricsOutputFormatter.getDtdMetricsFiles()
 
   if (env.PRODUCE_OUTPUT_JSON) {
-    writeFileSync('dtd-metrics.json', JSON.stringify({ ...dashboardOuput, dataDiPubblicazione: new Date() }, null, 2))
+    writeFileSync('dtd-metrics.json', JSON.stringify(dashboardOuput, null, 2))
   }
 
   for (const { filename, data } of dtdFilesOutput) {
