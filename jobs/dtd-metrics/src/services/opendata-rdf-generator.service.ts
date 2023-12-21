@@ -43,7 +43,7 @@ const SKOS_CONCEPT = [
 
 const ORGANIZATION = {
   name: 'PCM – Dipartimento per la trasformazione digitale',
-  email: undefined,
+  email: 'pdnd-interop-assistenza-opendata@pagopa.it',
   url: 'https://innovazione.gov.it',
 } as const satisfies Organization
 
