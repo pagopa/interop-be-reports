@@ -9,7 +9,6 @@ import { MetricFactoryFn } from '../services/metrics-producer.service.js'
  **/
 export const getPublishedEServicesMetric: MetricFactoryFn<'eservicePubblicati'> = async (readModel) => {
   const oneMonthAgoDate = getMonthsAgoDate(1)
-  const twoMonthsAgoDate = getMonthsAgoDate(2)
 
   const publishedEServiceFilter: Document = {
     'data.descriptors.state': {
@@ -31,26 +30,12 @@ export const getPublishedEServicesMetric: MetricFactoryFn<'eservicePubblicati'> 
     },
   })
 
-  const twoMonthsAgoPublishedEServicesCountPromise = readModel.eservices.countDocuments({
-    ...publishedEServiceFilter,
-    'data.descriptors': {
-      $elemMatch: {
-        version: '1',
-        publishedAt: {
-          $lte: oneMonthAgoDate.toISOString(),
-          $gte: twoMonthsAgoDate.toISOString(),
-        },
-      },
-    },
-  })
-
-  const [count, lastMonthCount, twoMonthsAgoPublishedEServicesCount] = await Promise.all([
+  const [count, lastMonthCount] = await Promise.all([
     publishedEServicesCountPromise,
     lastMonthPublishedEServicesCountPromise,
-    twoMonthsAgoPublishedEServicesCountPromise,
   ])
 
-  const variation = getVariationPercentage(lastMonthCount, twoMonthsAgoPublishedEServicesCount)
+  const variation = getVariationPercentage(lastMonthCount, count)
 
   return PublishedEServicesMetric.parse({ count, lastMonthCount, variation })
 }
