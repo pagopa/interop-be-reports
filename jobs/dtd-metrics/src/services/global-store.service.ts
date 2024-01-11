@@ -1,4 +1,4 @@
-import { Attribute, ReadModelClient, Tenant } from '@interop-be-reports/commons'
+import { Attribute, ReadModelClient } from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES, REGIONI_E_PROVINCE_AUTONOME } from '../configs/macro-categories.js'
 import {
   MacroCategories,
@@ -92,51 +92,57 @@ export class GlobalStoreService {
       .map(({ data }) => Attribute.pick({ id: true, code: true }).parse(data))
       .toArray()
 
-    function assignMacrocategoryId(data: Partial<Tenant>, macroCategoryId: MacroCategory['id']): MacroCategory['id'] {
-      // If we are in a safe macrocategory, just assign it
-      if (!['7', '8'].includes(macroCategoryId)) return macroCategoryId
-      // If the Tenant is a Region or an Autonomy, assign the "Regioni e Province Autonome" macrocategory id
-      if (REGIONI_E_PROVINCE_AUTONOME.includes(data.externalId!.value)) return '7'
-      // Assign the "Consorzi e associazioni regionali" to all others
-      return '8'
-    }
-
-    const enrichMacroCategory = async (macroCategory: (typeof MACRO_CATEGORIES)[number]): Promise<MacroCategory> => {
-      const macroCategoryAttributes = attributes
-        // Filter out attributes that are not part of the macro category
-        .filter(({ code }) => (macroCategory.ipaCodes as ReadonlyArray<string | undefined>).includes(code))
-        // Add macro category id to attributes
-        .map((attribute) => ({ ...attribute, macroCategoryId: macroCategory.id }))
-
-      // Get tenants that are onboarded,
-      // have at least one attribute of the macro category,
-      // and are not AO/UOO
-      const macroCategoryTenants = await readModel.tenants
-        .find(
-          {
-            'data.attributes': {
-              $elemMatch: {
-                id: { $in: macroCategoryAttributes.map((a) => a.id) },
-                revocationTimestamp: { $exists: false },
+    const tenants = await readModel.tenants
+      .find(
+        {
+          'data.attributes': {
+            $elemMatch: {
+              id: {
+                $in: attributes.map(({ id }) => id),
               },
             },
-            'data.subUnitType': { $exists: false },
-            'data.onboardedAt': { $exists: true },
           },
-          {
-            projection: {
-              _id: 0,
-              'data.id': 1,
-              'data.name': 1,
-              'data.onboardedAt': 1,
-              'data.externalId.value': 1,
-            },
-          }
+          'data.subUnitType': { $exists: false },
+          'data.onboardedAt': { $exists: true },
+        },
+        {
+          projection: {
+            _id: 0,
+            'data.id': 1,
+            'data.name': 1,
+            'data.onboardedAt': 1,
+            'data.externalId.value': 1,
+            'data.attributes.id': 1,
+            'data.attributes.revocationTimestamp': 1,
+          },
+        }
+      )
+      .map(({ data }) =>
+        GlobalStoreTenant.omit({ macroCategoryId: true })
+          .and(
+            z.object({ attributes: z.array(z.object({ id: z.string(), revocationTimestamp: z.string().optional() })) })
+          )
+          .parse(data)
+      )
+      .toArray()
+
+    const enrichMacroCategory = (macroCategory: (typeof MACRO_CATEGORIES)[number]): MacroCategory => {
+      const macroCategoryAttributes = attributes
+        .filter(({ code }) => (macroCategory.ipaCodes as ReadonlyArray<string | undefined>).includes(code))
+        .map((attribute) => ({ ...attribute, macroCategoryId: macroCategory.id }))
+
+      const macroCategoryTenants = tenants.reduce<Array<GlobalStoreTenant>>((acc, next) => {
+        const isTenantInMacroCategory = next.attributes.some(
+          ({ id, revocationTimestamp }) => macroCategoryAttributes.some((a) => a.id === id) && !revocationTimestamp
         )
-        .map(({ data }) =>
-          GlobalStoreTenant.parse({ ...data, macroCategoryId: assignMacrocategoryId(data, macroCategory.id) })
-        )
-        .toArray()
+
+        if (!isTenantInMacroCategory) return acc
+
+        const macroCategoryId = assignMacrocategoryId(next, macroCategory.id)
+        if (macroCategoryId !== macroCategory.id) return acc
+
+        return [...acc, { ...next, macroCategoryId }]
+      }, [])
 
       return MacroCategory.parse({
         id: macroCategory.id,
@@ -149,20 +155,13 @@ export class GlobalStoreService {
       })
     }
 
-    // Enrich macro categories in the MACRO_CATEGORIES constant with attributes and tenants
-    const macroCategories = MacroCategories.parse(await Promise.all(MACRO_CATEGORIES.map(enrichMacroCategory)))
-    // Get all the tenants from all the macro categories
-    const t = macroCategories.flatMap(({ tenants }) => tenants)
-    // Temporary fix: this should be fixed by IPA
-    // Surprise! Regioni and Province Autonome are duplicates! Remove them for now
-    const tenants = t.reduce<Array<MacroCategoryTenant>>((acc, next) => {
-      if (acc.some((i) => i.id === next.id)) return acc
-      return [...acc, next]
-    }, [])
+    const macroCategories = MACRO_CATEGORIES.map(enrichMacroCategory)
+    const macroCategoryTenants = macroCategories.flatMap(({ tenants }) => tenants)
 
-    if (config?.cache) this.cacheInitializationData({ macroCategories, tenants })
+    if (tenants.length !== macroCategoryTenants.length) throw new Error('Tenants count mismatch')
+    if (config?.cache) this.cacheInitializationData({ macroCategories, tenants: macroCategoryTenants })
 
-    return new GlobalStoreService(tenants, macroCategories)
+    return new GlobalStoreService(macroCategoryTenants, macroCategories)
   }
 
   private static getInitializationDataFromCache(): GlobalStoreCacheObj | undefined {
@@ -182,4 +181,16 @@ export class GlobalStoreService {
   private static cacheInitializationData(cache: GlobalStoreCacheObj): void {
     writeFileSync(GLOBAL_STORE_CACHE_PATH, JSON.stringify(cache))
   }
+}
+
+function assignMacrocategoryId<TTenant extends { externalId?: { value: string } }>(
+  tenant: TTenant,
+  macroCategoryId: MacroCategory['id']
+): MacroCategory['id'] {
+  // If we are in a safe macrocategory, just assign it
+  if (!['7', '8'].includes(macroCategoryId)) return macroCategoryId
+  // If the Tenant is a Region or an Autonomy, assign the "Regioni e Province Autonome" macrocategory id
+  if (REGIONI_E_PROVINCE_AUTONOME.includes(tenant.externalId?.value ?? '')) return '7'
+  // Assign the "Consorzi e associazioni regionali" to all others
+  return '8'
 }
