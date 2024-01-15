@@ -2,6 +2,7 @@ import { logInfo, logWarn, logError } from '@interop-be-reports/commons'
 import { randomUUID } from 'crypto'
 import { sub } from 'date-fns'
 import { json2csv as _json2csv } from 'json-2-csv'
+import { Worker } from 'worker_threads'
 
 export function getMonthsAgoDate(numMonths: number): Date {
   return sub(new Date(), { months: numMonths })
@@ -65,4 +66,16 @@ export function json2csv(data: object[]): string {
     .join(',')
 
   return [newHeader, ...records].join('\n')
+}
+
+export function createWorker(filename: string, workerData?: unknown): Promise<unknown> {
+  return new Promise(function (resolve, reject) {
+    const worker = new Worker(filename, { workerData })
+    worker.on('message', (data) => {
+      resolve(data)
+    })
+    worker.on('error', (msg) => {
+      reject(`An error ocurred: ${msg}`)
+    })
+  })
 }

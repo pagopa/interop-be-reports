@@ -1,10 +1,4 @@
-import {
-  GetObjectCommand,
-  ListObjectsV2Command,
-  NoSuchKey,
-  PutObjectCommand,
-  S3Client,
-} from '@aws-sdk/client-s3'
+import { GetObjectCommand, ListObjectsV2Command, NoSuchKey, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import * as crypto from 'crypto'
 
 export class AwsS3BucketClient {
@@ -57,7 +51,7 @@ export class AwsS3BucketClient {
    * @param path The path of the data to be retrieved.
    * @returns The data stored in the specified path as a string.
    */
-  public async getJSONData(path: string): Promise<string | undefined> {
+  public async getData(path: string): Promise<string | undefined> {
     try {
       const response = await this.s3Client.send(
         new GetObjectCommand({
@@ -71,11 +65,9 @@ export class AwsS3BucketClient {
       // NoSuchKey is thrown when the key does not exist.
       // AWS S3 does not distinguish between “NoSuchKey” and “AccessDenied”.
       // This is a security measure to prevent attackers from discovering information about the existence of keys.
-      if (statusCode === 403)
-        throw new NoSuchKey({ $metadata: response.$metadata, message: 'Access Denied' })
+      if (statusCode === 403) throw new NoSuchKey({ $metadata: response.$metadata, message: 'Access Denied' })
 
-      const data = await response.Body?.transformToString()
-      return data ? JSON.parse(data) : undefined
+      return await response.Body?.transformToString()
     } catch (e) {
       if (e instanceof NoSuchKey) return undefined
       else throw e
