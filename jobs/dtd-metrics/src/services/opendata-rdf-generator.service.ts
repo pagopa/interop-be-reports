@@ -42,7 +42,7 @@ const SKOS_CONCEPT = [
 ] as const satisfies ReadonlyArray<SkosConcept>
 
 const ORGANIZATION = {
-  name: 'PCM – Dipartimento per la trasformazione digitale',
+  name: 'PCM - Dipartimento per la trasformazione digitale',
   email: 'pdnd-interop-assistenza-opendata@pagopa.it',
   url: 'https://innovazione.gov.it',
 } as const satisfies Organization
@@ -290,8 +290,7 @@ const METRICS_FILES = [
 
 export class MetricsOpenDataRdfGenerator {
   public produceOpenDataRDF(): string {
-    return `
-<?xml version="1.0" encoding="utf-8"?>
+    return `<?xml version="1.0" encoding="utf-8"?>
   <rdf:RDF xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:locn="http://www.w3.org/ns/locn#" xmlns:hydra="http://www.w3.org/ns/hydra/core#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcat="http://www.w3.org/ns/dcat#" xmlns:dct="http://purl.org/dc/terms/" xmlns:dcatapit="http://dati.gov.it/onto/dcatapit#" xmlns:vcard="http://www.w3.org/2006/vcard/ns#" xmlns:adms="http://www.w3.org/ns/adms#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gsp="http://www.opengis.net/ont/geosparql#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
   ${this.produceRDFCatalog()}
   ${METRICS_FILES.map(this.produceRDFDataset).join('\n')}
