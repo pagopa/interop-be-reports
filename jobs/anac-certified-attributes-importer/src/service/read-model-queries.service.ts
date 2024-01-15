@@ -105,4 +105,21 @@ export class ReadModelQueries {
     if (result.length === 0) throw Error(`Attribute with origin ${origin} and code ${code} not found`)
     else return result[0]
   }
+
+  async getTenantsWithAttributes(attributeIds: string[]): Promise<PersistentTenant[]> {
+    return await this.readModelClient.tenants
+      .aggregate([
+        {
+          $match: {
+            'data.attributes.id': { $in: attributeIds },
+          },
+        },
+        {
+          $project: projectUnrevokedCertifiedAttributes,
+        },
+      ])
+      .map(({ data }) => PersistentTenant.parse(data))
+      .toArray()
+  }
+
 }

@@ -70,6 +70,7 @@ export const getAttributeByExternalIdMock = (origin: string, code: string): Prom
       return Promise.reject(new Error('Unexpected attribute code'))
   }
 }
+export const getTenantsWithAttributesMock = (_: string[]) => Promise.resolve([])
 
 export const persistentTenant: PersistentTenant = {
   id: '091fbea1-0c8e-411b-988f-5098b6a33ba7',

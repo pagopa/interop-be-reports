@@ -36,6 +36,7 @@ export async function importAttributes(
 
   let scanComplete = false
   let fromLine = 1
+  let allOrgsInFile: string[] = []
 
   do {
     const batchResult: BatchParseResult = getBatch(fileContent, fromLine, batchSize, jobCorrelationId)
@@ -65,11 +66,36 @@ export async function importAttributes(
       (codes) => readModel.getNonPATenants(codes)
     )
 
+    allOrgsInFile = allOrgsInFile.concat(paOrgs.map(o => o.codice_ipa)).concat(nonPaOrgs.map(o => o.cf_gestore))
+
     fromLine = fromLine + batchSize
     scanComplete = batchResult.processedRecordsCount === 0
   } while (!scanComplete)
 
+  if (allOrgsInFile.length === 0) {
+    throw new Error("File does not contain valid assignments")
+  }
+
+  await unassignMissingOrgsAttributes(readModel, tenantProcess, refreshableToken, allOrgsInFile, attributes, jobCorrelationId)
+
   logInfo(jobCorrelationId, "ANAC Certified attributes importer completed")
+}
+
+async function unassignMissingOrgsAttributes(readModel: ReadModelQueries, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken, allOrgsInFile: string[], attributes: AnacAttributes, jobCorrelationId: string) {
+
+  logInfo(jobCorrelationId, "Revoking attributes for organizations not in file...")
+
+  const tenantsWithAttribute = await readModel.getTenantsWithAttributes([attributes.anacAbilitato.id, attributes.anacInConvalida.id, attributes.anacIncaricato.id])
+  await Promise.all(tenantsWithAttribute
+    .filter(tenant => !allOrgsInFile.includes(tenant.externalId.value))
+    .map(async tenant => {
+      await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacAbilitato)
+      await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacInConvalida)
+      await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacIncaricato)
+    })
+  )
+
+  logInfo(jobCorrelationId, "Attributes revocation completed")
 }
 
 async function getAttributesIdentifiers(readModel: ReadModelQueries, anacTenantId: string): Promise<AnacAttributes> {
