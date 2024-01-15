@@ -30,80 +30,77 @@ export const MACRO_CATEGORIES = [
       'L38',
       'L31',
     ],
+    totalTenantsCount: 4201,
   },
   {
     id: '2',
     name: 'Aziende Ospedaliere e ASL',
     ipaCodes: ['L8', 'L22', 'L7'],
+    totalTenantsCount: 245,
   },
   {
     id: '3',
     name: 'Comuni',
     ipaCodes: ['L18', 'L6'],
+    totalTenantsCount: 8546,
   },
   {
     id: '4',
     name: 'Province e Città Metropolitane',
     ipaCodes: ['L5', 'L45'],
+    totalTenantsCount: 102,
   },
   {
     id: '5',
     name: 'Pubbliche Amministrazioni Centrali',
     ipaCodes: ['C10', 'C5', 'C11', 'C1', 'C2'],
+    totalTenantsCount: 47,
   },
   {
     id: '6',
     name: 'Enti Nazionali di Previdenza ed Assistenza Sociale',
     ipaCodes: ['C16', 'C17'],
+    totalTenantsCount: 22,
   },
   {
     id: '7',
     name: 'Regioni e Province Autonome',
     ipaCodes: ['L4'],
+    totalTenantsCount: 21, // 19 Regioni + 2 Province autonome (TN + BZ)
   },
   {
     id: '8',
     name: 'Consorzi e associazioni regionali',
     ipaCodes: ['L4'],
+    // Categoria IPA L4 meno i 21 enti in macrocategoria 7
+    // meno la Regione Trentino/Sudtirol che di fatto non esiste
+    totalTenantsCount: 53 - 21 - 1,
   },
   {
     id: '9',
     name: 'Scuole',
     ipaCodes: ['L33'],
+    totalTenantsCount: 8367,
   },
   {
     id: '10',
     name: 'Università e AFAM',
     ipaCodes: ['L17', 'L15', 'L43'],
+    totalTenantsCount: 207,
   },
   {
     id: '11',
     name: 'Istituti di Ricerca',
     ipaCodes: ['C8', 'C12', 'L28'],
+    totalTenantsCount: 89,
   },
   {
     id: '12',
     name: 'Stazioni Appaltanti e Gestori di pubblici servizi',
     ipaCodes: ['SAG', 'L37', 'S01', 'SA'],
+    totalTenantsCount: 1128,
   },
 ] as const
-
-export const MACRO_CATEGORIES_COUNTS = {
-  '1': 4201,
-  '2': 245,
-  '3': 8546,
-  '4': 102,
-  '5': 47,
-  '6': 22,
-  '7': 21, // 19 Regioni + 2 Province autonome (TN + BZ)
-  // Categoria IPA L4 meno i 21 enti in macrocategoria 7
-  // meno la Regione Trentino/Sudtirol che di fatto non esiste
-  '8': 53 - 21 - 1,
-  '9': 8367,
-  '10': 207,
-  '11': 89,
-  '12': 1128,
-} as const
 
 // Attenzione: la Regione Trentino (r_trenti) non va considerata,
 // si considerano le due province autonome Trento e Bolzano
