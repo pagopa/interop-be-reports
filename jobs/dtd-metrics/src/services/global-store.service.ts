@@ -196,7 +196,7 @@ function assignMacrocategoryId<TTenant extends { externalId?: { value: string } 
     throw new Error('Macro categories Regioni e Province Autonome or Consorzi e associazioni regionali not found')
 
   // If we are in a safe macrocategory, just assign it
-  if (macroCategoryId !== regioniEProvinceAutonomeId || macroCategoryId !== consorziEAssociazioniRegionaliId)
+  if (macroCategoryId !== regioniEProvinceAutonomeId && macroCategoryId !== consorziEAssociazioniRegionaliId)
     return macroCategoryId
   // If the Tenant is a Region or an Autonomy, assign the "Regioni e Province Autonome" macrocategory id
   if (REGIONI_E_PROVINCE_AUTONOME.includes(tenant.externalId?.value ?? '')) return regioniEProvinceAutonomeId
