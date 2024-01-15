@@ -26,11 +26,24 @@ export async function importAttributes(
 
   logInfo(jobCorrelationId, "ANAC Certified attributes importer started")
 
-  const batchSize = recordsBatchSize
-
   const fileContent = await sftpClient.downloadCSV(jobCorrelationId)
 
   const attributes: AnacAttributes = await getAttributesIdentifiers(readModel, anacTenantId)
+
+  const allOrgsInFile = await processFileContent(readModel, tenantProcess, refreshableToken, fileContent, attributes, recordsBatchSize, jobCorrelationId)
+
+  if (allOrgsInFile.length === 0) {
+    throw new Error("File does not contain valid assignments")
+  }
+
+  await unassignMissingOrgsAttributes(readModel, tenantProcess, refreshableToken, allOrgsInFile, attributes, jobCorrelationId)
+
+  logInfo(jobCorrelationId, "ANAC Certified attributes importer completed")
+}
+
+async function processFileContent(readModel: ReadModelQueries, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken, fileContent: string, attributes: AnacAttributes, recordsBatchSize: number, jobCorrelationId: string): Promise<string[]> {
+
+  const batchSize = recordsBatchSize
 
   const processTenants = prepareTenantsProcessor(tenantProcess, refreshableToken, attributes, jobCorrelationId)
 
@@ -72,13 +85,7 @@ export async function importAttributes(
     scanComplete = batchResult.processedRecordsCount === 0
   } while (!scanComplete)
 
-  if (allOrgsInFile.length === 0) {
-    throw new Error("File does not contain valid assignments")
-  }
-
-  await unassignMissingOrgsAttributes(readModel, tenantProcess, refreshableToken, allOrgsInFile, attributes, jobCorrelationId)
-
-  logInfo(jobCorrelationId, "ANAC Certified attributes importer completed")
+  return allOrgsInFile
 }
 
 async function unassignMissingOrgsAttributes(readModel: ReadModelQueries, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken, allOrgsInFile: string[], attributes: AnacAttributes, jobCorrelationId: string) {
