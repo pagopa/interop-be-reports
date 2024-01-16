@@ -1,13 +1,15 @@
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
-import { add } from 'date-fns'
+import { sub } from 'date-fns'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { TenantOnboardingTrendMetric } from '../models/metrics.model.js'
-import { MACRO_CATEGORIES_COUNTS } from '../configs/macro-categories.js'
 
 export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamentoAdesioni'> = (
   _readModel,
   globalStore
 ) => {
+  const sixMonthsAgoDate = getMonthsAgoDate(6)
+  const twelveMonthsAgoDate = getMonthsAgoDate(12)
+
   // Get the oldest tenant date, which will be used as the starting point for the timeseries
   const oldestTenantDate = globalStore.onboardedTenants.reduce((oldestDate, tenant) => {
     if (tenant.onboardedAt < oldestDate) {
@@ -15,9 +17,6 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
     }
     return oldestDate
   }, new Date())
-
-  const sixMonthsAgoDate = getMonthsAgoDate(6)
-  const twelveMonthsAgoDate = getMonthsAgoDate(12)
 
   // Filter out tenants that are older than 6 months
   const sixMonthsAgoData = globalStore.macroCategories.map((macroCategory) => ({
@@ -36,36 +35,36 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
     lastSixMonths: sixMonthsAgoData.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
-      data: toTimeseriesSequenceData(
-        sixMonthsAgoDate,
-        { days: 5 },
-        macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt)
-      ),
-      totalCount: MACRO_CATEGORIES_COUNTS[macroCategory.id as keyof typeof MACRO_CATEGORIES_COUNTS],
+      data: toTimeseriesSequenceData({
+        oldestDate: sixMonthsAgoDate,
+        jump: { days: 5 },
+        data: macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt),
+      }),
+      totalCount: macroCategory.totalTenantsCount,
       onboardedCount: macroCategory.onboardedTenants.length,
       startingDate: sixMonthsAgoDate,
     })),
     lastTwelveMonths: twelveMonthsAgoData.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
-      data: toTimeseriesSequenceData(
-        twelveMonthsAgoDate,
-        { days: 10 },
-        macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt)
-      ),
-      totalCount: MACRO_CATEGORIES_COUNTS[macroCategory.id as keyof typeof MACRO_CATEGORIES_COUNTS],
+      data: toTimeseriesSequenceData({
+        oldestDate: twelveMonthsAgoDate,
+        jump: { days: 10 },
+        data: macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt),
+      }),
+      totalCount: macroCategory.totalTenantsCount,
       onboardedCount: macroCategory.onboardedTenants.length,
       startingDate: twelveMonthsAgoDate,
     })),
     fromTheBeginning: fromTheBeginningData.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
-      data: toTimeseriesSequenceData(
-        oldestTenantDate,
-        { months: 1 },
-        macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt)
-      ),
-      totalCount: MACRO_CATEGORIES_COUNTS[macroCategory.id as keyof typeof MACRO_CATEGORIES_COUNTS],
+      data: toTimeseriesSequenceData({
+        oldestDate: oldestTenantDate,
+        jump: { months: 1 },
+        data: macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt),
+      }),
+      totalCount: macroCategory.totalTenantsCount,
       onboardedCount: macroCategory.onboardedTenants.length,
       startingDate: oldestTenantDate,
     })),
@@ -74,19 +73,33 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
   return result
 }
 
-function toTimeseriesSequenceData(
-  startingDate: Date,
-  jump: Duration,
+/**
+ * Converts a list of dates into a timeseries sequence data.
+ * @param oldestDate The oldest date in the list, which will be used as the starting point for the timeseries
+ * @param jump The jump between each data point
+ * @param data The list of dates
+ */
+function toTimeseriesSequenceData({
+  oldestDate,
+  jump,
+  data,
+}: {
+  oldestDate: Date
+  jump: Duration
   data: Array<Date>
-): Array<{ date: Date; count: number }> {
-  const timeseriesData: Array<{ date: Date; count: number }> = []
-  let currentDate = startingDate
-  let count = 0
-  while (currentDate < new Date()) {
-    const newDate = add(currentDate, jump)
-    count += data.filter((date) => date < newDate && date >= currentDate).length
-    timeseriesData.push({ date: currentDate, count })
-    currentDate = newDate
+}): Array<{ date: Date; count: number }> {
+  let currentDate = new Date()
+  let currentCount: number = data.length
+  const timeseriesData: Array<{ date: Date; count: number }> = [{ date: currentDate, count: currentCount }]
+
+  while (oldestDate < currentDate) {
+    // Jump to the next date
+    currentDate = sub(currentDate, jump)
+    // Count the number of dates that are less than or equal to the current date, and add it to the timeseries data
+    currentCount = data.filter((date) => date <= currentDate).length
+
+    timeseriesData.push({ date: currentDate, count: currentCount })
   }
-  return timeseriesData
+  // Reverse the timeseries data so that the oldest date is first
+  return timeseriesData.reverse()
 }

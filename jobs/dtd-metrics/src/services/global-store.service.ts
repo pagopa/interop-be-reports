@@ -92,16 +92,11 @@ export class GlobalStoreService {
       .map(({ data }) => Attribute.pick({ id: true, code: true }).parse(data))
       .toArray()
 
+    // Get all the tenants that have at least one of the attributes found before
     const tenants = await readModel.tenants
       .find(
         {
-          'data.attributes': {
-            $elemMatch: {
-              id: {
-                $in: attributes.map(({ id }) => id),
-              },
-            },
-          },
+          'data.attributes.id': { $in: attributes.map(({ id }) => id) },
           'data.subUnitType': { $exists: false },
           'data.onboardedAt': { $exists: true },
         },
@@ -127,27 +122,29 @@ export class GlobalStoreService {
       .toArray()
 
     const enrichMacroCategory = (macroCategory: (typeof MACRO_CATEGORIES)[number]): MacroCategory => {
+      // Get all the attributes related to the macro category
       const macroCategoryAttributes = attributes
         .filter(({ code }) => (macroCategory.ipaCodes as ReadonlyArray<string | undefined>).includes(code))
         .map((attribute) => ({ ...attribute, macroCategoryId: macroCategory.id }))
 
+      // Get all the tenants that have at least one of the macro category attributes
       const macroCategoryTenants = tenants.reduce<Array<GlobalStoreTenant>>((acc, next) => {
+        // If the tenant has no attributes or the attributes they have are revoked, skip it
         const isTenantInMacroCategory = next.attributes.some(
           ({ id, revocationTimestamp }) => macroCategoryAttributes.some((a) => a.id === id) && !revocationTimestamp
         )
-
         if (!isTenantInMacroCategory) return acc
 
+        // Get the macro category id for the tenant
         const macroCategoryId = assignMacrocategoryId(next, macroCategory.id)
+        // If the macro category id is not the same as the current macro category, skip it
         if (macroCategoryId !== macroCategory.id) return acc
 
         return [...acc, { ...next, macroCategoryId }]
       }, [])
 
       return MacroCategory.parse({
-        id: macroCategory.id,
-        name: macroCategory.name,
-        ipaCodes: macroCategory.ipaCodes,
+        ...macroCategory,
         attributes: macroCategoryAttributes,
         tenants: macroCategoryTenants,
         onboardedTenants: getOnboardedTenants(macroCategoryTenants),
@@ -158,9 +155,12 @@ export class GlobalStoreService {
     const macroCategories = MACRO_CATEGORIES.map(enrichMacroCategory)
     const macroCategoryTenants = macroCategories.flatMap(({ tenants }) => tenants)
 
-    if (tenants.length !== macroCategoryTenants.length) throw new Error('Tenants count mismatch')
+    if (tenants.length !== macroCategoryTenants.length) {
+      throw new Error(
+        `Tenants length (${tenants.length}) and macro category tenants length (${macroCategoryTenants.length}) mismatch`
+      )
+    }
     if (config?.cache) this.cacheInitializationData({ macroCategories, tenants: macroCategoryTenants })
-
     return new GlobalStoreService(macroCategoryTenants, macroCategories)
   }
 
@@ -187,10 +187,19 @@ function assignMacrocategoryId<TTenant extends { externalId?: { value: string } 
   tenant: TTenant,
   macroCategoryId: MacroCategory['id']
 ): MacroCategory['id'] {
+  const regioniEProvinceAutonomeId = MACRO_CATEGORIES.find(({ name }) => name === 'Regioni e Province Autonome')?.id
+  const consorziEAssociazioniRegionaliId = MACRO_CATEGORIES.find(
+    ({ name }) => name === 'Consorzi e associazioni regionali'
+  )?.id
+
+  if (!regioniEProvinceAutonomeId || !consorziEAssociazioniRegionaliId)
+    throw new Error('Macro categories Regioni e Province Autonome or Consorzi e associazioni regionali not found')
+
   // If we are in a safe macrocategory, just assign it
-  if (!['7', '8'].includes(macroCategoryId)) return macroCategoryId
+  if (macroCategoryId !== regioniEProvinceAutonomeId && macroCategoryId !== consorziEAssociazioniRegionaliId)
+    return macroCategoryId
   // If the Tenant is a Region or an Autonomy, assign the "Regioni e Province Autonome" macrocategory id
-  if (REGIONI_E_PROVINCE_AUTONOME.includes(tenant.externalId?.value ?? '')) return '7'
+  if (REGIONI_E_PROVINCE_AUTONOME.includes(tenant.externalId?.value ?? '')) return regioniEProvinceAutonomeId
   // Assign the "Consorzi e associazioni regionali" to all others
-  return '8'
+  return consorziEAssociazioniRegionaliId
 }
