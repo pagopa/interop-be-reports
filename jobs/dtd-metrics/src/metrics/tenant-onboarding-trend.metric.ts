@@ -18,21 +18,8 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
     return oldestDate
   }, new Date())
 
-  // Filter out tenants that are older than 6 months
-  const sixMonthsAgoData = globalStore.macroCategories.map((macroCategory) => ({
-    ...macroCategory,
-    onboardedTenants: macroCategory.onboardedTenants.filter(({ onboardedAt }) => onboardedAt > sixMonthsAgoDate),
-  }))
-  // Filter out tenants that are older than 12 months
-  const twelveMonthsAgoData = globalStore.macroCategories.map((macroCategory) => ({
-    ...macroCategory,
-    onboardedTenants: macroCategory.onboardedTenants.filter(({ onboardedAt }) => onboardedAt > twelveMonthsAgoDate),
-  }))
-
-  const fromTheBeginningData = globalStore.macroCategories
-
   const result = TenantOnboardingTrendMetric.parse({
-    lastSixMonths: sixMonthsAgoData.map((macroCategory) => ({
+    lastSixMonths: globalStore.macroCategories.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
       data: toTimeseriesSequenceData({
@@ -44,7 +31,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
       onboardedCount: macroCategory.onboardedTenants.length,
       startingDate: sixMonthsAgoDate,
     })),
-    lastTwelveMonths: twelveMonthsAgoData.map((macroCategory) => ({
+    lastTwelveMonths: globalStore.macroCategories.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
       data: toTimeseriesSequenceData({
@@ -56,7 +43,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
       onboardedCount: macroCategory.onboardedTenants.length,
       startingDate: twelveMonthsAgoDate,
     })),
-    fromTheBeginning: fromTheBeginningData.map((macroCategory) => ({
+    fromTheBeginning: globalStore.macroCategories.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
       data: toTimeseriesSequenceData({
