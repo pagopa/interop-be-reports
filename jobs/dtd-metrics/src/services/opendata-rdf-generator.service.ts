@@ -349,7 +349,7 @@ export class MetricsOpenDataRdfGenerator {
     } = metricFile
 
     return `
-<dcatapit:Dataset rdf:about="${GITHUB_REPO_URL}/${filename}.csv">
+<dcatapit:Dataset rdf:about="${GITHUB_REPO_URL}#/${filename}">
   <rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/>
   <dcat:theme rdf:resource="http://publications.europa.eu/resource/authority/data-theme/GOVE"/>
   <dct:license/>
