@@ -10,7 +10,8 @@ import {
   getOnboardedTenantsCountMetric,
   getTenantDistributionMetric,
   getTenantOnboardingTrendMetric,
-  getTokensMetric,
+  getTotalTokensMetric,
+  getTokensTrendMetric,
 } from './metrics/index.js'
 import {
   GithubClient,
@@ -55,7 +56,8 @@ try {
     .addMetric('entiChePubblicanoPiuEService', getTopProducersMetric)
     .addMetric('entiErogatoriEdEntiAbilitatiAllaFruizione', getTopProducersBySubscribersMetric)
     .addMetric('eserviceConPiuEntiAbilitati', getMostSubscribedEServicesMetric)
-    .addMetric('utilizzo', getTokensMetric)
+    .addMetric('totaleRichiesteDiAccesso', getTotalTokensMetric)
+    .addMetric('attivitaDellaPiattaforma', getTokensTrendMetric)
     .produceMetrics({
       filter: env.METRICS_FILTER,
     })

@@ -41,11 +41,13 @@ export class MetricsOutputFormatterService {
       case 'entiErogatoriDiEService':
       case 'totaleEnti':
       case 'distribuzioneDegliEntiPerAttivita':
+      case 'totaleRichiesteDiAccesso':
         return [{ filename: this.getFilename(metric.name, 'json'), data: JSON.stringify(metric.data) }]
       case 'eserviceConPiuEntiAbilitati':
       case 'entiErogatoriEdEntiAbilitatiAllaFruizione':
       case 'entiChePubblicanoPiuEService':
       case 'statoDiCompletamentoAdesioni':
+      case 'attivitaDellaPiattaforma':
         return [
           {
             filename: this.getFilename(metric.name, 'json', 'fromTheBeginning'),
@@ -60,21 +62,6 @@ export class MetricsOutputFormatterService {
             data: JSON.stringify(metric.data.lastTwelveMonths),
           },
         ]
-      case 'utilizzo':
-        return [
-          {
-            filename: this.getFilename(metric.name, 'json', 'fromTheBeginning'),
-            data: JSON.stringify(metric.data.attivitaDellaPiattaforma.fromTheBeginning),
-          },
-          {
-            filename: this.getFilename(metric.name, 'json', 'lastSixMonths'),
-            data: JSON.stringify(metric.data.attivitaDellaPiattaforma.lastSixMonths),
-          },
-          {
-            filename: this.getFilename(metric.name, 'json', 'lastTwelveMonths'),
-            data: JSON.stringify(metric.data.attivitaDellaPiattaforma.lastTwelveMonths),
-          },
-        ]
     }
   }
 
@@ -86,6 +73,7 @@ export class MetricsOutputFormatterService {
   private getMetricCSVFiles(metric: Metric): Array<MetricFile> {
     switch (metric.name) {
       case 'eservicePubblicati':
+      case 'totaleRichiesteDiAccesso':
         return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv([metric.data]) }]
       case 'totaleEnti':
       case 'distribuzioneDegliEntiPerAttivita':
@@ -95,6 +83,7 @@ export class MetricsOutputFormatterService {
       case 'entiErogatoriEdEntiAbilitatiAllaFruizione':
       case 'entiChePubblicanoPiuEService':
       case 'statoDiCompletamentoAdesioni':
+      case 'attivitaDellaPiattaforma':
         return [
           {
             filename: this.getFilename(metric.name, 'csv', 'fromTheBeginning'),
@@ -107,21 +96,6 @@ export class MetricsOutputFormatterService {
           {
             filename: this.getFilename(metric.name, 'csv', 'lastTwelveMonths'),
             data: json2csv(metric.data.lastTwelveMonths),
-          },
-        ]
-      case 'utilizzo':
-        return [
-          {
-            filename: this.getFilename(metric.name, 'csv', 'fromTheBeginning'),
-            data: json2csv(metric.data.attivitaDellaPiattaforma.fromTheBeginning),
-          },
-          {
-            filename: this.getFilename(metric.name, 'csv', 'lastSixMonths'),
-            data: json2csv(metric.data.attivitaDellaPiattaforma.lastSixMonths),
-          },
-          {
-            filename: this.getFilename(metric.name, 'csv', 'lastTwelveMonths'),
-            data: json2csv(metric.data.attivitaDellaPiattaforma.lastTwelveMonths),
           },
         ]
     }
