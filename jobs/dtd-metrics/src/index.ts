@@ -87,8 +87,6 @@ try {
   )
 
   log.info('Done!')
-} catch (err) {
-  log.error('An error occurred while producing metrics:', err as Error)
 } finally {
   await readModel.close()
 }
