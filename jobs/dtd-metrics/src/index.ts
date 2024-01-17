@@ -75,8 +75,7 @@ try {
     await githubClient.createOrUpdateRepoFile(data, env.GITHUB_REPO_OWNER, env.GITHUB_REPO, `data/${filename}`)
   }
 
-  // await awsS3BucketClient.uploadData(dashboardOuput, env.FILENAME)
-  awsS3BucketClient
+  await awsS3BucketClient.uploadData(dashboardOuput, env.FILENAME)
 
   log.info('Generating and uploading rdf opendata file...')
   const rdfFileOutput = new MetricsOpenDataRdfGenerator().produceOpenDataRDF()
