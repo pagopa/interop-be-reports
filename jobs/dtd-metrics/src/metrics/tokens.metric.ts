@@ -12,11 +12,12 @@ import os from 'os'
 import { z } from 'zod'
 import { AwsS3BucketClient } from '@interop-be-reports/commons'
 import { TokensMetric } from '../models/metrics.model.js'
+import { env } from '../configs/env.js'
 
 const THREAD_COUNT = os.cpus().length - 1
 const WORKER_FILE_PATH = fileURLToPath(import.meta.url)
 
-const s3 = new AwsS3BucketClient('interop-generated-jwt-details-dev')
+const s3 = new AwsS3BucketClient(env.TOKENS_STORAGE_BUCKET)
 
 export const getTokensMetric: MetricFactoryFn<'utilizzo'> = async () => {
   const paths = await s3.getBucketContentList()

@@ -25,6 +25,8 @@ export const Env = z.object({
   GITHUB_ACCESS_TOKEN: z.string(),
   FILENAME: z.string(),
 
+  TOKENS_STORAGE_BUCKET: z.string(),
+
   // If set, only metrics with names matching this string will be produced
   METRICS_FILTER: z.string().optional(),
   // If set, a JSON file with the metrics output will be produced
