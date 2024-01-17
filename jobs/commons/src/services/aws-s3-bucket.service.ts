@@ -1,4 +1,11 @@
-import { GetObjectCommand, ListObjectsV2Command, NoSuchKey, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import {
+  GetObjectCommand,
+  ListObjectsV2Command,
+  ListObjectsV2CommandOutput,
+  NoSuchKey,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
 import * as crypto from 'crypto'
 
 export class AwsS3BucketClient {
@@ -79,13 +86,22 @@ export class AwsS3BucketClient {
    * @returns The list of objects .
    * */
   async getBucketContentList(): Promise<Array<string>> {
-    const response = await this.s3Client.send(
-      new ListObjectsV2Command({
-        Bucket: this.bucket,
-      })
-    )
-    const contentKeys = response.Contents?.map((content) => content.Key).filter(Boolean) ?? []
-    return contentKeys as Array<string>
+    let response: ListObjectsV2CommandOutput | undefined = undefined
+    const contentKeys: Array<string> = []
+
+    do {
+      const ContinuationToken: string | undefined = response ? response.NextContinuationToken : undefined
+      response = await this.s3Client.send(
+        new ListObjectsV2Command({
+          Bucket: this.bucket,
+          ContinuationToken,
+        })
+      )
+      const keys = (response.Contents?.map((c) => c.Key).filter(Boolean) ?? []) as string[]
+      contentKeys.push(...keys)
+    } while (response && response.IsTruncated)
+
+    return contentKeys
   }
 
   /**
