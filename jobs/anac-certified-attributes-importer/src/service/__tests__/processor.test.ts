@@ -8,6 +8,7 @@ import { ReadModelQueries, SftpClient, TenantProcessService, importAttributes } 
 import {
   ATTRIBUTE_ANAC_ABILITATO_ID,
   ATTRIBUTE_ANAC_INCARICATO_ID,
+  ATTRIBUTE_ANAC_IN_CONVALIDA_ID,
   downloadCSVMock,
   downloadCSVMockGenerator,
   getAttributeByExternalIdMock,
@@ -16,6 +17,7 @@ import {
   getTenantByIdMock,
   getTenantByIdMockGenerator,
   getTenantsMockGenerator,
+  getTenantsWithAttributesMock,
   internalAssignCertifiedAttributeMock,
   internalRevokeCertifiedAttributeMock,
   persistentTenant,
@@ -61,6 +63,9 @@ describe('ANAC Certified Attributes Importer', () => {
   const getAttributeByExternalIdSpy = vi
     .spyOn(readModelQueriesMock, 'getAttributeByExternalId')
     .mockImplementation(getAttributeByExternalIdMock)
+  const getTenantsWithAttributesSpy = vi
+    .spyOn(readModelQueriesMock, 'getTenantsWithAttributes')
+    .mockImplementation(getTenantsWithAttributesMock)
 
   beforeAll(() => {
     vitest.spyOn(console, 'log').mockImplementation(loggerMock)
@@ -83,6 +88,7 @@ describe('ANAC Certified Attributes Importer', () => {
 
     expect(getPATenantsSpy).toBeCalledTimes(1)
     expect(getNonPATenantsSpy).toBeCalledTimes(1)
+    expect(getTenantsWithAttributesSpy).toBeCalledTimes(1)
 
     expect(refreshableInternalTokenSpy).toBeCalled()
     expect(internalAssignCertifiedAttributeSpy).toBeCalled()
@@ -115,6 +121,7 @@ describe('ANAC Certified Attributes Importer', () => {
 
     expect(getPATenantsSpy).toBeCalledTimes(1)
     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+    expect(getTenantsWithAttributesSpy).toBeCalledTimes(1)
 
     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
@@ -150,6 +157,7 @@ describe('ANAC Certified Attributes Importer', () => {
 
     expect(getPATenantsSpy).toBeCalledTimes(1)
     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+    expect(getTenantsWithAttributesSpy).toBeCalledTimes(1)
 
     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
@@ -183,6 +191,7 @@ describe('ANAC Certified Attributes Importer', () => {
 
     expect(getPATenantsSpy).toBeCalledTimes(1)
     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+    expect(getTenantsWithAttributesSpy).toBeCalledTimes(1)
 
     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
@@ -226,10 +235,97 @@ describe('ANAC Certified Attributes Importer', () => {
 
     expect(getPATenantsSpy).toBeCalledTimes(3)
     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+    expect(getTenantsWithAttributesSpy).toBeCalledTimes(1)
 
     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(0)
+  })
+
+
+  it('should succeed, unassign attributes for tenants not in the file', async () => {
+    const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,ANAC_incaricato,ANAC_abilitato,ANAC_in_convalida
+0123456781,Org name in IPA,gsp1@pec.it,ipa_code_1,TRUE,TRUE,TRUE`
+
+    const readModelTenants: PersistentTenant[] = [
+      {
+        // Tenant with attributes that should be kept
+        ...persistentTenant,
+        externalId: { origin: 'IPA', value: 'ipa_code_1' },
+        attributes: [
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_ABILITATO_ID },
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_INCARICATO_ID },
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_IN_CONVALIDA_ID },
+        ],
+      },
+      {
+        // IPA Tenant with ANAC_ABILITATO attribute that should be removed
+        ...persistentTenant,
+        externalId: { origin: 'IPA', value: 'ipa_code_2' },
+        attributes: [
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_ABILITATO_ID },
+        ],
+      },
+      {
+        // IPA Tenant with ANAC_INCARICATO attribute that should be removed
+        ...persistentTenant,
+        externalId: { origin: 'IPA', value: 'ipa_code_3' },
+        attributes: [
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_INCARICATO_ID },
+        ],
+      },
+      {
+        // IPA Tenant with ANAC_IN_CONVALIDA attribute that should be removed
+        ...persistentTenant,
+        externalId: { origin: 'IPA', value: 'ipa_code_4' },
+        attributes: [
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_IN_CONVALIDA_ID },
+        ],
+      },
+      {
+        // IPA Tenant with multiple attributes that should be removed
+        ...persistentTenant,
+        externalId: { origin: 'IPA', value: 'ipa_code_5' },
+        attributes: [
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_ABILITATO_ID },
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_INCARICATO_ID },
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_IN_CONVALIDA_ID },
+        ],
+      },
+      {
+        // Private Tenant with multiple attributes that should be removed
+        ...persistentTenant,
+        externalId: { origin: 'ANAC', value: '0123456786' },
+        attributes: [
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_ABILITATO_ID },
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_INCARICATO_ID },
+          { ...persistentTenantAttribute, id: ATTRIBUTE_ANAC_IN_CONVALIDA_ID },
+        ],
+      },
+    ]
+
+    const localDownloadCSVMock = downloadCSVMockGenerator(csvFileContent)
+    const downloadCSVSpy = vi.spyOn(sftpClientMock, 'downloadCSV').mockImplementation(localDownloadCSVMock)
+
+    const getPATenantsMock = getTenantsMockGenerator((_) => readModelTenants)
+    const getPATenantsSpy = vi.spyOn(readModelQueriesMock, 'getPATenants').mockImplementation(getPATenantsMock)
+
+    const getTenantsWithAttributesMock = getTenantsMockGenerator((_) => readModelTenants)
+    const getTenantsWithAttributesSpy = vi.spyOn(readModelQueriesMock, 'getTenantsWithAttributes').mockImplementationOnce(getTenantsWithAttributesMock)
+
+    await run()
+
+    expect(downloadCSVSpy).toBeCalledTimes(1)
+    expect(getTenantByIdSpy).toBeCalledTimes(1)
+    expect(getAttributeByExternalIdSpy).toBeCalledTimes(3)
+
+    expect(getPATenantsSpy).toBeCalledTimes(1)
+    expect(getNonPATenantsSpy).toBeCalledTimes(0)
+    expect(getTenantsWithAttributesSpy).toBeCalledTimes(1)
+
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(9)
+    expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
+    expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(9)
   })
 
   it('should fail on CSV retrieve error', async () => {
@@ -244,6 +340,7 @@ describe('ANAC Certified Attributes Importer', () => {
 
     expect(getPATenantsSpy).toBeCalledTimes(0)
     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+    expect(getTenantsWithAttributesSpy).toBeCalledTimes(0)
 
     expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
@@ -268,6 +365,7 @@ describe('ANAC Certified Attributes Importer', () => {
 
     expect(getPATenantsSpy).toBeCalledTimes(0)
     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+    expect(getTenantsWithAttributesSpy).toBeCalledTimes(0)
 
     expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
@@ -277,7 +375,7 @@ describe('ANAC Certified Attributes Importer', () => {
   it('should skip CSV file rows with unexpected schema', async () => {
     const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,ANAC_incaricato,ANAC_abilitato,ANAC_in_convalida
     ,Wrong format row,gsp1@pec.it,ipa_code_123,TRUE,TRUE,
-    ,Wrong "quotes" row,gsp1@pec.it,ipa_code_123,TRUE,TRUE,
+    ,Wrong "quotes" row,gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE
     0123456789,"Org name, in IPA",gsp1@pec.it,ipa_code_123,TRUE,TRUE,TRUE`
 
     const readModelTenants: PersistentTenant[] = [
@@ -302,6 +400,7 @@ describe('ANAC Certified Attributes Importer', () => {
 
     expect(getPATenantsSpy).toBeCalledTimes(1)
     expect(getNonPATenantsSpy).toBeCalledTimes(0)
+    expect(getTenantsWithAttributesSpy).toBeCalledTimes(1)
 
     expect(refreshableInternalTokenSpy).toBeCalledTimes(2)
     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(2)
