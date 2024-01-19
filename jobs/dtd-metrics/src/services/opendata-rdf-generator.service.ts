@@ -18,6 +18,7 @@ type SkosConcept = {
  */
 type Organization = {
   name: string
+  code: string
   email?: string
   url?: string
 }
@@ -43,6 +44,7 @@ const SKOS_CONCEPT = [
 
 const ORGANIZATION = {
   name: 'PCM - Dipartimento per la trasformazione digitale',
+  code: 'pcm',
   email: 'pdnd-interop-assistenza-opendata@pagopa.it',
   url: 'https://innovazione.gov.it',
 } as const satisfies Organization
@@ -307,10 +309,10 @@ export class MetricsOpenDataRdfGenerator {
   <rdf:type rdf:resource="http://www.w3.org/ns/dcat#Catalog"/>
   <dct:title>${OPENDATA_RDF_METADATA.TITLE}</dct:title>
   <dct:publisher>
-    <dcatapit:Agent rdf:about="mint">
+    <dcatapit:Agent rdf:about="${ORGANIZATION.code}">
       <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
       <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Agent"/>
-      <dct:identifier>mint</dct:identifier>
+      <dct:identifier>${ORGANIZATION.code}</dct:identifier>
       <foaf:name>${OPENDATA_RDF_METADATA.TITLE}</foaf:name>
     </dcatapit:Agent>
   </dct:publisher>
@@ -356,13 +358,13 @@ export class MetricsOpenDataRdfGenerator {
   <dct:title>${title}</dct:title>
   <dct:landingpage>${GITHUB_REPO_URL}/${filename}.csv</dct:landingpage>
   <dct:description>${description}</dct:description>
-  <dct:identifier>mint:${filename}</dct:identifier>
+  <dct:identifier>${rightsHolderCode}:${filename}</dct:identifier>
   <dct:accrualPeriodicity rdf:resource="http://publications.europa.eu/resource/authority/frequency/DAILY"/>
   <dcat:contactPoint rdf:resource="${CHARTS_PAGE}"/>
   <dct:rightsHolder>
     <dcatapit:Agent rdf:about="${rightsHolderCode}">
       <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Agent"/>
-      <dct:identifier>mint</dct:identifier>
+      <dct:identifier>${rightsHolderCode}</dct:identifier>
       <foaf:name>${rightsHolderName}</foaf:name>
     </dcatapit:Agent>
   </dct:rightsHolder>
@@ -370,7 +372,7 @@ export class MetricsOpenDataRdfGenerator {
     <dcatapit:Agent rdf:about="${publisherCode}">
       <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
       <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Agent"/>
-      <dct:identifier>mint</dct:identifier>
+      <dct:identifier>${publisherCode}</dct:identifier>
       <foaf:name>${publisherName}</foaf:name>
     </dcatapit:Agent>
   </dct:publisher>
