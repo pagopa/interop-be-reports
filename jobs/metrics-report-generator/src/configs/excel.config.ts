@@ -4,7 +4,7 @@ export const headerStyle: Partial<ExcelJs.Style> = {
   fill: {
     type: 'pattern',
     pattern: 'solid',
-    fgColor: { argb: 'FF90EE90' },
+    fgColor: { argb: 'FF90EE90' }, // lightgreen
   },
   font: {
     bold: true,
@@ -37,7 +37,7 @@ export const rowStyle: Partial<ExcelJs.Style> = {
   fill: {
     type: 'pattern',
     pattern: 'solid',
-    fgColor: { argb: 'FFFFFFFF' },
+    fgColor: { argb: 'FFFFFFFF' }, // white
   },
   border: {
     bottom: {

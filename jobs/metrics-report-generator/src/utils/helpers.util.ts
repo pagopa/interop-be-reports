@@ -40,17 +40,26 @@ export function generateDescriptorsWorksheetTableData(
   eservices: EServiceQueryData[],
   tenantsMap: SafeMap<string, TenantQueryData>
 ): DescriptorsWorksheetTableData[] {
+  function isDescriptorActive(descriptor: EServiceQueryData['descriptors'][0]): boolean {
+    return ['Published', 'Suspended', 'Deprecated'].includes(descriptor.state)
+  }
+
   return eservices.flatMap((eservice) =>
-    eservice.descriptors.map((descriptor) => {
-      return DescriptorsWorksheetTableData.parse({
-        Name: descriptor.id,
+    eservice.descriptors.reduce<DescriptorsWorksheetTableData[]>((acc, descriptor) => {
+      if (!isDescriptorActive(descriptor)) return acc
+
+      const interfaceChecksum = descriptor.interface?.checksum ?? ''
+
+      const data = DescriptorsWorksheetTableData.parse({
+        Name: eservice.name,
         CreatedAt: descriptor.createdAt,
         ProducerId: eservice.producerId,
         Producer: tenantsMap.get(eservice.producerId).externalId.value,
         DescriptorId: descriptor.id,
         State: descriptor.state,
-        Fingerprint: 'TEMP',
+        Fingerprint: interfaceChecksum,
       })
-    })
+      return [...acc, data]
+    }, [])
   )
 }

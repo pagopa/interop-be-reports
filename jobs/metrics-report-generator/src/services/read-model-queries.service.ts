@@ -20,6 +20,7 @@ export class ReadModelQueries {
         'data.descriptors.id': 1,
         'data.descriptors.createdAt': 1,
         'data.descriptors.state': 1,
+        'data.descriptors.interface.checksum': 1,
       },
     })
   }

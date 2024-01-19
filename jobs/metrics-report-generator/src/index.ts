@@ -32,37 +32,16 @@ const tenants = await readModelQueries.getAllTenantsByIds(tenantsIds)
 const eservicesMap = new SafeMap(eservices.map((eservice) => [eservice.id, eservice]))
 const tenantsMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant]))
 
-const agreementsWorksheetTableData = generateAgreementsWorksheetTableData(
-  agreements,
-  purposes,
-  eservicesMap,
-  tenantsMap
-)
-const descriptorWorksheetTableData = generateDescriptorsWorksheetTableData(eservices, tenantsMap)
-
-console.log(agreementsWorksheetTableData, descriptorWorksheetTableData)
-
 await readModel.close()
-process.exit(0)
 
 const excel = await new ExcelGenerator()
   .addWorksheetTable({
     name: 'Agreements',
-    header: ['EserviceId', 'Eservice', 'Producer', 'ProducerId'],
-    values: [
-      ['1', 'Agreement 1', '1'],
-      ['2', 'Agreement 2', '1'],
-      ['3', 'Agreement 3', '2'],
-    ],
+    data: generateAgreementsWorksheetTableData(agreements, purposes, eservicesMap, tenantsMap),
   })
   .addWorksheetTable({
-    name: 'EServices',
-    header: ['ID', 'Name', 'Tenant ID'],
-    values: [
-      ['1', 'EService 1', '1'],
-      ['2', 'EService 2', '1'],
-      ['3', 'EService 3', '2'],
-    ],
+    name: 'Descriptors',
+    data: generateDescriptorsWorksheetTableData(eservices, tenantsMap),
   })
   .generateExcelFile()
 
