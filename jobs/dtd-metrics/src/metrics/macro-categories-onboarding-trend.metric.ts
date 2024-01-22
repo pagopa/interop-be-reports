@@ -1,9 +1,9 @@
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { sub } from 'date-fns'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
-import { TenantOnboardingTrendMetric } from '../models/metrics.model.js'
+import { MacroCategoriesOnboardingTrendMetric } from '../models/metrics.model.js'
 
-export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamentoAdesioni'> = (
+export const getMacroCategoriesOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamentoAdesioni'> = (
   _readModel,
   globalStore
 ) => {
@@ -18,7 +18,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
     return oldestDate
   }, new Date())
 
-  const result = TenantOnboardingTrendMetric.parse({
+  return MacroCategoriesOnboardingTrendMetric.parse({
     lastSixMonths: globalStore.macroCategories.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
@@ -56,8 +56,6 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
       startingDate: oldestTenantDate,
     })),
   })
-
-  return result
 }
 
 /**

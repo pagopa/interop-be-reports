@@ -70,7 +70,10 @@ export const TenantDistributionMetric = z.array(
 )
 export type TenantDistributionMetric = z.infer<typeof TenantDistributionMetric>
 
-export const TenantOnboardingTrendMetric = TimedMetric(
+export const TenantOnboardingTrendMetric = z.array(z.object({ date: z.date(), count: z.number() }))
+export type TenantOnboardingTrendMetric = z.infer<typeof TenantOnboardingTrendMetric>
+
+export const MacroCategoriesOnboardingTrendMetric = TimedMetric(
   z.array(
     z.object({
       id: z.string(),
@@ -82,7 +85,7 @@ export const TenantOnboardingTrendMetric = TimedMetric(
     })
   )
 )
-export type TenantOnboardingTrendMetric = z.infer<typeof TenantOnboardingTrendMetric>
+export type MacroCategoriesOnboardingTrendMetric = z.infer<typeof MacroCategoriesOnboardingTrendMetric>
 
 export const OnboardedTenantsCountMetric = z.tuple([
   z.object({
@@ -136,7 +139,8 @@ export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 
 export const Metric = z.union([
   z.object({ name: z.literal('totaleEnti'), data: OnboardedTenantsCountMetric }),
-  z.object({ name: z.literal('statoDiCompletamentoAdesioni'), data: TenantOnboardingTrendMetric }),
+  z.object({ name: z.literal('andamentoDelleAdesioni'), data: TenantOnboardingTrendMetric }),
+  z.object({ name: z.literal('statoDiCompletamentoAdesioni'), data: MacroCategoriesOnboardingTrendMetric }),
   z.object({ name: z.literal('distribuzioneDegliEntiPerAttivita'), data: TenantDistributionMetric }),
   z.object({ name: z.literal('eservicePubblicati'), data: PublishedEServicesMetric }),
   z.object({ name: z.literal('entiErogatoriDiEService'), data: EServicesByMacroCategoriesMetric }),

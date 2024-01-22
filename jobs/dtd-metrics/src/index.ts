@@ -9,7 +9,7 @@ import {
   getTopProducersMetric,
   getOnboardedTenantsCountMetric,
   getTenantDistributionMetric,
-  getTenantOnboardingTrendMetric,
+  getMacroCategoriesOnboardingTrendMetric,
 } from './metrics/index.js'
 import {
   GithubClient,
@@ -47,7 +47,7 @@ try {
 
   const metrics = await new MetricsProducerService(readModel, globalStore)
     .addMetric('totaleEnti', getOnboardedTenantsCountMetric)
-    .addMetric('statoDiCompletamentoAdesioni', getTenantOnboardingTrendMetric)
+    .addMetric('statoDiCompletamentoAdesioni', getMacroCategoriesOnboardingTrendMetric)
     .addMetric('distribuzioneDegliEntiPerAttivita', getTenantDistributionMetric)
     .addMetric('eservicePubblicati', getPublishedEServicesMetric)
     .addMetric('entiErogatoriDiEService', getEServicesByMacroCategoriesMetric)
