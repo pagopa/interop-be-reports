@@ -170,6 +170,19 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
+    fileKey: 'andamentoDelleAdesioni',
+    filename: getFilename('andamentoDelleAdesioni'),
+    title: 'Andamento delle adesioni',
+    description: '', // TODO
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'pcm',
+    publisherName: 'PagoPA S.p.A.',
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
+    modified: TODAY_DATE,
+    issued: TODAY_DATE,
+  },
+  {
     fileKey: 'statoDiCompletamentoAdesioniLastSixMonths',
     filename: getFilename('statoDiCompletamentoAdesioniLastSixMonths'),
     title: 'Stato di completamento delle adesioni per categoria di ente pubblico',

@@ -13,7 +13,7 @@ const sixMonthsAgoDate = sub(new Date(), { months: 6 }).toISOString()
 const oneYearAgoDate = sub(new Date(), { years: 1 }).toISOString()
 describe('getMacroCategoriesOnboardingTrendMetric', () => {
   it('should return the correct metrics', async () => {
-    const oboardedTenants = [
+    const onboardedTenants = [
       {
         data: getTenantMock({
           id: randomUUID(),
@@ -68,7 +68,7 @@ describe('getMacroCategoriesOnboardingTrendMetric', () => {
       },
     ]
 
-    await seedCollection('tenants', oboardedTenants)
+    await seedCollection('tenants', onboardedTenants)
     await seedCollection('attributes', attributes)
 
     const globalStore = await GlobalStoreService.init(readModelMock)
