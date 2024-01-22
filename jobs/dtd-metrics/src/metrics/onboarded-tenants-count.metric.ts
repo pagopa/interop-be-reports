@@ -1,11 +1,13 @@
 import { OnboardedTenantsCountMetric } from '../models/metrics.model.js'
-import { GlobalStoreService, GlobalStoreOnboardedTenant } from '../services/global-store.service.js'
+import { GlobalStoreService } from '../services/global-store.service.js'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
 
 export const getOnboardedTenantsCountMetric: MetricFactoryFn<'totaleEnti'> = (_readModel, globalStore) => {
   return OnboardedTenantsCountMetric.parse([
     getMetricData('Totale', globalStore),
+    getMetricData('Pubblici', globalStore),
+    getMetricData('Privati', globalStore),
     getMetricData('Comuni', globalStore),
     getMetricData('Regioni e Province Autonome', globalStore),
     getMetricData('Università e AFAM', globalStore),
@@ -16,11 +18,24 @@ function getMetricData(
   name: OnboardedTenantsCountMetric[number]['name'],
   globalStore: GlobalStoreService
 ): OnboardedTenantsCountMetric[number] {
-  const onboardedTenants =
-    name === 'Totale' ? globalStore.onboardedTenants : globalStore.getMacroCategoryByName(name).onboardedTenants
+  let tenants: Array<{ onboardedAt: Date }>
 
-  const totalCount = onboardedTenants.length
-  const lastMonthCount = getLastMonthTenantsCount(onboardedTenants)
+  switch (name) {
+    case 'Totale':
+      tenants = [...globalStore.tenants, ...globalStore.notIPATenants]
+      break
+    case 'Pubblici':
+      tenants = globalStore.tenants
+      break
+    case 'Privati':
+      tenants = globalStore.notIPATenants
+      break
+    default:
+      tenants = globalStore.getMacroCategoryByName(name).tenants
+  }
+
+  const totalCount = tenants.length
+  const lastMonthCount = getLastMonthTenantsCount(tenants)
   const variation = getVariationPercentage(lastMonthCount, totalCount)
 
   return {
@@ -31,7 +46,7 @@ function getMetricData(
   }
 }
 
-function getLastMonthTenantsCount(tenants: Array<GlobalStoreOnboardedTenant>): number {
+function getLastMonthTenantsCount<TTenant extends { onboardedAt: Date }>(tenants: Array<TTenant>): number {
   const oneMonthAgoDate = getMonthsAgoDate(1)
   return tenants.filter((tenant) => tenant.onboardedAt >= oneMonthAgoDate).length
 }

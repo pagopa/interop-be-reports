@@ -11,16 +11,6 @@ export function getVariationPercentage(current: number, total: number): number {
   return total === 0 ? 0 : Number(((current / total) * 100).toFixed(1))
 }
 
-/**
- * Returns the tenants considered onboarded, i.e. the tenants that have an onboardedAt date
- */
-export function getOnboardedTenants<TTenants extends { onboardedAt?: Date | undefined }>(
-  tenants: Array<TTenants>
-): Array<TTenants & { onboardedAt: Date }> {
-  const isOnboarded = (tenant: TTenants): tenant is TTenants & { onboardedAt: Date } => !!tenant.onboardedAt
-  return tenants.filter(isOnboarded)
-}
-
 const cidJob = randomUUID()
 
 export const log = {

@@ -1,23 +1,4 @@
-import { getOnboardedTenants, json2csv, toSnakeCase } from '../helpers.utils.js'
-
-describe('getOnboardedTenants', () => {
-  it('should return the correct onboarded tenants', () => {
-    const todayDate = new Date()
-    const tenants = [
-      { onboardedAt: todayDate },
-      { onboardedAt: todayDate },
-      { onboardedAt: todayDate },
-      { onboardedAt: undefined },
-      { onboardedAt: todayDate },
-    ]
-    expect(getOnboardedTenants(tenants)).toEqual([
-      { onboardedAt: todayDate },
-      { onboardedAt: todayDate },
-      { onboardedAt: todayDate },
-      { onboardedAt: todayDate },
-    ])
-  })
-})
+import { json2csv, toSnakeCase } from '../helpers.utils.js'
 
 describe('toSnakeCase', () => {
   it('should return the correct snake case string', () => {

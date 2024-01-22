@@ -92,6 +92,18 @@ export const OnboardedTenantsCountMetric = z.tuple([
     variation: z.number(),
   }),
   z.object({
+    name: z.literal('Pubblici'),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
+    variation: z.number(),
+  }),
+  z.object({
+    name: z.literal('Privati'),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
+    variation: z.number(),
+  }),
+  z.object({
     name: z.literal(MACRO_CATEGORIES[2].name),
     totalCount: z.number(),
     lastMonthCount: z.number(),
