@@ -1,4 +1,4 @@
-import { json2csv, splitArrayIntoChunks, toSnakeCase } from '../helpers.utils.js'
+import { json2csv, toSnakeCase } from '../helpers.utils.js'
 
 describe('toSnakeCase', () => {
   it('should return the correct snake case string', () => {
@@ -23,20 +23,5 @@ describe('json2csv', () => {
       { foo: 'bar2', baz: { qux: 'quux2' } },
     ]
     expect(json2csv(data)).toBe('foo,qux\nbar,quux\nbar2,quux2')
-  })
-})
-
-describe('splitArrayIntoChunks', () => {
-  it('should return the correct chunks', () => {
-    const array = [1, 2, 3, 4, 5, 6, 7]
-    const chunkSize = 3
-    const chunks = splitArrayIntoChunks(array, chunkSize)
-    expect(chunks).toEqual([[1, 2, 3], [4, 5, 6], [7]])
-  })
-
-  it('should throw an error if the chunk size is invalid', () => {
-    const array = [1, 2, 3, 4, 5, 6, 7]
-    const chunkSize = 0
-    expect(() => splitArrayIntoChunks(array, chunkSize)).toThrowError()
   })
 })
