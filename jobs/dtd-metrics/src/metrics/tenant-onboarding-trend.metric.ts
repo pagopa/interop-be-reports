@@ -10,7 +10,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
   const twelveMonthsAgoDate = getMonthsAgoDate(12)
 
   // Get the oldest tenant date, which will be used as the starting point for the timeseries
-  const oldestTenantDate = globalStore.onboardedTenants.reduce((oldestDate, tenant) => {
+  const oldestTenantDate = globalStore.tenants.reduce((oldestDate, tenant) => {
     if (tenant.onboardedAt < oldestDate) {
       return tenant.onboardedAt
     }
@@ -25,10 +25,10 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
       data: toTimeseriesSequenceData({
         oldestDate: sixMonthsAgoDate,
         jump: { days: 5 },
-        data: macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt),
+        data: macroCategory.tenants.map((tenant) => tenant.onboardedAt),
       }),
       totalCount: macroCategory.totalTenantsCount,
-      onboardedCount: macroCategory.onboardedTenants.length,
+      onboardedCount: macroCategory.tenants.length,
       startingDate: sixMonthsAgoDate,
     })),
     lastTwelveMonths: globalStore.macroCategories.map((macroCategory) => ({
@@ -37,10 +37,10 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
       data: toTimeseriesSequenceData({
         oldestDate: twelveMonthsAgoDate,
         jump: { days: 10 },
-        data: macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt),
+        data: macroCategory.tenants.map((tenant) => tenant.onboardedAt),
       }),
       totalCount: macroCategory.totalTenantsCount,
-      onboardedCount: macroCategory.onboardedTenants.length,
+      onboardedCount: macroCategory.tenants.length,
       startingDate: twelveMonthsAgoDate,
     })),
     fromTheBeginning: globalStore.macroCategories.map((macroCategory) => ({
@@ -49,10 +49,10 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
       data: toTimeseriesSequenceData({
         oldestDate: oldestTenantDate,
         jump: { months: 1 },
-        data: macroCategory.onboardedTenants.map((tenant) => tenant.onboardedAt),
+        data: macroCategory.tenants.map((tenant) => tenant.onboardedAt),
       }),
       totalCount: macroCategory.totalTenantsCount,
-      onboardedCount: macroCategory.onboardedTenants.length,
+      onboardedCount: macroCategory.tenants.length,
       startingDate: oldestTenantDate,
     })),
   })

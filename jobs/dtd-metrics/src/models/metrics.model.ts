@@ -86,7 +86,19 @@ export type TenantOnboardingTrendMetric = z.infer<typeof TenantOnboardingTrendMe
 
 export const OnboardedTenantsCountMetric = z.tuple([
   z.object({
-    name: z.literal('Totale'),
+    name: z.literal('Totale enti'),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
+    variation: z.number(),
+  }),
+  z.object({
+    name: z.literal('Pubblici'),
+    totalCount: z.number(),
+    lastMonthCount: z.number(),
+    variation: z.number(),
+  }),
+  z.object({
+    name: z.literal('Privati'),
     totalCount: z.number(),
     lastMonthCount: z.number(),
     variation: z.number(),

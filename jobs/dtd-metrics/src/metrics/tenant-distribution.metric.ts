@@ -71,7 +71,7 @@ export const getTenantDistributionMetric: MetricFactoryFn<'distribuzioneDegliEnt
     else onlyAccess.count++
   }
 
-  globalStore.onboardedTenants.forEach(resolveTenantDistribution)
+  globalStore.tenants.forEach(resolveTenantDistribution)
 
   return [onlyConsumers, onlyProducers, bothConsumersAndProducers, onlyAccess]
 }
