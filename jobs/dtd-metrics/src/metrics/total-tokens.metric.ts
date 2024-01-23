@@ -4,16 +4,15 @@ import { TotalTokensMetric } from '../models/metrics.model.js'
 import { TokensStore } from '../services/tokens-store.service.js'
 
 export const getTotalTokensMetric: MetricFactoryFn<'totaleRichiesteDiAccesso'> = async () => {
-  const { tokens } = await TokensStore.getInstance()
+  const { totalTokens, tokensByDay, aggregateTokensCount } = await TokensStore.getInstance()
 
   const oneMonthAgo = getMonthsAgoDate(1)
 
-  const totalCount = tokens.length
-  const lastMonthCount = tokens.filter((d) => d > oneMonthAgo).length
-  const variation = getVariationPercentage(lastMonthCount, totalCount)
+  const lastMonthCount = aggregateTokensCount(tokensByDay.filter((d) => d.day > oneMonthAgo))
+  const variation = getVariationPercentage(lastMonthCount, totalTokens)
 
   return TotalTokensMetric.parse({
-    totalCount,
+    totalCount: totalTokens,
     lastMonthCount,
     variation,
   })

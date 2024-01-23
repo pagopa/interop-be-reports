@@ -1,26 +1,46 @@
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
-import { getMonthsAgoDate, toTimeseriesSequenceData } from '../utils/helpers.utils.js'
+import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { TokensTrendMetric } from '../models/metrics.model.js'
 import { TokensStore } from '../services/tokens-store.service.js'
+import { sub } from 'date-fns'
 
 export const getTokensTrendMetric: MetricFactoryFn<'attivitaDellaPiattaforma'> = async () => {
-  const { tokens } = await TokensStore.getInstance()
+  const { tokensByDay, aggregateTokensCount } = await TokensStore.getInstance()
+
+  function getTimeseriesFromTokensByDay({
+    oldestDate,
+    jump,
+  }: {
+    oldestDate: Date
+    jump: Duration
+  }): Array<{ date: Date; count: number }> {
+    let currentDate = new Date()
+    currentDate.setHours(0, 0, 0, 0)
+    let currentCount: number = aggregateTokensCount(tokensByDay)
+    const timeseriesData: Array<{ date: Date; count: number }> = [{ date: currentDate, count: currentCount }]
+
+    while (oldestDate <= currentDate) {
+      currentDate = sub(currentDate, jump)
+      currentDate.setHours(0, 0, 0, 0)
+      currentCount = aggregateTokensCount(tokensByDay.filter(({ day }) => day <= currentDate))
+      timeseriesData.push({ date: currentDate, count: currentCount })
+    }
+
+    return timeseriesData.reverse()
+  }
 
   return TokensTrendMetric.parse({
-    lastSixMonths: toTimeseriesSequenceData({
+    lastSixMonths: getTimeseriesFromTokensByDay({
       oldestDate: getMonthsAgoDate(6),
       jump: { days: 5 },
-      data: tokens,
     }),
-    lastTwelveMonths: toTimeseriesSequenceData({
+    lastTwelveMonths: getTimeseriesFromTokensByDay({
       oldestDate: getMonthsAgoDate(12),
       jump: { days: 10 },
-      data: tokens,
     }),
-    fromTheBeginning: toTimeseriesSequenceData({
-      oldestDate: tokens[0],
+    fromTheBeginning: getTimeseriesFromTokensByDay({
+      oldestDate: tokensByDay[0].day,
       jump: { months: 1 },
-      data: tokens,
     }),
   })
 }
