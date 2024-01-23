@@ -52,10 +52,10 @@ try {
     .addMetric('statoDiCompletamentoAdesioni', getMacroCategoriesOnboardingTrendMetric)
     .addMetric('distribuzioneDegliEntiPerAttivita', getTenantDistributionMetric)
     .addMetric('eservicePubblicati', getPublishedEServicesMetric)
-    .addMetric('entiErogatoriDiEService', getEServicesByMacroCategoriesMetric)
+    .addMetric('categorieDiErogatori', getEServicesByMacroCategoriesMetric)
     .addMetric('entiChePubblicanoPiuEService', getTopProducersMetric)
-    .addMetric('entiErogatoriEdEntiAbilitatiAllaFruizione', getTopProducersBySubscribersMetric)
-    .addMetric('eserviceConPiuEntiAbilitati', getMostSubscribedEServicesMetric)
+    .addMetric('flussiDiRichiesteFraEnti', getTopProducersBySubscribersMetric)
+    .addMetric('eservicePiuRichiesti', getMostSubscribedEServicesMetric)
     .produceMetrics({
       filter: env.METRICS_FILTER,
     })
