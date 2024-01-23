@@ -16,6 +16,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
     }
     return oldestDate
   }, new Date())
+  oldestTenantDate.setHours(0, 0, 0, 0)
 
   const result = TenantOnboardingTrendMetric.parse({
     lastSixMonths: globalStore.macroCategories.map((macroCategory) => ({

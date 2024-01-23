@@ -5,7 +5,9 @@ import { json2csv as _json2csv } from 'json-2-csv'
 import { Worker } from 'worker_threads'
 
 export function getMonthsAgoDate(numMonths: number): Date {
-  return sub(new Date(), { months: numMonths })
+  const result = sub(new Date(), { months: numMonths })
+  result.setHours(0, 0, 0, 0)
+  return result
 }
 
 export function getVariationPercentage(current: number, total: number): number {
