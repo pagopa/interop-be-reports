@@ -60,12 +60,14 @@ export function json2csv(data: object[]): string {
 }
 
 export function getOldestDate(data: Array<Date>): Date {
-  return data.reduce((oldestDate, date) => {
+  const oldestDate = data.reduce((oldestDate, date) => {
     if (date < oldestDate) {
       return date
     }
     return oldestDate
   }, new Date())
+  oldestDate.setHours(0, 0, 0, 0)
+  return oldestDate
 }
 
 /**
@@ -84,12 +86,15 @@ export function toTimeseriesSequenceData({
   data: Array<Date>
 }): Array<{ date: Date; count: number }> {
   let currentDate = new Date()
+  currentDate.setHours(0, 0, 0, 0)
+
   let currentCount: number = data.length
   const timeseriesData: Array<{ date: Date; count: number }> = [{ date: currentDate, count: currentCount }]
 
   while (oldestDate < currentDate) {
     // Jump to the next date
     currentDate = sub(currentDate, jump)
+    currentDate.setHours(0, 0, 0, 0)
     // Count the number of dates that are less than or equal to the current date, and add it to the timeseries data
     currentCount = data.filter((date) => date <= currentDate).length
 
