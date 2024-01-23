@@ -1,4 +1,4 @@
-import { env } from '../configs/env.js'
+// import { env } from '../configs/env.js'
 import { Metric, MetricName, TimedMetricKey } from '../models/metrics.model.js'
 import { toSnakeCase } from '../utils/helpers.utils.js'
 
@@ -23,8 +23,10 @@ type Organization = {
   url?: string
 }
 
-const GITHUB_REPO_URL = `https://github.com/${env.GITHUB_REPO_OWNER}/${env.GITHUB_REPO}/tree/main/data`
-const GITHUB_RAW_CONTENT_URL = `https://raw.githubusercontent.com/${env.GITHUB_REPO_OWNER}/${env.GITHUB_REPO}/main/data`
+// const GITHUB_REPO_URL = `https://github.com/${env.GITHUB_REPO_OWNER}/${env.GITHUB_REPO}/tree/main/data`
+// const GITHUB_RAW_CONTENT_URL = `https://raw.githubusercontent.com/${env.GITHUB_REPO_OWNER}/${env.GITHUB_REPO}/main/data`
+const GITHUB_REPO_URL = `https://github.com/italia/pdnd-opendata/tree/main/data`
+const GITHUB_RAW_CONTENT_URL = `https://raw.githubusercontent.com/italia/pdnd-opendata/main/data`
 const CHARTS_PAGE = `https://www.interop.pagopa.it/numeri`
 
 const OPENDATA_RDF_METADATA = {
@@ -346,7 +348,7 @@ export class MetricsOpenDataRdfGenerator {
   }
 
   private produceRDFCatalogDataset({ filename }: MetricFile): string {
-    return `<dcat:dataset rdf:resource="${GITHUB_REPO_URL}#/${filename}"/>`
+    return `<dcat:dataset rdf:resource="${GITHUB_REPO_URL}/${filename}"/>`
   }
 
   private produceRDFDataset(metricFile: MetricFile): string {
@@ -364,7 +366,7 @@ export class MetricsOpenDataRdfGenerator {
     } = metricFile
 
     return `
-<dcatapit:Dataset rdf:about="${GITHUB_REPO_URL}#/${filename}">
+<dcatapit:Dataset rdf:about="${GITHUB_REPO_URL}/${filename}">
   <rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/>
   <dcat:theme rdf:resource="http://publications.europa.eu/resource/authority/data-theme/GOVE"/>
   <dct:license/>
