@@ -77,12 +77,14 @@ export function toTimeseriesSequenceData({
   data: Array<Date>
 }): Array<{ date: Date; count: number }> {
   let currentDate = new Date()
+  currentDate.setHours(0, 0, 0, 0)
   let currentCount: number = data.length
   const timeseriesData: Array<{ date: Date; count: number }> = [{ date: currentDate, count: currentCount }]
 
   while (oldestDate < currentDate) {
     // Jump to the next date
     currentDate = sub(currentDate, jump)
+    currentDate.setHours(0, 0, 0, 0)
     // Count the number of dates that are less than or equal to the current date, and add it to the timeseries data
     currentCount = data.filter((date) => date <= currentDate).length
 
