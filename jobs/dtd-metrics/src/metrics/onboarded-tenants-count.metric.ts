@@ -5,7 +5,7 @@ import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils
 
 export const getOnboardedTenantsCountMetric: MetricFactoryFn<'totaleEnti'> = (_readModel, globalStore) => {
   return OnboardedTenantsCountMetric.parse([
-    getMetricData('Totale', globalStore),
+    getMetricData('Totale enti', globalStore),
     getMetricData('Pubblici', globalStore),
     getMetricData('Privati', globalStore),
     getMetricData('Comuni', globalStore),
@@ -21,7 +21,7 @@ function getMetricData(
   let tenants: Array<{ onboardedAt: Date }>
 
   switch (name) {
-    case 'Totale':
+    case 'Totale enti':
       tenants = [...globalStore.tenants, ...globalStore.notIPATenants]
       break
     case 'Pubblici':

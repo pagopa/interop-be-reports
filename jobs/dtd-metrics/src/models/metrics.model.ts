@@ -89,7 +89,7 @@ export type MacroCategoriesOnboardingTrendMetric = z.infer<typeof MacroCategorie
 
 export const OnboardedTenantsCountMetric = z.tuple([
   z.object({
-    name: z.literal('Totale'),
+    name: z.literal('Totale enti'),
     totalCount: z.number(),
     lastMonthCount: z.number(),
     variation: z.number(),
