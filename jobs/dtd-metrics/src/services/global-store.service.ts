@@ -1,16 +1,11 @@
 import { Attribute, ReadModelClient } from '@interop-be-reports/commons'
 import { MACRO_CATEGORIES, REGIONI_E_PROVINCE_AUTONOME } from '../configs/macro-categories.js'
-import {
-  MacroCategories,
-  MacroCategory,
-  MacroCategoryOnboardedTenant,
-  MacroCategoryTenant,
-} from '../models/macro-categories.model.js'
+import { MacroCategories, MacroCategory, MacroCategoryTenant } from '../models/macro-categories.model.js'
 import { z } from 'zod'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 import { URL } from 'url'
-import { getOnboardedTenants, log } from '../utils/helpers.utils.js'
+import { log } from '../utils/helpers.utils.js'
 import { MacroCategoryName } from '../utils/tests.utils.js'
 
 const __dirname = new URL('.', import.meta.url).pathname
@@ -19,12 +14,13 @@ const GLOBAL_STORE_CACHE_PATH = path.join(__dirname, '.global-store-cache')
 const GlobalStoreTenant = MacroCategoryTenant
 export type GlobalStoreTenant = z.infer<typeof GlobalStoreTenant>
 
-const GlobalStoreOnboardedTenant = MacroCategoryOnboardedTenant
-export type GlobalStoreOnboardedTenant = z.infer<typeof GlobalStoreOnboardedTenant>
+const GlobalStoreNotIPATenant = MacroCategoryTenant.omit({ macroCategoryId: true, externalId: true })
+export type GlobalStoreNotIPATenant = z.infer<typeof GlobalStoreNotIPATenant>
 
 const GlobalStoreCacheObj = z.object({
   macroCategories: MacroCategories,
   tenants: z.array(GlobalStoreTenant),
+  notIPATenants: z.array(GlobalStoreNotIPATenant),
 })
 
 type GlobalStoreCacheObj = z.infer<typeof GlobalStoreCacheObj>
@@ -42,7 +38,7 @@ type GlobalStoreInitConfig = {
  */
 export class GlobalStoreService {
   tenants: Array<GlobalStoreTenant>
-  onboardedTenants: Array<GlobalStoreOnboardedTenant>
+  notIPATenants: Array<GlobalStoreNotIPATenant>
   tenantsMap: Map<string, GlobalStoreTenant>
   macroCategories: MacroCategories
 
@@ -60,9 +56,13 @@ export class GlobalStoreService {
     return macroCategory
   }
 
-  private constructor(tenants: Array<GlobalStoreTenant>, macroCategories: MacroCategories) {
+  private constructor(
+    tenants: Array<GlobalStoreTenant>,
+    notIPATenants: Array<GlobalStoreNotIPATenant>,
+    macroCategories: MacroCategories
+  ) {
     this.tenants = tenants
-    this.onboardedTenants = getOnboardedTenants(tenants)
+    this.notIPATenants = notIPATenants
     this.tenantsMap = new Map(tenants.map((tenant) => [tenant.id, tenant]))
     this.macroCategories = macroCategories
   }
@@ -74,7 +74,7 @@ export class GlobalStoreService {
     // If cache is enabled, try to get the initialization data from the cache
     if (config?.cache) {
       const cache = this.getInitializationDataFromCache()
-      if (cache) return new GlobalStoreService(cache.tenants, cache.macroCategories)
+      if (cache) return new GlobalStoreService(cache.tenants, cache.notIPATenants, cache.macroCategories)
     }
 
     // Get all the attributes with at least one of the ipa codes of the macro categories
@@ -121,6 +121,25 @@ export class GlobalStoreService {
       )
       .toArray()
 
+    // Get all the tenants that are not IPA
+    const notIPATenants = await readModel.tenants
+      .find(
+        {
+          'data.externalId.origin': { $ne: 'IPA' },
+          'data.subUnitType': { $exists: false },
+          'data.onboardedAt': { $exists: true },
+        },
+        {
+          projection: {
+            'data.id': 1,
+            'data.name': 1,
+            'data.onboardedAt': 1,
+          },
+        }
+      )
+      .map(({ data }) => GlobalStoreNotIPATenant.parse(data))
+      .toArray()
+
     const enrichMacroCategory = (macroCategory: (typeof MACRO_CATEGORIES)[number]): MacroCategory => {
       // Get all the attributes related to the macro category
       const macroCategoryAttributes = attributes
@@ -147,7 +166,6 @@ export class GlobalStoreService {
         ...macroCategory,
         attributes: macroCategoryAttributes,
         tenants: macroCategoryTenants,
-        onboardedTenants: getOnboardedTenants(macroCategoryTenants),
         tenantsIds: Array.from(new Set(macroCategoryTenants.map(({ id }) => id))),
       })
     }
@@ -160,8 +178,8 @@ export class GlobalStoreService {
         `Tenants length (${tenants.length}) and macro category tenants length (${macroCategoryTenants.length}) mismatch`
       )
     }
-    if (config?.cache) this.cacheInitializationData({ macroCategories, tenants: macroCategoryTenants })
-    return new GlobalStoreService(macroCategoryTenants, macroCategories)
+    if (config?.cache) this.cacheInitializationData({ macroCategories, tenants: macroCategoryTenants, notIPATenants })
+    return new GlobalStoreService(macroCategoryTenants, notIPATenants, macroCategories)
   }
 
   private static getInitializationDataFromCache(): GlobalStoreCacheObj | undefined {

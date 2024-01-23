@@ -17,19 +17,24 @@ describe('getOnboardedTenantsCountMetric', () => {
           selfcareId: randomUUID(),
           onboardedAt: getMonthsAgoDate(6),
           attributes: [{ id: comuniAttributeId }],
+          externalId: { origin: 'IPA' },
         }),
         attributes: [{ id: comuniAttributeId }],
       },
       10
     )
 
-    const _notOnboardedTenant = getTenantMock<Tenant>({ attributes: [{ id: comuniAttributeId }] })
+    const _notOnboardedTenant = getTenantMock<Tenant>({
+      attributes: [{ id: comuniAttributeId }],
+      externalId: { origin: 'IPA' },
+    })
     delete _notOnboardedTenant.onboardedAt
     const _notOnboardedTenants = repeatObjInArray({ data: _notOnboardedTenant }, 10)
 
     const _onboardedLastMonthTenant = getTenantMock({
       onboardedAt: new Date(),
       attributes: [{ id: comuniAttributeId }],
+      externalId: { origin: 'IPA' },
     })
     const _onboardedLastMonthTenants = repeatObjInArray({ data: _onboardedLastMonthTenant }, 2)
 
