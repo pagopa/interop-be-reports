@@ -1,12 +1,12 @@
-import { AthenaClientService, SafeMap, logError, logInfo, logWarn } from '@interop-be-reports/commons'
+import { SafeMap, logError, logInfo, logWarn } from '@interop-be-reports/commons'
 import {
   AgreementsWorksheetTableData,
   DescriptorsWorksheetTableData,
   TokensWorksheetTableData,
 } from '../models/excel.model.js'
 import { AgreementQueryData, EServiceQueryData, PurposeQueryData, TenantQueryData } from '../models/query-data.model.js'
-import { env } from '../configs/env.js'
 import { randomUUID } from 'crypto'
+import { TokensDataQueryResult } from '../services/athena-queries.service.js'
 
 const cidJob = randomUUID()
 
@@ -78,34 +78,11 @@ export function generateDescriptorsWorksheetTableData(
   )
 }
 
-export async function generateTokensWorksheetTableData(
+export function generateTokensWorksheetTableData(
+  tokens: TokensDataQueryResult[],
   agreementsMap: Map<string, AgreementQueryData>
-): Promise<TokensWorksheetTableData[]> {
-  const athena = new AthenaClientService({ outputLocation: `s3://${env.ATHENA_OUTPUT_BUCKET}` })
-  const { ResultSet } = await athena.query(
-    `
-      SELECT 
-        agreementid,
-        purposeid,
-        date_format(from_unixtime(cast(issuedAt as bigint) / 1000), '%Y-%m-%d') as day,
-        count(*) as tokens,
-        expirationTime - issuedAt as tokenDuration
-      FROM 
-        ${env.ATHENA_TOKENS_DB_NAME} 
-      GROUP BY 
-        agreementid,
-        purposeid,
-        date_format(from_unixtime(cast(issuedAt as bigint) / 1000), '%Y-%m-%d'),
-        expirationTime - issuedAt
-    `
-  )
-
-  if (!ResultSet?.Rows) throw new Error('Invalid result set')
-
-  return ResultSet.Rows.slice(1).map((row) => {
-    if (!row.Data) throw new Error('Invalid row data')
-
-    const [agreementId, purposeId, date, tokencount, tokenDuration] = row.Data.map((data) => data.VarCharValue)
+): TokensWorksheetTableData[] {
+  return tokens.map(({ agreementId, purposeId, date, tokencount, tokenDuration }) => {
     const agreementState = agreementsMap.get(agreementId ?? '')?.state ?? ''
 
     if (!agreementState) log.warn(`Agreement ${agreementId} not found in readmodel`)

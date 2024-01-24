@@ -1,12 +1,29 @@
 import { ReadModelClient } from '@interop-be-reports/commons'
-import { Collection, Document, Filter } from 'mongodb'
+import { Collection, Document, Filter, ReadPreferenceMode } from 'mongodb'
 import { z } from 'zod'
 import { AgreementQueryData, EServiceQueryData, PurposeQueryData, TenantQueryData } from '../models/query-data.model.js'
+import { env } from '../configs/env.js'
 
 const QUERY_LIMIT_SIZE = 10_000
 
 export class ReadModelQueries {
-  constructor(private readModel: ReadModelClient) {}
+  private constructor(private readModel: ReadModelClient) {}
+
+  static async connect(): Promise<ReadModelQueries> {
+    const readModel = await ReadModelClient.connect({
+      mongodbReplicaSet: env.MONGODB_REPLICA_SET,
+      mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
+      mongodbReadPreference: env.MONGODB_READ_PREFERENCE as ReadPreferenceMode,
+      mongodbRetryWrites: env.MONGODB_RETRY_WRITES,
+      readModelDbHost: env.READ_MODEL_DB_HOST,
+      readModelDbPort: env.READ_MODEL_DB_PORT,
+      readModelDbUser: env.READ_MODEL_DB_USER,
+      readModelDbPassword: env.READ_MODEL_DB_PASSWORD,
+      readModelDbName: env.READ_MODEL_DB_NAME,
+    })
+
+    return new ReadModelQueries(readModel)
+  }
 
   public async getAllEServices(): Promise<EServiceQueryData[]> {
     return await this.getAll({
@@ -84,5 +101,9 @@ export class ReadModelQueries {
     } while (docs.length > 0)
 
     return results
+  }
+
+  public async close(): Promise<void> {
+    await this.readModel.close()
   }
 }

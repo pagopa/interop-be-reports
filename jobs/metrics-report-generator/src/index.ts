@@ -1,5 +1,4 @@
-import { ReadModelClient, Mailer, SafeMap } from '@interop-be-reports/commons'
-import { ReadPreferenceMode } from 'mongodb'
+import { Mailer, SafeMap } from '@interop-be-reports/commons'
 import { ExcelGenerator, ReadModelQueries } from './services/index.js'
 import { env } from './configs/env.js'
 import {
@@ -10,66 +9,48 @@ import {
   log,
 } from './utils/helpers.util.js'
 import { writeFileSync } from 'fs'
+import { TokensQueriesService } from './services/athena-queries.service.js'
 
 const EMAIL_SUBJECT = 'Metrics report'
 const EMAIL_TEXT = 'Metrics report'
 const REPORT_FILE_NAME = 'report.xlsx'
 
-const readModel = await ReadModelClient.connect({
-  mongodbReplicaSet: env.MONGODB_REPLICA_SET,
-  mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
-  mongodbReadPreference: env.MONGODB_READ_PREFERENCE as ReadPreferenceMode,
-  mongodbRetryWrites: env.MONGODB_RETRY_WRITES,
-  readModelDbHost: env.READ_MODEL_DB_HOST,
-  readModelDbPort: env.READ_MODEL_DB_PORT,
-  readModelDbUser: env.READ_MODEL_DB_USER,
-  readModelDbPassword: env.READ_MODEL_DB_PASSWORD,
-  readModelDbName: env.READ_MODEL_DB_NAME,
-})
-
 log.warn('Job started')
-const readModelQueries = new ReadModelQueries(readModel)
+
+const readModelQueries = await ReadModelQueries.connect()
 
 log.warn('Fetching data from read model...')
 
 const eservices = await readModelQueries.getAllEServices()
 const agreements = await readModelQueries.getAllAgreements()
 const purposes = await readModelQueries.getAllPurposes()
+const tenants = await readModelQueries.getAllTenantsByIds(getAllTenantsIdsFromAgreements(agreements))
 
-const tenantsIds = getAllTenantsIdsFromAgreements(agreements)
-const tenants = await readModelQueries.getAllTenantsByIds(tenantsIds)
+await readModelQueries.close()
 
-await readModel.close()
+log.info('Fetching tokens data...')
 
-log.info('Getting table data...')
+const tokenQueries = new TokensQueriesService()
+const tokens = await tokenQueries.getTokensData()
+
+log.info('Generating excel file...')
 
 const eservicesMap = new SafeMap(eservices.map((eservice) => [eservice.id, eservice]))
 const agreementsMap = new Map(agreements.map((agreement) => [agreement.id, agreement]))
 const tenantsMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant]))
 
-const agreementsWorksheetTableData = generateAgreementsWorksheetTableData(
-  agreements,
-  purposes,
-  eservicesMap,
-  tenantsMap
-)
-const descriptorsWorksheetTableData = generateDescriptorsWorksheetTableData(eservices, tenantsMap)
-const tokensWorksheetTableData = await generateTokensWorksheetTableData(agreementsMap)
-
-log.info('Generating excel file...')
-
 const excel = await new ExcelGenerator()
   .addWorksheetTable({
     name: 'Agreements',
-    data: agreementsWorksheetTableData,
+    data: generateAgreementsWorksheetTableData(agreements, purposes, eservicesMap, tenantsMap),
   })
   .addWorksheetTable({
     name: 'Descriptors',
-    data: descriptorsWorksheetTableData,
+    data: generateDescriptorsWorksheetTableData(eservices, tenantsMap),
   })
   .addWorksheetTable({
     name: 'Tokens',
-    data: tokensWorksheetTableData,
+    data: generateTokensWorksheetTableData(tokens, agreementsMap),
   })
   .generateExcelFile()
 
