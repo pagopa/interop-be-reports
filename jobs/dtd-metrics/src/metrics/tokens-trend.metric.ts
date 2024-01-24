@@ -1,11 +1,11 @@
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
-import { getMonthsAgoDate } from '../utils/helpers.utils.js'
+import { aggregateTokensCount, getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { TokensTrendMetric } from '../models/metrics.model.js'
 import { TokensStore } from '../services/tokens-store.service.js'
 import { sub } from 'date-fns'
 
 export const getTokensTrendMetric: MetricFactoryFn<'attivitaDellaPiattaforma'> = async () => {
-  const { tokensByDay, aggregateTokensCount } = await TokensStore.getInstance()
+  const { tokensByDay } = await TokensStore.getInstance()
 
   function getTimeseriesFromTokensByDay({
     oldestDate,
