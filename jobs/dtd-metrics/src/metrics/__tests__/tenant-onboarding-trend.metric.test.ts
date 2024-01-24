@@ -1,88 +1,47 @@
 import { getTenantMock } from '@interop-be-reports/commons'
 import { randomUUID } from 'crypto'
-import { MacroCategoryCodeFor, MacroCategoryName, readModelMock, seedCollection } from '../../utils/tests.utils.js'
-import { sub } from 'date-fns'
+import { readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { GlobalStoreService } from '../../services/global-store.service.js'
 import { getTenantOnboardingTrendMetric } from '../tenant-onboarding-trend.metric.js'
 
-const comuneAttributeUuid = randomUUID()
-const aziendaOspedalieraAttributeUuid = randomUUID()
-
-const oneMonthAgoDate = sub(new Date(), { months: 1 }).toISOString()
-const sixMonthsAgoDate = sub(new Date(), { months: 6 }).toISOString()
-const oneYearAgoDate = sub(new Date(), { years: 1 }).toISOString()
 describe('getTenantOnboardingTrendMetric', () => {
   it('should return the correct metrics', async () => {
-    const oboardedTenants = [
+    const onboardedTenants = [
       {
         data: getTenantMock({
           id: randomUUID(),
-          onboardedAt: oneMonthAgoDate,
-          attributes: [{ id: comuneAttributeUuid }],
+          externalId: { value: 'IPA' },
         }),
       },
       {
         data: getTenantMock({
           id: randomUUID(),
-          onboardedAt: oneMonthAgoDate,
-          attributes: [{ id: comuneAttributeUuid }],
+          externalId: { value: 'IPA' },
         }),
       },
       {
         data: getTenantMock({
           id: randomUUID(),
-          onboardedAt: sixMonthsAgoDate,
-          attributes: [{ id: comuneAttributeUuid }],
-        }),
-      },
-      {
-        data: getTenantMock({
-          id: randomUUID(),
-          onboardedAt: sixMonthsAgoDate,
-          attributes: [{ id: aziendaOspedalieraAttributeUuid }],
-        }),
-      },
-      {
-        data: getTenantMock({
-          id: randomUUID(),
-          onboardedAt: oneYearAgoDate,
-          attributes: [{ id: aziendaOspedalieraAttributeUuid }],
-        }),
-      },
-      {
-        data: getTenantMock({
-          id: randomUUID(),
-          onboardedAt: oneYearAgoDate,
-          attributes: [{ id: aziendaOspedalieraAttributeUuid }],
+          externalId: { value: 'IPA' },
         }),
       },
     ]
 
-    const attributes = [
-      { data: { id: comuneAttributeUuid, code: 'L18' satisfies MacroCategoryCodeFor<'Comuni'> } },
+    const onboardedNoIPATenants = [
       {
-        data: {
-          id: aziendaOspedalieraAttributeUuid,
-          code: 'L8' satisfies MacroCategoryCodeFor<'Aziende Ospedaliere e ASL'>,
-        },
+        data: getTenantMock({
+          id: randomUUID(),
+          externalId: { value: 'NOIPA' },
+        }),
       },
     ]
 
-    await seedCollection('tenants', oboardedTenants)
-    await seedCollection('attributes', attributes)
+    await seedCollection('tenants', onboardedTenants)
+    await seedCollection('tenants', onboardedNoIPATenants)
 
     const globalStore = await GlobalStoreService.init(readModelMock)
     const result = await getTenantOnboardingTrendMetric(readModelMock, globalStore)
 
-    const comuniMetric = result?.fromTheBeginning.find(
-      (metric) => metric.name === ('Comuni' satisfies MacroCategoryName)
-    )
-
-    const aziendeOspedaliereMetric = result?.fromTheBeginning.find(
-      (metric) => metric.name === ('Aziende Ospedaliere e ASL' satisfies MacroCategoryName)
-    )
-
-    expect(comuniMetric?.data[comuniMetric?.data.length - 1].count).toBe(3)
-    expect(aziendeOspedaliereMetric?.data[aziendeOspedaliereMetric?.data.length - 1].count).toBe(3)
+    expect(result[result.length - 1].count).toEqual(onboardedTenants.length + onboardedNoIPATenants.length)
   })
 })
