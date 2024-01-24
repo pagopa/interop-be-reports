@@ -25,6 +25,7 @@ export const AgreementQueryData = Agreement.pick({
   producerId: true,
   eserviceId: true,
   descriptorId: true,
+  state: true,
 })
 export type AgreementQueryData = z.infer<typeof AgreementQueryData>
 

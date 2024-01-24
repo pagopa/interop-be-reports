@@ -39,6 +39,9 @@ export const rowStyle: Partial<ExcelJs.Style> = {
     pattern: 'solid',
     fgColor: { argb: 'FFFFFFFF' }, // white
   },
+  alignment: {
+    vertical: 'middle',
+  },
   border: {
     bottom: {
       style: 'thin',

@@ -27,10 +27,10 @@ export type DescriptorsWorksheetTableData = z.infer<typeof DescriptorsWorksheetT
 
 export const TokensWorksheetTableData = z.object({
   agreementId: z.string(),
-  pruposeId: z.string(),
-  year: z.number().transform((value) => value.toString()),
-  month: z.number().transform((value) => value.toString()),
-  day: z.number().transform((value) => value.toString()),
-  tokencount: z.number().transform((value) => value.toString()),
+  purposeId: z.string(),
+  date: z.string(),
+  tokencount: z.string(),
+  agreementState: z.string(),
+  tokenDuration: z.string(),
 })
 export type TokensWorksheetTableData = z.infer<typeof TokensWorksheetTableData>

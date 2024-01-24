@@ -7,6 +7,7 @@ export const AgreementState = z.enum([
   'Suspended',
   'Archived',
   'Rejected',
+  'MissingCertifiedAttributes',
 ])
 
 export const AgreementDocument = z.object({

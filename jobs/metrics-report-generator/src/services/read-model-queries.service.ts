@@ -36,6 +36,7 @@ export class ReadModelQueries {
         'data.producerId': 1,
         'data.eserviceId': 1,
         'data.descriptorId': 1,
+        'data.state': 1,
       },
     })
   }

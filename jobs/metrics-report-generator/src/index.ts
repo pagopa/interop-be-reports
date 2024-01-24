@@ -5,8 +5,15 @@ import { env } from './configs/env.js'
 import {
   generateAgreementsWorksheetTableData,
   generateDescriptorsWorksheetTableData,
+  generateTokensWorksheetTableData,
   getAllTenantsIdsFromAgreements,
+  log,
 } from './utils/helpers.util.js'
+import { writeFileSync } from 'fs'
+
+const EMAIL_SUBJECT = 'Metrics report'
+const EMAIL_TEXT = 'Metrics report'
+const REPORT_FILE_NAME = 'report.xlsx'
 
 const readModel = await ReadModelClient.connect({
   mongodbReplicaSet: env.MONGODB_REPLICA_SET,
@@ -20,7 +27,10 @@ const readModel = await ReadModelClient.connect({
   readModelDbName: env.READ_MODEL_DB_NAME,
 })
 
+log.warn('Job started')
 const readModelQueries = new ReadModelQueries(readModel)
+
+log.warn('Fetching data from read model...')
 
 const eservices = await readModelQueries.getAllEServices()
 const agreements = await readModelQueries.getAllAgreements()
@@ -29,21 +39,46 @@ const purposes = await readModelQueries.getAllPurposes()
 const tenantsIds = getAllTenantsIdsFromAgreements(agreements)
 const tenants = await readModelQueries.getAllTenantsByIds(tenantsIds)
 
+await readModel.close()
+
+log.info('Getting table data...')
+
 const eservicesMap = new SafeMap(eservices.map((eservice) => [eservice.id, eservice]))
+const agreementsMap = new Map(agreements.map((agreement) => [agreement.id, agreement]))
 const tenantsMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant]))
 
-await readModel.close()
+const agreementsWorksheetTableData = generateAgreementsWorksheetTableData(
+  agreements,
+  purposes,
+  eservicesMap,
+  tenantsMap
+)
+const descriptorsWorksheetTableData = generateDescriptorsWorksheetTableData(eservices, tenantsMap)
+const tokensWorksheetTableData = await generateTokensWorksheetTableData(agreementsMap)
+
+log.info('Generating excel file...')
 
 const excel = await new ExcelGenerator()
   .addWorksheetTable({
     name: 'Agreements',
-    data: generateAgreementsWorksheetTableData(agreements, purposes, eservicesMap, tenantsMap),
+    data: agreementsWorksheetTableData,
   })
   .addWorksheetTable({
     name: 'Descriptors',
-    data: generateDescriptorsWorksheetTableData(eservices, tenantsMap),
+    data: descriptorsWorksheetTableData,
+  })
+  .addWorksheetTable({
+    name: 'Tokens',
+    data: tokensWorksheetTableData,
   })
   .generateExcelFile()
+
+if (env.PRODUCE_OUTPUT) {
+  log.info('Writing excel file...')
+  writeFileSync(REPORT_FILE_NAME, excel)
+}
+
+log.info('Sending email...')
 
 const mailer = new Mailer({
   name: env.SMTP_ADDRESS,
@@ -59,7 +94,9 @@ const mailer = new Mailer({
 await mailer.sendMail({
   from: env.SMTP_USER,
   to: env.MAIL_RECIPIENTS,
-  subject: 'ciao',
-  text: 'ciao ciao',
-  attachments: [{ filename: 'ciao.xlsx', content: excel }],
+  subject: EMAIL_SUBJECT,
+  text: EMAIL_TEXT,
+  attachments: [{ filename: REPORT_FILE_NAME, content: excel }],
 })
+
+log.info('Job finished!')
