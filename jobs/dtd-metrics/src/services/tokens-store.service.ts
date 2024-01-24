@@ -2,9 +2,10 @@ import { z } from 'zod'
 import { Row } from '@aws-sdk/client-athena'
 import { env } from '../configs/env.js'
 import { AthenaClientService } from '@interop-be-reports/commons'
+import { aggregateTokensCount } from '../utils/helpers.utils.js'
 
-const TokensByDay = z.array(z.object({ day: z.date(), tokens: z.number() }))
-type TokensByDay = z.infer<typeof TokensByDay>
+export const TokensByDay = z.array(z.object({ day: z.date(), tokens: z.number() }))
+export type TokensByDay = z.infer<typeof TokensByDay>
 
 export class TokensStore {
   private static athena = new AthenaClientService({ outputLocation: `s3://${env.ATHENA_OUTPUT_BUCKET}` })
@@ -15,7 +16,7 @@ export class TokensStore {
 
   private constructor(tokensByDay: TokensByDay) {
     this.tokensByDay = tokensByDay
-    this.totalTokens = this.aggregateTokensCount(tokensByDay)
+    this.totalTokens = aggregateTokensCount(tokensByDay)
   }
 
   public static async getInstance(): Promise<TokensStore> {
@@ -24,10 +25,6 @@ export class TokensStore {
       TokensStore.instance = new TokensStore(tokensByDay)
     }
     return TokensStore.instance
-  }
-
-  public aggregateTokensCount(tokensByDay: TokensByDay): number {
-    return tokensByDay.reduce((acc, { tokens }) => acc + tokens, 0)
   }
 
   private static async getTokensGroupedByDay(): Promise<TokensByDay> {

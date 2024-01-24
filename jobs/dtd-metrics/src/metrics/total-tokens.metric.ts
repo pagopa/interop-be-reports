@@ -1,10 +1,10 @@
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
-import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
+import { aggregateTokensCount, getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
 import { TotalTokensMetric } from '../models/metrics.model.js'
 import { TokensStore } from '../services/tokens-store.service.js'
 
 export const getTotalTokensMetric: MetricFactoryFn<'totaleRichiesteDiAccesso'> = async () => {
-  const { totalTokens, tokensByDay, aggregateTokensCount } = await TokensStore.getInstance()
+  const { totalTokens, tokensByDay } = await TokensStore.getInstance()
 
   const oneMonthAgo = getMonthsAgoDate(1)
 

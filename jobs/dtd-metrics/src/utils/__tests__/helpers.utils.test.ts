@@ -1,4 +1,4 @@
-import { json2csv, toSnakeCase } from '../helpers.utils.js'
+import { aggregateTokensCount, json2csv, toSnakeCase } from '../helpers.utils.js'
 
 describe('toSnakeCase', () => {
   it('should return the correct snake case string', () => {
@@ -23,5 +23,20 @@ describe('json2csv', () => {
       { foo: 'bar2', baz: { qux: 'quux2' } },
     ]
     expect(json2csv(data)).toBe('foo,qux\nbar,quux\nbar2,quux2')
+  })
+})
+
+describe('aggregateTokensCount', () => {
+  it('should return the correct count', () => {
+    const tokensByDayMock = [
+      { day: new Date(), tokens: 1 },
+      { day: new Date(), tokens: 2 },
+      { day: new Date(), tokens: 3 },
+    ]
+    expect(aggregateTokensCount(tokensByDayMock)).toBe(6)
+  })
+
+  it('should return 0 if tokensByDay is empty', () => {
+    expect(aggregateTokensCount([])).toBe(0)
   })
 })
