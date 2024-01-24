@@ -9,6 +9,7 @@ import {
   getTopProducersMetric,
   getOnboardedTenantsCountMetric,
   getTenantDistributionMetric,
+  getMacroCategoriesOnboardingTrendMetric,
   getTenantOnboardingTrendMetric,
   getTotalTokensMetric,
   getTokensTrendMetric,
@@ -49,13 +50,14 @@ try {
 
   const metrics = await new MetricsProducerService(readModel, globalStore)
     .addMetric('totaleEnti', getOnboardedTenantsCountMetric)
-    .addMetric('statoDiCompletamentoAdesioni', getTenantOnboardingTrendMetric)
+    .addMetric('andamentoDelleAdesioni', getTenantOnboardingTrendMetric)
+    .addMetric('statoDiCompletamentoAdesioni', getMacroCategoriesOnboardingTrendMetric)
     .addMetric('distribuzioneDegliEntiPerAttivita', getTenantDistributionMetric)
     .addMetric('eservicePubblicati', getPublishedEServicesMetric)
-    .addMetric('entiErogatoriDiEService', getEServicesByMacroCategoriesMetric)
+    .addMetric('categorieDiErogatori', getEServicesByMacroCategoriesMetric)
     .addMetric('entiChePubblicanoPiuEService', getTopProducersMetric)
-    .addMetric('entiErogatoriEdEntiAbilitatiAllaFruizione', getTopProducersBySubscribersMetric)
-    .addMetric('eserviceConPiuEntiAbilitati', getMostSubscribedEServicesMetric)
+    .addMetric('flussiDiRichiesteFraEnti', getTopProducersBySubscribersMetric)
+    .addMetric('eservicePiuRichiesti', getMostSubscribedEServicesMetric)
     .addMetric('totaleRichiesteDiAccesso', getTotalTokensMetric)
     .addMetric('attivitaDellaPiattaforma', getTokensTrendMetric)
     .produceMetrics({
