@@ -1,7 +1,7 @@
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
+import { sub } from 'date-fns'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { TenantOnboardingTrendMetric } from '../models/metrics.model.js'
-import { sub } from 'date-fns'
 
 export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamentoAdesioni'> = (
   _readModel,
@@ -17,7 +17,6 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
     }
     return oldestDate
   }, new Date())
-
   oldestTenantDate.setHours(0, 0, 0, 0)
 
   const result = TenantOnboardingTrendMetric.parse({
@@ -68,7 +67,7 @@ export const getTenantOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamen
  * @param jump The jump between each data point
  * @param data The list of dates
  */
-export function toTimeseriesSequenceData({
+function toTimeseriesSequenceData({
   oldestDate,
   jump,
   data,
@@ -79,6 +78,7 @@ export function toTimeseriesSequenceData({
 }): Array<{ date: Date; count: number }> {
   let currentDate = new Date()
   currentDate.setHours(0, 0, 0, 0)
+
   let currentCount: number = data.length
   const timeseriesData: Array<{ date: Date; count: number }> = [{ date: currentDate, count: currentCount }]
 
