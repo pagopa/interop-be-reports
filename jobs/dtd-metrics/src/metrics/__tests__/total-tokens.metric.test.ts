@@ -26,7 +26,6 @@ vi.mock('../../services/tokens-store.service.js', () => ({
 describe('getTotalTokensMetric', () => {
   it('should return the correct metrics', async () => {
     const result = await getTotalTokensMetric({} as ReadModelClient, {} as GlobalStoreService)
-    console.log(result)
 
     expect(result.lastMonthCount).toStrictEqual(3)
     expect(result.totalCount).toStrictEqual(getTokensByDayMock().totalTokens)
