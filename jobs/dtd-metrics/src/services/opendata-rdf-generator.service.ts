@@ -79,8 +79,8 @@ const getFilename = (fileKey: MetricFileKey): string => toSnakeCase(fileKey)
 
 const METRICS_FILES = [
   {
-    fileKey: 'categorieDiErogatori',
-    filename: getFilename('categorieDiErogatori'),
+    fileKey: 'entiErogatoriDiEService',
+    filename: getFilename('entiErogatoriDiEService'),
     title: 'Categorie di erogatori',
     description: 'Numero di e-service per categoria di ente erogatore',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
@@ -92,8 +92,8 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'eservicePiuRichiestiLastSixMonths',
-    filename: getFilename('eservicePiuRichiestiLastSixMonths'),
+    fileKey: 'eServiceConPiuEntiAbilitatiLastSixMonths',
+    filename: getFilename('eServiceConPiuEntiAbilitatiLastSixMonths'),
     title: 'E-service più richiesti (ultimi sei mesi)',
     description:
       'E-service ordinati per numero di richieste di fruizione, totale e per categoria di ente erogatore (ultimi sei mesi)',
@@ -106,8 +106,8 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'eservicePiuRichiestiLastTwelveMonths',
-    filename: getFilename('eservicePiuRichiestiLastTwelveMonths'),
+    fileKey: 'eServiceConPiuEntiAbilitatiLastTwelveMonths',
+    filename: getFilename('eServiceConPiuEntiAbilitatiLastTwelveMonths'),
     title: 'E-service più richiesti (ultimi dodici mesi)',
     description:
       'E-service ordinati per numero di richieste di fruizione, totale e per categoria di ente erogatore (ultimi dodici mesi)',
@@ -120,8 +120,8 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'eservicePiuRichiestiFromTheBeginning',
-    filename: getFilename('eservicePiuRichiestiFromTheBeginning'),
+    fileKey: 'eServiceConPiuEntiAbilitatiFromTheBeginning',
+    filename: getFilename('eServiceConPiuEntiAbilitatiFromTheBeginning'),
     title: 'E-service più richiesti (dall’inizio del servizio)',
     description:
       'E-service ordinati per numero di richieste di fruizione, totale e per categoria di ente erogatore (dall’inizio del servizio)',
@@ -265,8 +265,8 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'flussiDiRichiesteFraEntiLastSixMonths',
-    filename: getFilename('flussiDiRichiesteFraEntiLastSixMonths'),
+    fileKey: 'entiErogatoriEdEntiAbilitatiAllaFruizioneLastSixMonths',
+    filename: getFilename('entiErogatoriEdEntiAbilitatiAllaFruizioneLastSixMonths'),
     title: 'Flussi di richieste tra enti (ultimi sei mesi)',
     description:
       'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori (ultimi sei mesi)',
@@ -279,8 +279,8 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'flussiDiRichiesteFraEntiLastTwelveMonths',
-    filename: getFilename('flussiDiRichiesteFraEntiLastTwelveMonths'),
+    fileKey: 'entiErogatoriEdEntiAbilitatiAllaFruizioneLastTwelveMonths',
+    filename: getFilename('entiErogatoriEdEntiAbilitatiAllaFruizioneLastTwelveMonths'),
     title: 'Flussi di richieste tra enti (ultimi dodici mesi)',
     description:
       'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori (ultimi dodici mesi)',
@@ -293,8 +293,8 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'flussiDiRichiesteFraEntiFromTheBeginning',
-    filename: getFilename('flussiDiRichiesteFraEntiFromTheBeginning'),
+    fileKey: 'entiErogatoriEdEntiAbilitatiAllaFruizioneFromTheBeginning',
+    filename: getFilename('entiErogatoriEdEntiAbilitatiAllaFruizioneFromTheBeginning'),
     title: 'Flussi di richieste tra enti (dall’inizio del servizio)',
     description:
       'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori (dall’inizio del servizio)',

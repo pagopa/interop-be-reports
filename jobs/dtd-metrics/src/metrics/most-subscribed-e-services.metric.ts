@@ -24,7 +24,7 @@ type EServiceCollectionItem = {
   agreements: Array<RelevantAgreementInfo>
 }
 
-export const getMostSubscribedEServicesMetric: MetricFactoryFn<'eservicePiuRichiesti'> = async (
+export const getMostSubscribedEServicesMetric: MetricFactoryFn<'eServiceConPiuEntiAbilitati'> = async (
   readModel,
   globalStore
 ) => {
