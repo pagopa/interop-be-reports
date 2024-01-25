@@ -1,6 +1,7 @@
 import { getMonthsAgoDate, getOldestDate, toTimeseriesSequenceData } from '../utils/helpers.utils.js'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { MacroCategoriesOnboardingTrendMetric } from '../models/metrics.model.js'
+import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 
 export const getMacroCategoriesOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamentoAdesioni'> = (
   _readModel,
@@ -12,8 +13,13 @@ export const getMacroCategoriesOnboardingTrendMetric: MetricFactoryFn<'statoDiCo
   // Get the oldest tenant date, which will be used as the starting point for the timeseries
   const oldestTenantDate = getOldestDate(globalStore.tenants.map((tenant) => tenant.onboardedAt))
 
+  // Remove the 'Privati' macro category, which is not relevant for this metric
+  const macroCategories = globalStore.macroCategories.filter(
+    (macroCategory) => macroCategory.name !== ('Privati' satisfies (typeof MACRO_CATEGORIES)[number]['name'])
+  )
+
   return MacroCategoriesOnboardingTrendMetric.parse({
-    lastSixMonths: globalStore.macroCategories.map((macroCategory) => ({
+    lastSixMonths: macroCategories.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
       data: toTimeseriesSequenceData({
@@ -25,7 +31,7 @@ export const getMacroCategoriesOnboardingTrendMetric: MetricFactoryFn<'statoDiCo
       onboardedCount: macroCategory.tenants.length,
       startingDate: sixMonthsAgoDate,
     })),
-    lastTwelveMonths: globalStore.macroCategories.map((macroCategory) => ({
+    lastTwelveMonths: macroCategories.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
       data: toTimeseriesSequenceData({
@@ -37,7 +43,7 @@ export const getMacroCategoriesOnboardingTrendMetric: MetricFactoryFn<'statoDiCo
       onboardedCount: macroCategory.tenants.length,
       startingDate: twelveMonthsAgoDate,
     })),
-    fromTheBeginning: globalStore.macroCategories.map((macroCategory) => ({
+    fromTheBeginning: macroCategories.map((macroCategory) => ({
       id: macroCategory.id,
       name: macroCategory.name,
       data: toTimeseriesSequenceData({

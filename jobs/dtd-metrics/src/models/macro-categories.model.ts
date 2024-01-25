@@ -1,3 +1,4 @@
+import { ExternalId } from '@interop-be-reports/commons'
 import { z } from 'zod'
 
 export const MacroCategoryAttribute = z.object({
@@ -13,11 +14,7 @@ export const MacroCategoryTenant = z.object({
   name: z.string(),
   macroCategoryId: z.string(),
   onboardedAt: z.coerce.date(),
-  externalId: z
-    .object({
-      value: z.string(),
-    })
-    .optional(),
+  externalId: ExternalId,
 })
 export type MacroCategoryTenant = z.infer<typeof MacroCategoryTenant>
 
