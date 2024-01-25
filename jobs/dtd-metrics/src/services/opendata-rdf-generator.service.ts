@@ -1,4 +1,4 @@
-// import { env } from '../configs/env.js'
+import { env } from '../configs/env.js'
 import { Metric, MetricName, TimedMetricKey } from '../models/metrics.model.js'
 import { toSnakeCase } from '../utils/helpers.utils.js'
 
@@ -23,10 +23,8 @@ type Organization = {
   url?: string
 }
 
-// const GITHUB_REPO_URL = `https://github.com/${env.GITHUB_REPO_OWNER}/${env.GITHUB_REPO}/tree/main/data`
-// const GITHUB_RAW_CONTENT_URL = `https://raw.githubusercontent.com/${env.GITHUB_REPO_OWNER}/${env.GITHUB_REPO}/main/data`
-const GITHUB_REPO_URL = `https://github.com/italia/pdnd-opendata/tree/main/data`
-const GITHUB_RAW_CONTENT_URL = `https://raw.githubusercontent.com/italia/pdnd-opendata/main/data`
+const GITHUB_REPO_URL = `https://github.com/${env.GITHUB_REPO_OWNER}/${env.GITHUB_REPO}/tree/main/data`
+const GITHUB_RAW_CONTENT_URL = `https://raw.githubusercontent.com/${env.GITHUB_REPO_OWNER}/${env.GITHUB_REPO}/main/data`
 const CHARTS_PAGE = `https://www.interop.pagopa.it/numeri`
 
 const OPENDATA_RDF_METADATA = {
@@ -79,12 +77,12 @@ const getFilename = (fileKey: MetricFileKey): string => toSnakeCase(fileKey)
 
 const METRICS_FILES = [
   {
-    fileKey: 'categorieDiErogatori',
-    filename: getFilename('categorieDiErogatori'),
-    title: 'Categorie di erogatori',
+    fileKey: 'entiErogatoriDiEService',
+    filename: getFilename('entiErogatoriDiEService'),
+    title: 'PDND - Categorie di erogatori',
     description: 'Numero di e-service per categoria di ente erogatore',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -92,13 +90,13 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'eservicePiuRichiestiLastSixMonths',
-    filename: getFilename('eservicePiuRichiestiLastSixMonths'),
-    title: 'E-service più richiesti (ultimi sei mesi)',
+    fileKey: 'eserviceConPiuEntiAbilitatiLastSixMonths',
+    filename: getFilename('eserviceConPiuEntiAbilitatiLastSixMonths'),
+    title: 'PDND - E-service più richiesti - ultimi 6 mesi',
     description:
-      'E-service ordinati per numero di richieste di fruizione, totale e per categoria di ente erogatore (ultimi sei mesi)',
+      'E-service ordinati per numero di richieste di fruizione, totale e per categoria di ente fruitore',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2', 
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -106,13 +104,13 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'eservicePiuRichiestiLastTwelveMonths',
-    filename: getFilename('eservicePiuRichiestiLastTwelveMonths'),
-    title: 'E-service più richiesti (ultimi dodici mesi)',
+    fileKey: 'eserviceConPiuEntiAbilitatiLastTwelveMonths',
+    filename: getFilename('eserviceConPiuEntiAbilitatiLastTwelveMonths'),
+    title: 'PDND - E-service più richiesti - ultimi 12 mesi',
     description:
-      'E-service ordinati per numero di richieste di fruizione, totale e per categoria di ente erogatore (ultimi dodici mesi)',
+      'E-service ordinati per numero di richieste di fruizione, totale e per categoria di ente fruitore)',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -120,13 +118,13 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'eservicePiuRichiestiFromTheBeginning',
-    filename: getFilename('eservicePiuRichiestiFromTheBeginning'),
-    title: 'E-service più richiesti (dall’inizio del servizio)',
+    fileKey: 'eserviceConPiuEntiAbilitatiFromTheBeginning',
+    filename: getFilename('eserviceConPiuEntiAbilitatiFromTheBeginning'),
+    title: 'PDND - E-service con più enti abilitati - inizio del servizio',
     description:
-      'E-service ordinati per numero di richieste di fruizione, totale e per categoria di ente erogatore (dall’inizio del servizio)',
+      'E-service ordinati per numero di richieste di fruizione, totale e per categoria di ente fruitore',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -136,10 +134,10 @@ const METRICS_FILES = [
   {
     fileKey: 'totaleEnti',
     filename: getFilename('totaleEnti'),
-    title: 'Totale enti e suddivisione per macro-categorie',
-    description: 'Il totale degli enti che hanno aderito a PDND Interoperabilità',
+    title: 'PDND - Totale enti e suddivisione per macro-categorie',
+    description: 'Il totale degli enti e delle categorie in evidenza che hanno aderito a PDND Interoperabilità, con la variazione dal mese precedente',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -149,10 +147,10 @@ const METRICS_FILES = [
   {
     fileKey: 'eservicePubblicati',
     filename: getFilename('eservicePubblicati'),
-    title: 'E-service pubblicati',
+    title: 'PDND - E-service pubblicati',
     description: "Numero di e-service pubblicati e variazione nell'ultimo mese",
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -162,24 +160,11 @@ const METRICS_FILES = [
   {
     fileKey: 'distribuzioneDegliEntiPerAttivita',
     filename: getFilename('distribuzioneDegliEntiPerAttivita'),
-    title: 'Distribuzione degli enti per attività',
+    title: 'PDND - Distribuzione degli enti per attività',
     description:
       'Numero di: enti erogatori che mettono a disposizione e-service; enti fruitori che li utilizzano; enti sia erogatori che fruitori; enti che effettuano solo l’accesso alla piattaforma',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
-    publisherName: 'PagoPA S.p.A.',
-    publisherCode: '5N2TR557',
-    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
-    modified: TODAY_DATE,
-    issued: TODAY_DATE,
-  },
-  {
-    fileKey: 'andamentoDelleAdesioni',
-    filename: getFilename('andamentoDelleAdesioni'),
-    title: 'Andamento delle adesioni',
-    description: 'Numero progressivo di enti che aderiscono alla piattaforma',
-    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -189,10 +174,10 @@ const METRICS_FILES = [
   {
     fileKey: 'statoDiCompletamentoAdesioniLastSixMonths',
     filename: getFilename('statoDiCompletamentoAdesioniLastSixMonths'),
-    title: 'Stato di completamento delle adesioni per categoria di ente pubblico (ultimi sei mesi)',
-    description: 'Percentuale di adesione degli enti sul totale della categoria (ultimi sei mesi)',
+    title: 'PDND - Stato di completamento delle adesioni per categoria di ente pubblico - ultimi 6 mesi',
+    description: 'Percentuale di adesione degli enti sul totale della categoria',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -202,10 +187,10 @@ const METRICS_FILES = [
   {
     fileKey: 'statoDiCompletamentoAdesioniLastTwelveMonths',
     filename: getFilename('statoDiCompletamentoAdesioniLastTwelveMonths'),
-    title: 'Stato di completamento delle adesioni per categoria di ente pubblico (ultimi dodici mesi)',
-    description: 'Percentuale di adesione degli enti sul totale della categoria (ultimi dodici mesi)',
+    title: 'PDND - Stato di completamento delle adesioni per categoria di ente pubblico - ultimi 12 mesi',
+    description: 'Percentuale di adesione degli enti sul totale della categoria',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -215,10 +200,10 @@ const METRICS_FILES = [
   {
     fileKey: 'statoDiCompletamentoAdesioniFromTheBeginning',
     filename: getFilename('statoDiCompletamentoAdesioniFromTheBeginning'),
-    title: 'Stato di completamento delle adesioni per categoria di ente pubblico (dall’inizio del servizio)',
-    description: 'Percentuale di adesione degli enti sul totale della categoria (dall’inizio del servizio)',
+    title: 'PDND - Stato di completamento delle adesioni per categoria di ente pubblico - inizio del servizio',
+    description: 'Percentuale di adesione degli enti sul totale della categoria',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -228,10 +213,10 @@ const METRICS_FILES = [
   {
     fileKey: 'entiChePubblicanoPiuEServiceLastSixMonths',
     filename: getFilename('entiChePubblicanoPiuEServiceLastSixMonths'),
-    title: 'Enti che pubblicano più e-service',
-    description: 'I 10 enti erogatori con più e-service pubblicati (ultimi sei mesi)',
+    title: 'PDND - Enti che pubblicano più e-service - ultimi 6 mesi',
+    description: 'I 10 enti erogatori con più e-service pubblicati',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -241,10 +226,10 @@ const METRICS_FILES = [
   {
     fileKey: 'entiChePubblicanoPiuEServiceLastTwelveMonths',
     filename: getFilename('entiChePubblicanoPiuEServiceLastTwelveMonths'),
-    title: 'Enti che pubblicano più e-service (ultimi dodici mesi)',
-    description: 'I 10 enti erogatori con più e-service pubblicati (ultimi dodici mesi)',
+    title: 'PDND - Enti che pubblicano più e-service - ultimi 12 mesi',
+    description: 'I 10 enti erogatori con più e-service pubblicati',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -254,10 +239,10 @@ const METRICS_FILES = [
   {
     fileKey: 'entiChePubblicanoPiuEServiceFromTheBeginning',
     filename: getFilename('entiChePubblicanoPiuEServiceFromTheBeginning'),
-    title: 'Enti che pubblicano più e-service (dall’inizio del servizio)',
-    description: 'I 10 enti erogatori con più e-service pubblicati (dall’inizio del servizio)',
+    title: 'PDND - Enti che pubblicano più e-service - inizio del servizio',
+    description: 'I 10 enti erogatori con più e-service pubblicati',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -265,13 +250,12 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'flussiDiRichiesteFraEntiLastSixMonths',
-    filename: getFilename('flussiDiRichiesteFraEntiLastSixMonths'),
-    title: 'Flussi di richieste tra enti (ultimi sei mesi)',
-    description:
-      'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori (ultimi sei mesi)',
+    fileKey: 'entiErogatoriEdEntiAbilitatiAllaFruizioneLastSixMonths',
+    filename: getFilename('entiErogatoriEdEntiAbilitatiAllaFruizioneLastSixMonths'),
+    title: 'PDND - Flussi di richieste tra enti - ultimi 6 mesi',
+    description: 'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -279,13 +263,12 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'flussiDiRichiesteFraEntiLastTwelveMonths',
-    filename: getFilename('flussiDiRichiesteFraEntiLastTwelveMonths'),
-    title: 'Flussi di richieste tra enti (ultimi dodici mesi)',
-    description:
-      'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori (ultimi dodici mesi)',
+    fileKey: 'entiErogatoriEdEntiAbilitatiAllaFruizioneLastTwelveMonths',
+    filename: getFilename('entiErogatoriEdEntiAbilitatiAllaFruizioneLastTwelveMonths'),
+    title: 'PDND - Flussi di richieste tra enti - ultimi 12 mesi',
+    description: 'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -293,13 +276,12 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'flussiDiRichiesteFraEntiFromTheBeginning',
-    filename: getFilename('flussiDiRichiesteFraEntiFromTheBeginning'),
-    title: 'Flussi di richieste tra enti (dall’inizio del servizio)',
-    description:
-      'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori (dall’inizio del servizio)',
+    fileKey: 'entiErogatoriEdEntiAbilitatiAllaFruizioneFromTheBeginning',
+    filename: getFilename('entiErogatoriEdEntiAbilitatiAllaFruizioneFromTheBeginning'),
+    title: 'PDND - Flussi di richieste tra enti - inizio del servizio',
+    description: 'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -351,7 +333,7 @@ export class MetricsOpenDataRdfGenerator {
   }
 
   private produceRDFCatalogDataset({ filename }: MetricFile): string {
-    return `<dcat:dataset rdf:resource="${GITHUB_REPO_URL}/${filename}"/>`
+    return `<dcat:dataset rdf:resource="${GITHUB_REPO_URL}#/${filename}"/>`
   }
 
   private produceRDFDataset(metricFile: MetricFile): string {
@@ -369,7 +351,7 @@ export class MetricsOpenDataRdfGenerator {
     } = metricFile
 
     return `
-<dcatapit:Dataset rdf:about="${GITHUB_REPO_URL}/${filename}">
+<dcatapit:Dataset rdf:about="${GITHUB_REPO_URL}#/${filename}">
   <rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/>
   <dcat:theme rdf:resource="http://publications.europa.eu/resource/authority/data-theme/GOVE"/>
   <dct:license/>
