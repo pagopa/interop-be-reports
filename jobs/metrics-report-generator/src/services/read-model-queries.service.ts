@@ -6,10 +6,10 @@ import { env } from '../configs/env.js'
 
 const QUERY_LIMIT_SIZE = 10_000
 
-export class ReadModelQueries {
+export class ReadModelQueriesService {
   private constructor(private readModel: ReadModelClient) {}
 
-  static async connect(): Promise<ReadModelQueries> {
+  static async connect(): Promise<ReadModelQueriesService> {
     const readModel = await ReadModelClient.connect({
       mongodbReplicaSet: env.MONGODB_REPLICA_SET,
       mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
@@ -22,7 +22,7 @@ export class ReadModelQueries {
       readModelDbName: env.READ_MODEL_DB_NAME,
     })
 
-    return new ReadModelQueries(readModel)
+    return new ReadModelQueriesService(readModel)
   }
 
   public async getAllEServices(): Promise<EServiceQueryData[]> {

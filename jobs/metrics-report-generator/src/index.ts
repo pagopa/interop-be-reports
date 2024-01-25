@@ -1,5 +1,5 @@
 import { Mailer, SafeMap } from '@interop-be-reports/commons'
-import { ExcelGenerator, ReadModelQueries } from './services/index.js'
+import { ExcelGenerator, ReadModelQueriesService } from './services/index.js'
 import { env } from './configs/env.js'
 import {
   generateAgreementsWorksheetTableData,
@@ -17,7 +17,7 @@ const REPORT_FILE_NAME = 'report.xlsx'
 
 log.warn('Job started')
 
-const readModelQueries = await ReadModelQueries.connect()
+const readModelQueries = await ReadModelQueriesService.connect()
 
 log.warn('Fetching data from read model...')
 
