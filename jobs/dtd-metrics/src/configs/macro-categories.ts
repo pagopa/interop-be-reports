@@ -64,7 +64,7 @@ export const MACRO_CATEGORIES = [
   },
   {
     id: '7',
-    name: 'Regioni e Province Autonome',
+    name: 'Regioni e Province autonome',
     ipaCodes: ['L4'],
     totalTenantsCount: 21, // 19 Regioni + 2 Province autonome (TN + BZ)
   },

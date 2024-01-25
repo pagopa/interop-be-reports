@@ -9,7 +9,7 @@ export const getOnboardedTenantsCountMetric: MetricFactoryFn<'totaleEnti'> = (_r
     getMetricData('Pubblici', globalStore),
     getMetricData('Privati', globalStore),
     getMetricData('Comuni', globalStore),
-    getMetricData('Regioni e Province Autonome', globalStore),
+    getMetricData('Regioni e Province autonome', globalStore),
     getMetricData('Università e AFAM', globalStore),
   ])
 }
