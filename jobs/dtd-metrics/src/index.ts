@@ -54,8 +54,8 @@ try {
     .addMetric('eservicePubblicati', getPublishedEServicesMetric)
     .addMetric('entiErogatoriDiEService', getEServicesByMacroCategoriesMetric)
     .addMetric('entiChePubblicanoPiuEService', getTopProducersMetric)
-    .addMetric('entiErogatoriEdEntiAbilitatiAllaFruizione', getTopProducersBySubscribersMetric)
-    .addMetric('eServiceConPiuEntiAbilitati', getMostSubscribedEServicesMetric)
+    .addMetric('flussiDiRichiesteFraEnti', getTopProducersBySubscribersMetric)
+    .addMetric('eServicePiuRichiesti', getMostSubscribedEServicesMetric)
     .produceMetrics({
       filter: env.METRICS_FILTER,
     })
