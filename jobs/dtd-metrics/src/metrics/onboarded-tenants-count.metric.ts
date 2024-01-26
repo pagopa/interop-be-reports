@@ -9,7 +9,7 @@ export const getOnboardedTenantsCountMetric: MetricFactoryFn<'totaleEnti'> = (_r
     getMetricData('Pubblici', globalStore),
     getMetricData('Privati', globalStore),
     getMetricData('Comuni', globalStore),
-    getMetricData('Regioni e Province Autonome', globalStore),
+    getMetricData('Regioni e Province autonome', globalStore),
     getMetricData('Università e AFAM', globalStore),
   ])
 }
@@ -22,13 +22,10 @@ function getMetricData(
 
   switch (name) {
     case 'Totale enti':
-      tenants = [...globalStore.tenants, ...globalStore.notIPATenants]
-      break
-    case 'Pubblici':
       tenants = globalStore.tenants
       break
-    case 'Privati':
-      tenants = globalStore.notIPATenants
+    case 'Pubblici':
+      tenants = globalStore.tenants.filter((t) => t.externalId.origin === 'IPA')
       break
     default:
       tenants = globalStore.getMacroCategoryByName(name).tenants
