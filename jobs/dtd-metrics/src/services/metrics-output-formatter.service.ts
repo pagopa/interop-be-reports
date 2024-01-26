@@ -43,8 +43,8 @@ export class MetricsOutputFormatterService {
       case 'distribuzioneDegliEntiPerAttivita':
       case 'andamentoDelleAdesioni':
         return [{ filename: this.getFilename(metric.name, 'json'), data: JSON.stringify(metric.data) }]
-      case 'eServiceConPiuEntiAbilitati':
-      case 'entiErogatoriEdEntiAbilitatiAllaFruizione':
+      case 'eServicePiuRichiesti':
+      case 'flussiDiRichiesteFraEnti':
       case 'entiChePubblicanoPiuEService':
       case 'statoDiCompletamentoAdesioni':
         return [
@@ -78,8 +78,8 @@ export class MetricsOutputFormatterService {
       case 'entiErogatoriDiEService':
       case 'andamentoDelleAdesioni':
         return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv(metric.data) }]
-      case 'eServiceConPiuEntiAbilitati':
-      case 'entiErogatoriEdEntiAbilitatiAllaFruizione':
+      case 'eServicePiuRichiesti':
+      case 'flussiDiRichiesteFraEnti':
       case 'entiChePubblicanoPiuEService':
       case 'statoDiCompletamentoAdesioni':
         return [
