@@ -1,11 +1,10 @@
-import { Mailer, SafeMap } from '@interop-be-reports/commons'
+import { Mailer } from '@interop-be-reports/commons'
 import { ExcelGenerator, ReadModelQueriesService } from './services/index.js'
 import { env } from './configs/env.js'
 import {
   generateAgreementsWorksheetTableData,
   generateDescriptorsWorksheetTableData,
   generateTokensWorksheetTableData,
-  getAllTenantsIdsFromAgreements,
   log,
 } from './utils/helpers.util.js'
 import { writeFileSync } from 'fs'
@@ -15,29 +14,35 @@ const EMAIL_SUBJECT = 'Metrics report'
 const EMAIL_TEXT = 'Metrics report'
 const REPORT_FILE_NAME = 'report.xlsx'
 
-log.warn('Job started')
+log.info('Job started')
 
 const readModelQueries = await ReadModelQueriesService.connect()
 
-log.warn('Fetching data from read model...')
+log.info('Fetching data from read model...')
 
+log.info('Fetching e-services...')
 const eservices = await readModelQueries.getAllEServices()
+
+log.info('Fetching agreements...')
 const agreements = await readModelQueries.getAllAgreements()
+
+log.info('Fetching purposes...')
 const purposes = await readModelQueries.getAllPurposes()
-const tenants = await readModelQueries.getAllTenantsByIds(getAllTenantsIdsFromAgreements(agreements))
+
+log.info('Fetching tenants...')
+const tenants = await readModelQueries.getAllOnboardedTenants()
 
 await readModelQueries.close()
 
 log.info('Fetching tokens data...')
-
 const tokenQueries = new TokensQueriesService()
 const tokens = await tokenQueries.getTokensData()
 
 log.info('Generating excel file...')
 
-const eservicesMap = new SafeMap(eservices.map((eservice) => [eservice.id, eservice]))
+const eservicesMap = new Map(eservices.map((eservice) => [eservice.id, eservice]))
 const agreementsMap = new Map(agreements.map((agreement) => [agreement.id, agreement]))
-const tenantsMap = new SafeMap(tenants.map((tenant) => [tenant.id, tenant]))
+const tenantsMap = new Map(tenants.map((tenant) => [tenant.id, tenant]))
 
 const excel = await new ExcelGenerator()
   .addWorksheetTable({

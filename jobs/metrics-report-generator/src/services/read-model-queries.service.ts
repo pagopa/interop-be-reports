@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { AgreementQueryData, EServiceQueryData, PurposeQueryData, TenantQueryData } from '../models/query-data.model.js'
 import { env } from '../configs/env.js'
 
-const QUERY_LIMIT_SIZE = 100
+const QUERY_LIMIT_SIZE = 1_000
 
 export class ReadModelQueriesService {
   private constructor(private readModel: ReadModelClient) {}
@@ -66,12 +66,12 @@ export class ReadModelQueriesService {
     })
   }
 
-  public async getAllTenantsByIds(ids: string[]): Promise<TenantQueryData[]> {
+  public async getAllOnboardedTenants(): Promise<TenantQueryData[]> {
     return await this.getAll({
       collection: this.readModel.tenants,
       schema: TenantQueryData,
       projection: { _id: 0, 'data.id': 1, 'data.externalId': 1 },
-      filter: { 'data.id': { $in: ids } },
+      filter: { 'data.onboardedAt': { $exists: true } },
     })
   }
 
@@ -86,7 +86,7 @@ export class ReadModelQueriesService {
     projection?: Document
     filter?: Filter<TCollection>
   }): Promise<TResult[]> {
-    const results: TResult[] = []
+    let results: TResult[] = []
     let docs: TResult[]
 
     do {
@@ -97,7 +97,7 @@ export class ReadModelQueriesService {
         .skip(results.length)
         .toArray()) as TResult[]
 
-      results.push(...docs)
+      results = results.concat(docs)
     } while (docs.length > 0)
 
     return results

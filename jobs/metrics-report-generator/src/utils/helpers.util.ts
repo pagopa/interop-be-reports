@@ -1,4 +1,4 @@
-import { SafeMap, logError, logInfo, logWarn } from '@interop-be-reports/commons'
+import { logError, logInfo, logWarn } from '@interop-be-reports/commons'
 import {
   AgreementsWorksheetTableData,
   DescriptorsWorksheetTableData,
@@ -16,32 +16,28 @@ export const log = {
   error: logError.bind(null, cidJob),
 }
 
-export function getAllTenantsIdsFromAgreements<TAgreement extends { consumerId: string; producerId: string }>(
-  agreements: TAgreement[]
-): string[] {
-  const extractTenantsFromAgreement = (agreement: TAgreement): [string, string] => [
-    agreement.consumerId,
-    agreement.producerId,
-  ]
-  const tenantsIds = agreements.map(extractTenantsFromAgreement).flat()
-  return Array.from(new Set(tenantsIds))
-}
-
 export function generateAgreementsWorksheetTableData(
   agreements: AgreementQueryData[],
   purposes: PurposeQueryData[],
-  eservicesMap: SafeMap<string, EServiceQueryData>,
-  tenantsMap: SafeMap<string, TenantQueryData>
+  eservicesMap: Map<string, EServiceQueryData>,
+  tenantsMap: Map<string, TenantQueryData>
 ): AgreementsWorksheetTableData[] {
   return agreements.map<AgreementsWorksheetTableData>((agreement) => {
     const agreementPurposes = purposes.filter((purpose) => purpose.eserviceId === agreement.eserviceId)
+    const consumer = tenantsMap.get(agreement.consumerId)
+    const producer = tenantsMap.get(agreement.producerId)
+    const eservice = eservicesMap.get(agreement.eserviceId)
+
+    if (!consumer) log.warn(`Tenant consumer ${agreement.consumerId} not found in readmodel`)
+    if (!producer) log.warn(`Tenant producer ${agreement.producerId} not found in readmodel`)
+    if (!eservice) log.warn(`Eservice ${agreement.eserviceId} not found in readmodel`)
 
     return AgreementsWorksheetTableData.parse({
       EserviceId: agreement.eserviceId,
-      Eservice: eservicesMap.get(agreement.eserviceId).name,
-      Producer: tenantsMap.get(agreement.producerId).externalId.value,
+      Eservice: eservice?.name ?? '',
+      Producer: producer?.externalId.value ?? '',
       ProducerId: agreement.producerId,
-      Consumer: tenantsMap.get(agreement.consumerId).externalId.value,
+      Consumer: consumer?.externalId.value ?? '',
       ConsumerId: agreement.consumerId,
       Agreement: agreement.id,
       Purposes: agreementPurposes.map((purpose) => purpose.title),
@@ -52,7 +48,7 @@ export function generateAgreementsWorksheetTableData(
 
 export function generateDescriptorsWorksheetTableData(
   eservices: EServiceQueryData[],
-  tenantsMap: SafeMap<string, TenantQueryData>
+  tenantsMap: Map<string, TenantQueryData>
 ): DescriptorsWorksheetTableData[] {
   function isDescriptorActive(descriptor: EServiceQueryData['descriptors'][0]): boolean {
     return ['Published', 'Suspended', 'Deprecated'].includes(descriptor.state)
@@ -63,12 +59,15 @@ export function generateDescriptorsWorksheetTableData(
       if (!isDescriptorActive(descriptor)) return acc
 
       const interfaceChecksum = descriptor.interface?.checksum ?? ''
+      const tenant = tenantsMap.get(eservice.producerId)
+
+      if (!tenant) log.warn(`Tenant producer ${eservice.producerId} not found in readmodel`)
 
       const data = DescriptorsWorksheetTableData.parse({
         Name: eservice.name,
         CreatedAt: descriptor.createdAt,
         ProducerId: eservice.producerId,
-        Producer: tenantsMap.get(eservice.producerId).externalId.value,
+        Producer: tenant?.externalId.value ?? '',
         DescriptorId: descriptor.id,
         State: descriptor.state,
         Fingerprint: interfaceChecksum,
@@ -83,16 +82,16 @@ export function generateTokensWorksheetTableData(
   agreementsMap: Map<string, AgreementQueryData>
 ): TokensWorksheetTableData[] {
   return tokens.map(({ agreementId, purposeId, date, tokencount, tokenDuration }) => {
-    const agreementState = agreementsMap.get(agreementId ?? '')?.state ?? ''
+    const agreement = agreementsMap.get(agreementId)
 
-    if (!agreementState) log.warn(`Agreement ${agreementId} not found in readmodel`)
+    if (!agreement) log.warn(`Agreement ${agreementId} not found in readmodel`)
 
     return TokensWorksheetTableData.parse({
       agreementId,
       purposeId,
       date,
       tokencount,
-      agreementState,
+      agreementState: agreement?.state ?? '',
       tokenDuration,
     })
   })
