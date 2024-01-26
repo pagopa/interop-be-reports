@@ -100,6 +100,12 @@ export const MACRO_CATEGORIES = [
     ipaCodes: ['SAG', 'L37', 'S01', 'SA'],
     totalTenantsCount: 1128,
   },
+  {
+    id: '13',
+    name: 'Privati',
+    ipaCodes: [], // Privates don't have an IPA code
+    totalTenantsCount: 0, // Privates are potentially infinite
+  },
 ] as const
 
 // Attenzione: la Regione Trentino (r_trenti) non va considerata,
