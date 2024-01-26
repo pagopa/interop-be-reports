@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { AgreementQueryData, EServiceQueryData, PurposeQueryData, TenantQueryData } from '../models/query-data.model.js'
 import { env } from '../configs/env.js'
 
-const QUERY_LIMIT_SIZE = 10_000
+const QUERY_LIMIT_SIZE = 100
 
 export class ReadModelQueriesService {
   private constructor(private readModel: ReadModelClient) {}
