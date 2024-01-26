@@ -64,7 +64,7 @@ export const MACRO_CATEGORIES = [
   },
   {
     id: '7',
-    name: 'Regioni e Province Autonome',
+    name: 'Regioni e Province autonome',
     ipaCodes: ['L4'],
     totalTenantsCount: 21, // 19 Regioni + 2 Province autonome (TN + BZ)
   },
@@ -99,6 +99,12 @@ export const MACRO_CATEGORIES = [
     name: 'Stazioni Appaltanti e Gestori di pubblici servizi',
     ipaCodes: ['SAG', 'L37', 'S01', 'SA'],
     totalTenantsCount: 1128,
+  },
+  {
+    id: '13',
+    name: 'Privati',
+    ipaCodes: [], // Privates don't have an IPA code
+    totalTenantsCount: 0, // Privates are potentially infinite
   },
 ] as const
 

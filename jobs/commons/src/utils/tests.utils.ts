@@ -109,7 +109,7 @@ export const getTenantMock = createMockFactory<Tenant>({
   createdAt: new Date(),
   onboardedAt: new Date(),
   externalId: {
-    origin: 'origin',
+    origin: 'IPA',
     value: 'value',
   },
   features: [],

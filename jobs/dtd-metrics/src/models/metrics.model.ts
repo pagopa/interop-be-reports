@@ -153,10 +153,10 @@ export const Metric = z.union([
   z.object({ name: z.literal('statoDiCompletamentoAdesioni'), data: MacroCategoriesOnboardingTrendMetric }),
   z.object({ name: z.literal('distribuzioneDegliEntiPerAttivita'), data: TenantDistributionMetric }),
   z.object({ name: z.literal('eservicePubblicati'), data: PublishedEServicesMetric }),
-  z.object({ name: z.literal('categorieDiErogatori'), data: EServicesByMacroCategoriesMetric }),
+  z.object({ name: z.literal('entiErogatoriDiEService'), data: EServicesByMacroCategoriesMetric }),
   z.object({ name: z.literal('entiChePubblicanoPiuEService'), data: TopProducersMetric }),
-  z.object({ name: z.literal('flussiDiRichiesteFraEnti'), data: TopProducersBySubscribersMetric }),
-  z.object({ name: z.literal('eservicePiuRichiesti'), data: MostSubscribedEServicesMetric }),
+  z.object({ name: z.literal('entiErogatoriEdEntiAbilitatiAllaFruizione'), data: TopProducersBySubscribersMetric }),
+  z.object({ name: z.literal('eServiceConPiuEntiAbilitati'), data: MostSubscribedEServicesMetric }),
   z.object({ name: z.literal('totaleRichiesteDiAccesso'), data: TotalTokensMetric }),
   z.object({ name: z.literal('attivitaDellaPiattaforma'), data: TokensTrendMetric }),
 ])
