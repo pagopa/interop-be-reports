@@ -14,9 +14,18 @@ const EMAIL_SUBJECT = 'Metrics report'
 const EMAIL_TEXT = 'Metrics report'
 const REPORT_FILE_NAME = 'report.xlsx'
 
+// eslint-disable-next-line prefer-const
+let test = true
+
 log.info('Job started')
 
 const readModelQueries = await ReadModelQueriesService.connect()
+
+await readModelQueries.test()
+
+if (test) {
+  process.exit(0)
+}
 
 log.info('Fetching data from read model...')
 

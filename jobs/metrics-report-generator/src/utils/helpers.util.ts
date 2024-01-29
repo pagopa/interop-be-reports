@@ -28,9 +28,9 @@ export function generateAgreementsWorksheetTableData(
     const producer = tenantsMap.get(agreement.producerId)
     const eservice = eservicesMap.get(agreement.eserviceId)
 
-    if (!consumer) log.warn(`Tenant consumer ${agreement.consumerId} not found in readmodel`)
-    if (!producer) log.warn(`Tenant producer ${agreement.producerId} not found in readmodel`)
-    if (!eservice) log.warn(`Eservice ${agreement.eserviceId} not found in readmodel`)
+    if (!consumer) log.warn(`[Agreements Worksheet] Tenant consumer ${agreement.consumerId} not found in readmodel`)
+    if (!producer) log.warn(`[Agreements Worksheet] Tenant producer ${agreement.producerId} not found in readmodel`)
+    if (!eservice) log.warn(`[Agreements Worksheet] Eservice ${agreement.eserviceId} not found in readmodel`)
 
     return AgreementsWorksheetTableData.parse({
       EserviceId: agreement.eserviceId,
@@ -61,7 +61,7 @@ export function generateDescriptorsWorksheetTableData(
       const interfaceChecksum = descriptor.interface?.checksum ?? ''
       const tenant = tenantsMap.get(eservice.producerId)
 
-      if (!tenant) log.warn(`Tenant producer ${eservice.producerId} not found in readmodel`)
+      if (!tenant) log.warn(`[Descriptors Worksheet] Tenant producer ${eservice.producerId} not found in readmodel`)
 
       const data = DescriptorsWorksheetTableData.parse({
         Name: eservice.name,
@@ -84,7 +84,7 @@ export function generateTokensWorksheetTableData(
   return tokens.map(({ agreementId, purposeId, date, tokencount, tokenDuration }) => {
     const agreement = agreementsMap.get(agreementId)
 
-    if (!agreement) log.warn(`Agreement ${agreementId} not found in readmodel`)
+    if (!agreement) log.warn(`[Tokens Worksheet] Agreement ${agreementId} not found in readmodel`)
 
     return TokensWorksheetTableData.parse({
       agreementId,
