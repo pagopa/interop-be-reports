@@ -412,7 +412,7 @@ export class MetricsOpenDataRdfGenerator {
 <dcatapit:Distribution rdf:about="${GITHUB_REPO_URL}/${filename}.csv">
   <dcat:accessURL rdf:resource="${csvfileUrl}"/>
   <dct:license>
-    <dcatapit:LicenseDocument rdf:about="https://w3id.org/italia/controlled-vocabulary/licences/A11:CCO10">
+    <dcatapit:LicenseDocument rdf:about="https://w3id.org/italia/controlled-vocabulary/licences/A11_CCO10">
       <rdf:type rdf:resource="dct:LicenseDocument"/>
       <dct:type rdf:resource="http://purl.org/adms/licencetype/Attribution"/>
       <foaf:name>Creative Commons CC0 1.0 Universale - Public Domain Dedication (CC0 1.0)</foaf:name>
@@ -426,7 +426,7 @@ export class MetricsOpenDataRdfGenerator {
 <dcatapit:Distribution rdf:about="${GITHUB_REPO_URL}/${filename}.json">
   <dcat:accessURL rdf:resource="${csvfileJSON}"/>
   <dct:license>
-    <dcatapit:LicenseDocument rdf:about="https://w3id.org/italia/controlled-vocabulary/licences/A11:CCO10">
+    <dcatapit:LicenseDocument rdf:about="https://w3id.org/italia/controlled-vocabulary/licences/A11_CCO10">
       <rdf:type rdf:resource="dct:LicenseDocument"/>
       <dct:type rdf:resource="http://purl.org/adms/licencetype/Attribution"/>
       <foaf:name>Creative Commons CC0 1.0 Universale - Public Domain Dedication (CC0 1.0)</foaf:name>
