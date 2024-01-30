@@ -25,13 +25,6 @@ export class ReadModelQueriesService {
     return new ReadModelQueriesService(readModel)
   }
 
-  public async test(): Promise<void> {
-    const result = await this.readModel.eservices
-      .find({ 'data.producerId': 'd953553b-8ad7-4afa-905d-373c823b1aaf' })
-      .toArray()
-    console.log(JSON.stringify(result, null, 2))
-  }
-
   public async getAllEServices(): Promise<EServiceQueryData[]> {
     return await this.getAll({
       collection: this.readModel.eservices,

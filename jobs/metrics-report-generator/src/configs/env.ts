@@ -29,6 +29,8 @@ export const Env = z.object({
   ATHENA_TOKENS_DB_NAME: z.string(),
   ATHENA_OUTPUT_BUCKET: z.string(),
 
+  ENVIROMENT: z.string(),
+
   // If set, a xmls file with output will be saved locally
   PRODUCE_OUTPUT: z
     .string()

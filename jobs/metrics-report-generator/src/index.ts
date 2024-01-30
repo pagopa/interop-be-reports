@@ -10,22 +10,13 @@ import {
 import { writeFileSync } from 'fs'
 import { TokensQueriesService } from './services/athena-queries.service.js'
 
-const EMAIL_SUBJECT = 'Metrics report'
-const EMAIL_TEXT = 'Metrics report'
-const REPORT_FILE_NAME = 'report.xlsx'
-
-// eslint-disable-next-line prefer-const
-let test = true
+const EMAIL_SUBJECT = `Report ${env.ENVIROMENT}`
+const EMAIL_TEXT = `Data report of ${env.ENVIROMENT}`
+const REPORT_FILE_NAME = `report-${env.ENVIROMENT}.xlsx`
 
 log.info('Job started')
 
 const readModelQueries = await ReadModelQueriesService.connect()
-
-await readModelQueries.test()
-
-if (test) {
-  process.exit(0)
-}
 
 log.info('Fetching data from read model...')
 
