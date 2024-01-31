@@ -10,9 +10,9 @@ import {
 import { writeFileSync } from 'fs'
 import { TokensQueriesService } from './services/athena-queries.service.js'
 
-const EMAIL_SUBJECT = `Report ${env.ENVIROMENT}`
-const EMAIL_TEXT = `Data report of ${env.ENVIROMENT}`
-const REPORT_FILE_NAME = `report-${env.ENVIROMENT}.xlsx`
+const EMAIL_SUBJECT = `Report ${env.ENVIRONMENT}`
+const EMAIL_TEXT = `Data report of ${env.ENVIRONMENT}`
+const REPORT_FILE_NAME = `report-${env.ENVIRONMENT}.xlsx`
 
 log.info('Job started')
 
