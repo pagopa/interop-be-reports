@@ -1,6 +1,5 @@
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { aggregateTokensCount, getMonthsAgoDate } from '../utils/helpers.utils.js'
-import { TokensTrendMetric } from '../models/metrics.model.js'
 import { TokensStore } from '../services/tokens-store.service.js'
 import { sub } from 'date-fns'
 
@@ -29,7 +28,7 @@ export const getTokensTrendMetric: MetricFactoryFn<'attivitaDellaPiattaforma'> =
     return timeseriesData.reverse()
   }
 
-  return TokensTrendMetric.parse({
+  return {
     lastSixMonths: getTimeseriesFromTokensByDay({
       oldestDate: getMonthsAgoDate(6),
       jump: { days: 5 },
@@ -42,5 +41,5 @@ export const getTokensTrendMetric: MetricFactoryFn<'attivitaDellaPiattaforma'> =
       oldestDate: tokensByDay[0].day,
       jump: { months: 1 },
     }),
-  })
+  }
 }
