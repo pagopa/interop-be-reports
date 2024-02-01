@@ -32,7 +32,7 @@ export function generateAgreementsWorksheetTableData(
     if (!producer) log.warn(`[Agreements Worksheet] Tenant producer ${agreement.producerId} not found in readmodel`)
     if (!eservice) log.warn(`[Agreements Worksheet] Eservice ${agreement.eserviceId} not found in readmodel`)
 
-    return AgreementsWorksheetTableData.parse({
+    return {
       EserviceId: agreement.eserviceId,
       Eservice: eservice?.name ?? '',
       Producer: producer?.externalId.value ?? '',
@@ -40,9 +40,9 @@ export function generateAgreementsWorksheetTableData(
       Consumer: consumer?.externalId.value ?? '',
       ConsumerId: agreement.consumerId,
       Agreement: agreement.id,
-      Purposes: agreementPurposes.map((purpose) => purpose.title),
-      PurposeIds: agreementPurposes.map((purpose) => purpose.id),
-    })
+      Purposes: agreementPurposes.map((purpose) => purpose.title).join(','),
+      PurposeIds: agreementPurposes.map((purpose) => purpose.id).join(','),
+    }
   })
 }
 
@@ -63,15 +63,15 @@ export function generateDescriptorsWorksheetTableData(
 
       if (!tenant) log.warn(`[Descriptors Worksheet] Tenant producer ${eservice.producerId} not found in readmodel`)
 
-      const data = DescriptorsWorksheetTableData.parse({
+      const data = {
         Name: eservice.name,
-        CreatedAt: descriptor.createdAt,
+        CreatedAt: descriptor.createdAt.toISOString(),
         ProducerId: eservice.producerId,
         Producer: tenant?.externalId.value ?? '',
         DescriptorId: descriptor.id,
         State: descriptor.state,
         Fingerprint: interfaceChecksum,
-      })
+      }
       return [...acc, data]
     }, [])
   )
@@ -86,13 +86,13 @@ export function generateTokensWorksheetTableData(
 
     if (!agreement) log.warn(`[Tokens Worksheet] Agreement ${agreementId} not found in readmodel`)
 
-    return TokensWorksheetTableData.parse({
+    return {
       agreementId,
       purposeId,
       date,
       tokencount,
       agreementState: agreement?.state ?? '',
       tokenDuration,
-    })
+    }
   })
 }

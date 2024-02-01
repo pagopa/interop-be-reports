@@ -9,14 +9,14 @@ export const AgreementsWorksheetTableData = z.object({
   Consumer: z.string(),
   ConsumerId: z.string(),
   Agreement: z.string(),
-  Purposes: z.array(z.string()).transform((value) => value.join(', ')),
-  PurposeIds: z.array(z.string()).transform((value) => value.join(', ')),
+  Purposes: z.string(),
+  PurposeIds: z.string(),
 })
 export type AgreementsWorksheetTableData = z.infer<typeof AgreementsWorksheetTableData>
 
 export const DescriptorsWorksheetTableData = z.object({
   Name: z.string(),
-  CreatedAt: z.date().transform((value) => value.toISOString()),
+  CreatedAt: z.string(),
   ProducerId: z.string(),
   Producer: z.string(),
   DescriptorId: z.string(),
