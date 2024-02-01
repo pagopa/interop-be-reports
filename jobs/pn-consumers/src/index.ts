@@ -54,7 +54,7 @@ async function main(): Promise<void> {
 
   await mailer.sendMail({
     from: env.SMTP_USER,
-    to: env.MAIL_RECIPIENTS[0],
+    to: env.MAIL_RECIPIENTS,
     subject: MAIL_SUBJECT,
     text: MAIL_BODY,
     attachments: [{ filename: CSV_FILENAME, content: csv }],
