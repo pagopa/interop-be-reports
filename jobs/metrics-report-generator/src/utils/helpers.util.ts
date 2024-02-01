@@ -23,7 +23,7 @@ export function generateAgreementsWorksheetTableData(
   tenantsMap: Map<string, TenantQueryData>
 ): AgreementsWorksheetTableData[] {
   return agreements.map<AgreementsWorksheetTableData>((agreement) => {
-    const agreementPurposes = purposes.filter((purpose) => purpose.eserviceId === agreement.eserviceId)
+    const agreementPurposes = purposes.filter((purpose) => purpose.eserviceId === agreement.eserviceId && purpose.consumerId === agreement.consumerId)
     const consumer = tenantsMap.get(agreement.consumerId)
     const producer = tenantsMap.get(agreement.producerId)
     const eservice = eservicesMap.get(agreement.eserviceId)
