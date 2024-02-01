@@ -29,7 +29,7 @@ export const AgreementQueryData = Agreement.pick({
 })
 export type AgreementQueryData = z.infer<typeof AgreementQueryData>
 
-export const PurposeQueryData = Purpose.pick({ id: true, title: true, eserviceId: true })
+export const PurposeQueryData = Purpose.pick({ id: true, title: true, eserviceId: true, consumerId: true })
 export type PurposeQueryData = z.infer<typeof PurposeQueryData>
 
 export const TenantQueryData = z.object({ id: z.string(), externalId: ExternalId })

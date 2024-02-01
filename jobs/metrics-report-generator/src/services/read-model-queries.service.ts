@@ -62,7 +62,7 @@ export class ReadModelQueriesService {
     return await this.getAll({
       collection: this.readModel.purposes,
       schema: PurposeQueryData,
-      projection: { _id: 0, 'data.id': 1, 'data.title': 1, 'data.eserviceId': 1 },
+      projection: { _id: 0, 'data.id': 1, 'data.title': 1, 'data.eserviceId': 1, 'data.consumerId': 1 },
     })
   }
 
