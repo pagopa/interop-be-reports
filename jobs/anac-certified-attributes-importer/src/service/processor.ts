@@ -18,8 +18,8 @@ import { AgreementProcessService } from './agreement-process.service.js'
 export async function importAttributes(
   sftpClient: SftpClient,
   readModel: ReadModelQueries,
-  tenantProcess: TenantProcessService,
   agreementProcess: AgreementProcessService,
+  tenantProcess: TenantProcessService,
   refreshableToken: RefreshableInteropToken,
   recordsBatchSize: number,
   anacTenantId: string

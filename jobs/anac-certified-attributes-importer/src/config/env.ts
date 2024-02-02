@@ -26,6 +26,7 @@ const Env = z.object({
   READ_MODEL_DB_NAME: z.string(),
 
   TENANT_PROCESS_URL: z.string(),
+  AGREEMENT_PROCESS_URL: z.string(),
 
   INTERNAL_JWT_KID: z.string(),
   INTERNAL_JWT_SUBJECT: z.string(),

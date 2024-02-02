@@ -7,6 +7,7 @@ import {
 } from '@interop-be-reports/commons'
 import { ReadModelQueries, SftpClient, TenantProcessService, importAttributes } from './service/index.js'
 import { SftpConfig, env } from './config/index.js'
+import { AgreementProcessService } from './service/agreement-process.service.js'
 
 const readModelConfig: ReadModelConfig = {
   mongodbReplicaSet: env.MONGODB_REPLICA_SET,
@@ -44,11 +45,13 @@ const readModelQueries: ReadModelQueries = new ReadModelQueries(readModelClient)
 
 const tokenGenerator = new InteropTokenGenerator(tokenGeneratorConfig)
 const refreshableToken = new RefreshableInteropToken(tokenGenerator)
+const agreementProcess = new AgreementProcessService(env.AGREEMENT_PROCESS_URL)
 const tenantProcess = new TenantProcessService(env.TENANT_PROCESS_URL)
 
 await importAttributes(
   sftpClient,
   readModelQueries,
+  agreementProcess,
   tenantProcess,
   refreshableToken,
   env.RECORDS_PROCESS_BATCH_SIZE,
