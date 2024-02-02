@@ -28,7 +28,6 @@ import {
 } from './helpers.js'
 import { PersistentTenant } from '../../model/tenant.model.js'
 import { AgreementProcessService } from '../agreement-process.service.js'
-import { PersistentAgreement } from '../../model/agreement.model.js'
 
 describe('ANAC Certified Attributes Importer', () => {
   const tokenGeneratorMock = {} as InteropTokenGenerator
