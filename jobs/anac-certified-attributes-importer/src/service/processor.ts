@@ -13,11 +13,13 @@ import {
 import { ReadModelQueries, SftpClient, TenantProcessService } from '../service/index.js'
 import { RefreshableInteropToken, zipBy, logError, logWarn, logInfo } from '@interop-be-reports/commons'
 import crypto from 'crypto'
+import { AgreementProcessService } from './agreement-process.service.js'
 
 export async function importAttributes(
   sftpClient: SftpClient,
   readModel: ReadModelQueries,
   tenantProcess: TenantProcessService,
+  agreementProcess: AgreementProcessService,
   refreshableToken: RefreshableInteropToken,
   recordsBatchSize: number,
   anacTenantId: string
@@ -36,7 +38,7 @@ export async function importAttributes(
     throw new Error("File does not contain valid assignments")
   }
 
-  await unassignMissingOrgsAttributes(readModel, tenantProcess, refreshableToken, allOrgsInFile, attributes, jobCorrelationId)
+  await unassignMissingOrgsAttributes(readModel, tenantProcess, agreementProcess, refreshableToken, allOrgsInFile, attributes, jobCorrelationId)
 
   logInfo(jobCorrelationId, "ANAC Certified attributes importer completed")
 }
@@ -88,7 +90,14 @@ async function processFileContent(readModel: ReadModelQueries, tenantProcess: Te
   return allOrgsInFile
 }
 
-async function unassignMissingOrgsAttributes(readModel: ReadModelQueries, tenantProcess: TenantProcessService, refreshableToken: RefreshableInteropToken, allOrgsInFile: string[], attributes: AnacAttributes, jobCorrelationId: string) {
+async function unassignMissingOrgsAttributes(
+  readModel: ReadModelQueries,
+  tenantProcess: TenantProcessService,
+  agreementProcess: AgreementProcessService,
+  refreshableToken: RefreshableInteropToken,
+  allOrgsInFile: string[],
+  attributes: AnacAttributes,
+  jobCorrelationId: string) {
 
   logInfo(jobCorrelationId, "Revoking attributes for organizations not in file...")
 
@@ -96,6 +105,7 @@ async function unassignMissingOrgsAttributes(readModel: ReadModelQueries, tenant
   await Promise.all(tenantsWithAttribute
     .filter(tenant => !allOrgsInFile.includes(tenant.externalId.value))
     .map(async tenant => {
+      await archiveAgreements(readModel, agreementProcess, refreshableToken, tenant.id, attributes)
       await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacAbilitato)
       await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacInConvalida)
       await unassignAttribute(tenantProcess, refreshableToken, tenant, attributes.anacIncaricato)
@@ -210,6 +220,23 @@ async function unassignAttribute(
       context
     )
   }
+}
+
+async function archiveAgreements(
+  readModel: ReadModelQueries,
+  agreementProcess: AgreementProcessService,
+  refreshableToken: RefreshableInteropToken,
+  tenantId: string,
+  attributes: AnacAttributes): Promise<void> {
+  const agreements = await readModel.getArchivableAgreements(tenantId, [attributes.anacInConvalida.id, attributes.anacIncaricato.id, attributes.anacAbilitato.id])
+
+  const token = await refreshableToken.get()
+  const context: InteropContext = {
+    correlationId: crypto.randomUUID(),
+    bearerToken: token.serialized,
+  }
+
+  await Promise.all(agreements.map(async agreement => await agreementProcess.archiveAgreement(agreement.id, context)))
 }
 
 function tenantContainsAttribute(tenant: PersistentTenant, attributeId: string): boolean {

@@ -1,6 +1,7 @@
 import { ReadModelClient } from '@interop-be-reports/commons'
 import { PersistentTenant } from '../model/tenant.model.js'
 import { PersistentAttribute } from '../model/attribute.model.js'
+import { PersistentAgreement } from '../model/index.js'
 
 const projectUnrevokedCertifiedAttributes = {
   _id: 0,
@@ -119,6 +120,28 @@ export class ReadModelQueries {
         },
       ])
       .map(({ data }) => PersistentTenant.parse(data))
+      .toArray()
+  }
+
+  async getArchivableAgreements(tenantId: string, attributeIds: string[]): Promise<PersistentAgreement[]> {
+    return await this.readModelClient.agreements
+      .aggregate([
+        {
+          // TODO Query to be defined
+          $match: {
+            'data.consumerId': tenantId,
+            'data.state': { $in: ['Active', 'Suspended'] },
+            'data.certifiedAttributes.id': { $in: attributeIds },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            'data.id': 1
+          },
+        },
+      ])
+      .map(({ data }) => PersistentAgreement.parse(data))
       .toArray()
   }
 
