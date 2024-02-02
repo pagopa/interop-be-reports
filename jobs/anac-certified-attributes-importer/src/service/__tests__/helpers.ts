@@ -1,5 +1,5 @@
 import { ANAC_ABILITATO_CODE, ANAC_INCARICATO_CODE, ANAC_IN_CONVALIDA_CODE, SftpConfig } from '../../config/index.js'
-import { InteropContext, PersistentAttribute, PersistentTenant, PersistentTenantAttribute } from '../../model/index.js'
+import { InteropContext, PersistentAgreement, PersistentAttribute, PersistentTenant, PersistentTenantAttribute } from '../../model/index.js'
 
 export const sftpConfigTest: SftpConfig = {
   host: 'host',
@@ -20,15 +20,17 @@ export const ATTRIBUTE_ANAC_INCARICATO_ID = 'b1d64ee0-fda9-48e2-84f8-1b62f1292b4
 export const ATTRIBUTE_ANAC_ABILITATO_ID = 'dc77c852-7635-4522-bc1c-e431c5d68b55'
 export const ATTRIBUTE_ANAC_IN_CONVALIDA_ID = '97dec753-8a6e-4a25-aa02-95ac8602b364'
 
+export const archivableAgreements: PersistentAgreement[] = [{ id: 'd250a831-d89f-4eed-b516-33bc36c0ce87' }, { id: 'e999635d-d2f0-4c8e-bf7e-c0db789102a7' }]
+
 export const downloadCSVMockGenerator = (csvContent: string) => (): Promise<string> => Promise.resolve(csvContent)
 export const getTenantsMockGenerator =
   (f: (codes: string[]) => PersistentTenant[]) =>
-  (codes: string[]): Promise<PersistentTenant[]> =>
-    Promise.resolve(f(codes))
+    (codes: string[]): Promise<PersistentTenant[]> =>
+      Promise.resolve(f(codes))
 export const getTenantByIdMockGenerator =
   (f: (tenantId: string) => PersistentTenant) =>
-  (tenantId: string): Promise<PersistentTenant> =>
-    Promise.resolve(f(tenantId))
+    (tenantId: string): Promise<PersistentTenant> =>
+      Promise.resolve(f(tenantId))
 
 export const downloadCSVMock = downloadCSVMockGenerator(csvFileContent)
 
@@ -44,6 +46,10 @@ export const internalRevokeCertifiedAttributeMock = (
   _tenantExternalId: string,
   _attributeOrigin: string,
   _attributeExternalId: string,
+  _context: InteropContext
+): Promise<void> => Promise.resolve()
+export const archiveAgreementMock = (
+  _agreementId: string,
   _context: InteropContext
 ): Promise<void> => Promise.resolve()
 
@@ -71,6 +77,8 @@ export const getAttributeByExternalIdMock = (origin: string, code: string): Prom
   }
 }
 export const getTenantsWithAttributesMock = (_: string[]) => Promise.resolve([])
+
+export const getArchivableAgreementsMock = (_t: string, _a: string[]) => Promise.resolve(archivableAgreements)
 
 export const persistentTenant: PersistentTenant = {
   id: '091fbea1-0c8e-411b-988f-5098b6a33ba7',

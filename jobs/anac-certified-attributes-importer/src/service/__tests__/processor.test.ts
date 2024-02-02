@@ -9,8 +9,10 @@ import {
   ATTRIBUTE_ANAC_ABILITATO_ID,
   ATTRIBUTE_ANAC_INCARICATO_ID,
   ATTRIBUTE_ANAC_IN_CONVALIDA_ID,
+  archiveAgreementMock,
   downloadCSVMock,
   downloadCSVMockGenerator,
+  getArchivableAgreementsMock,
   getAttributeByExternalIdMock,
   getNonPATenantsMock,
   getPATenantsMock,
@@ -25,10 +27,13 @@ import {
   sftpConfigTest,
 } from './helpers.js'
 import { PersistentTenant } from '../../model/tenant.model.js'
+import { AgreementProcessService } from '../agreement-process.service.js'
+import { PersistentAgreement } from '../../model/agreement.model.js'
 
 describe('ANAC Certified Attributes Importer', () => {
   const tokenGeneratorMock = {} as InteropTokenGenerator
   const refreshableTokenMock = new RefreshableInteropToken(tokenGeneratorMock)
+  const agreementProcessMock = new AgreementProcessService('url')
   const tenantProcessMock = new TenantProcessService('url')
   const sftpClientMock = new SftpClient(sftpConfigTest)
   const readModelClient = {} as ReadModelClient
@@ -38,6 +43,7 @@ describe('ANAC Certified Attributes Importer', () => {
     importAttributes(
       sftpClientMock,
       readModelQueriesMock,
+      agreementProcessMock,
       tenantProcessMock,
       refreshableTokenMock,
       10,
@@ -56,6 +62,9 @@ describe('ANAC Certified Attributes Importer', () => {
   const internalRevokeCertifiedAttributeSpy = vi
     .spyOn(tenantProcessMock, 'internalRevokeCertifiedAttribute')
     .mockImplementation(internalRevokeCertifiedAttributeMock)
+  const archiveAgreementSpy = vi
+    .spyOn(agreementProcessMock, 'archiveAgreement')
+    .mockImplementation(archiveAgreementMock)
 
   const getPATenantsSpy = vi.spyOn(readModelQueriesMock, 'getPATenants').mockImplementation(getPATenantsMock)
   const getNonPATenantsSpy = vi.spyOn(readModelQueriesMock, 'getNonPATenants').mockImplementation(getNonPATenantsMock)
@@ -66,6 +75,9 @@ describe('ANAC Certified Attributes Importer', () => {
   const getTenantsWithAttributesSpy = vi
     .spyOn(readModelQueriesMock, 'getTenantsWithAttributes')
     .mockImplementation(getTenantsWithAttributesMock)
+  const getArchivableAgreementsSpy = vi
+    .spyOn(readModelQueriesMock, 'getArchivableAgreements')
+    .mockImplementation(getArchivableAgreementsMock)
 
   beforeAll(() => {
     vitest.spyOn(console, 'log').mockImplementation(loggerMock)
@@ -223,6 +235,7 @@ describe('ANAC Certified Attributes Importer', () => {
     await importAttributes(
       sftpClientMock,
       readModelQueriesMock,
+      agreementProcessMock,
       tenantProcessMock,
       refreshableTokenMock,
       1,
@@ -243,7 +256,7 @@ describe('ANAC Certified Attributes Importer', () => {
   })
 
 
-  it('should succeed, unassign attributes for tenants not in the file', async () => {
+  it('should succeed, unassign attributes and archiving agreements for tenants not in the file', async () => {
     const csvFileContent = `codiceFiscaleGestore,denominazioneGestore,PEC,codiceIPA,ANAC_incaricato,ANAC_abilitato,ANAC_in_convalida
 0123456781,Org name in IPA,gsp1@pec.it,ipa_code_1,TRUE,TRUE,TRUE`
 
@@ -322,10 +335,12 @@ describe('ANAC Certified Attributes Importer', () => {
     expect(getPATenantsSpy).toBeCalledTimes(1)
     expect(getNonPATenantsSpy).toBeCalledTimes(0)
     expect(getTenantsWithAttributesSpy).toBeCalledTimes(1)
+    expect(getArchivableAgreementsSpy).toBeCalledTimes(5)
 
-    expect(refreshableInternalTokenSpy).toBeCalledTimes(9)
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(14)
     expect(internalAssignCertifiedAttributeSpy).toBeCalledTimes(0)
     expect(internalRevokeCertifiedAttributeSpy).toBeCalledTimes(9)
+    expect(archiveAgreementSpy).toBeCalledTimes(10)
   })
 
   it('should fail on CSV retrieve error', async () => {
