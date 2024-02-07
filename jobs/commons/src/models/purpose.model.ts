@@ -1,12 +1,6 @@
 import { z } from 'zod'
 
-export const PurposeState = z.enum([
-  'Active',
-  'Suspended',
-  'WaitingForApproval',
-  'Archived',
-  'Draft',
-])
+export const PurposeState = z.enum(['Active', 'Suspended', 'WaitingForApproval', 'Archived', 'Draft'])
 
 export const PurposeVersionDocument = z.object({
   id: z.string(),
@@ -59,6 +53,7 @@ export const Purpose = z.object({
   createdAt: z.string().pipe(z.coerce.date()),
   updatedAt: z.string().pipe(z.coerce.date()).optional(),
   isFreeOfCharge: z.boolean(),
+  isRiskAnalysisValid: z.boolean(),
   freeOfChargeReason: z.string().optional(),
 })
 
