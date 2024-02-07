@@ -90,6 +90,7 @@ export const getEServiceMock = createMockFactory<EService>({
   producerId: '5ec5dd81-ff71-4af8-974b-4190eb8347bf',
   technology: 'Rest',
   createdAt: new Date(),
+  mode: 'Deliver',
 })
 
 export const getAttributeMock = createMockFactory<Attribute>({

@@ -55,6 +55,7 @@ export const EService = z.object({
   attributes: DescriptorAttributes.optional(),
   descriptors: z.array(EServiceDescriptor),
   createdAt: z.string().pipe(z.coerce.date()),
+  mode: z.enum(['Deliver', 'Receive']),
 })
 
 export type EService = z.infer<typeof EService>
