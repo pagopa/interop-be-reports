@@ -1,4 +1,4 @@
-import { Agreement, EService, EServiceDescriptor, Tenant } from '@interop-be-reports/commons'
+import { Agreement, EService, EServiceDescriptor, Purpose, PurposeVersion, Tenant } from '@interop-be-reports/commons'
 import { z } from 'zod'
 
 export type DataType = 'tenants' | 'eservices' | 'agreements' | 'purposes'
@@ -66,3 +66,29 @@ export const ExportedAgreement = Agreement.pick({
   stamps: true,
 } satisfies StrictPick<Agreement>)
 export type ExportedAgreement = z.infer<typeof ExportedAgreement>
+
+const ExportedPurposeVersion = PurposeVersion.pick({
+  id: true,
+  state: true,
+  createdAt: true,
+  updatedAt: true,
+  suspendedAt: true,
+  firstActivationAt: true,
+  expectedApprovalDate: true,
+  dailyCalls: true,
+} satisfies StrictPick<PurposeVersion>)
+export const ExportedPurpose = Purpose.pick({
+  id: true,
+  eserviceId: true,
+  consumerId: true,
+  suspendedByConsumer: true,
+  suspendedByProducer: true,
+  title: true,
+  description: true,
+  createdAt: true,
+  updatedAt: true,
+  isRiskAnalysisValid: true,
+  isFreeOfCharge: true,
+  freeOfChargeReason: true,
+} satisfies StrictPick<Purpose>).and(z.object({ versions: z.array(ExportedPurposeVersion) }))
+export type ExportedPurpose = z.infer<typeof ExportedPurpose>
