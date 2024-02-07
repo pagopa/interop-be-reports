@@ -2,16 +2,14 @@ import { AwsS3BucketClient, ReadModelClient } from '@interop-be-reports/commons'
 import { ReadPreferenceMode } from 'mongodb'
 import { env } from './configs/env.js'
 import { ReadModelQueriesService } from './services/read-model-queries.service.js'
-import {
-  addExportTimestampToData,
-  arrayToNdjson,
-  getNdjsonBucketKey,
-  splitArrayIntoChunks,
-} from './utils/helpers.utils.js'
+import { arrayToNdjson, getNdjsonBucketKey, log, splitArrayIntoChunks } from './utils/helpers.utils.js'
 import { DataType } from './models.js'
 
 const exportTimestamp = new Date()
 
+log.info('Program started')
+
+log.info('Connecting to read model...')
 const readModel = await ReadModelClient.connect({
   mongodbReplicaSet: env.MONGODB_REPLICA_SET,
   mongodbDirectConnection: env.MONGODB_DIRECT_CONNECTION,
@@ -26,6 +24,8 @@ const readModel = await ReadModelClient.connect({
 
 const readModelQueries = new ReadModelQueriesService(readModel)
 
+log.info('Fetching data from read model...')
+
 const tenants = await readModelQueries.getTenants()
 const eservices = await readModelQueries.getEServices()
 const agreements = await readModelQueries.getAgreements()
@@ -33,14 +33,15 @@ const purposes = await readModelQueries.getPurposes()
 
 await readModel.close()
 
-const s3Bucket = new AwsS3BucketClient(env.DATALAKE_STORAGE_BUCKET)
+log.info('Preparing data for export...')
 
-function preparaDataForExport(data: unknown[]): string[] {
-  // Add export timestamp to data and split it into chunks of 1000
-  const dataWithTimestamp = addExportTimestampToData(data, exportTimestamp)
+function preparaDataForExport(data: object[]): string[] {
+  // Add export timestamp to data
+  const dataWithTimestamp = data.map((item) => ({ ...item, exportTimestamp }))
+  // Split data into chunks of 1000 items
   const dataChunks = splitArrayIntoChunks(dataWithTimestamp, 1000)
 
-  // Convert each chunk to NDJSON format
+  // Convert each chunk to ndjson format
   return dataChunks.map(arrayToNdjson)
 }
 
@@ -51,9 +52,17 @@ const dataToExport: [DataType, string[]][] = [
   ['purposes', preparaDataForExport(purposes)],
 ]
 
+log.info(`Uploading data to ${env.DATALAKE_STORAGE_BUCKET} bucket...`)
+
+const s3Bucket = new AwsS3BucketClient(env.DATALAKE_STORAGE_BUCKET)
 for (const [dataType, ndjsonFiles] of dataToExport) {
   for (const ndjson of ndjsonFiles) {
     const bucketKey = getNdjsonBucketKey(dataType, exportTimestamp)
-    await s3Bucket.uploadData(bucketKey, ndjson)
+    // await s3Bucket.uploadData(bucketKey, ndjson)
+    s3Bucket.uploadData
+    ndjson
+    console.log(bucketKey)
   }
 }
+
+log.info('Done!')

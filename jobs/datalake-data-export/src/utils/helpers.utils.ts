@@ -1,12 +1,13 @@
 import { randomUUID } from 'crypto'
 import { DataType } from '../models.js'
-import format from 'date-fns/format'
+import { format } from 'date-fns'
+import { logError, logInfo, logWarn } from '@interop-be-reports/commons'
 
 /**
  * Get the path where to store the ndjson file
  */
 export function getNdjsonBucketKey(dataType: DataType, date: Date): string {
-  return format(date, `/${dataType}/yyyyMMdd/yyyyMMdd_HHmmss_${randomUUID()}.ndjson`)
+  return format(date, `'/${dataType}/'yyyyMMdd'/'yyyyMMdd'_'HHmmss'_${randomUUID()}.ndjson'`)
 }
 
 /**
@@ -27,6 +28,10 @@ export function arrayToNdjson(array: unknown[]): string {
   return array.map((item) => JSON.stringify(item)).join('\n') + '\n'
 }
 
-export function addExportTimestampToData<T>(data: T[], exportTimestamp: Date): (T & { exportTimestamp: Date })[] {
-  return data.map((item) => ({ ...item, exportTimestamp }))
+const cidJob = randomUUID()
+
+export const log = {
+  info: logInfo.bind(null, cidJob),
+  warn: logWarn.bind(null, cidJob),
+  error: logError.bind(null, cidJob),
 }
