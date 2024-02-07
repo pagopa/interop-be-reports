@@ -26,7 +26,7 @@ const readModel = await ReadModelClient.connect({
 
 const readModelQueries = new ReadModelQueriesService(readModel)
 
-const tenants = await readModelQueries.getOnboardedTenants()
+const tenants = await readModelQueries.getTenants()
 const eservices = await readModelQueries.getEServices()
 const agreements = await readModelQueries.getAgreements()
 const purposes = await readModelQueries.getPurposes()
