@@ -1,8 +1,15 @@
-import { EService, EServiceDescriptor, Tenant } from '@interop-be-reports/commons'
+import { Agreement, EService, EServiceDescriptor, Tenant } from '@interop-be-reports/commons'
 import { z } from 'zod'
 
 export type DataType = 'tenants' | 'eservices' | 'agreements' | 'purposes'
 
+/**
+ * The pick method used to extract the fields from the original type is not
+ * type-safe. It is possible to put a field that does not exist in the original
+ * and the type will still be valid.
+ * This type utility makes the pick method type-safe by accepting only the
+ * fields that exist in the original type.
+ */
 type StrictPick<T> = Partial<Record<keyof T, boolean>>
 
 export const ExportedTenant = Tenant.pick({
@@ -42,3 +49,20 @@ export const ExportedEService = EService.pick({
   })
 )
 export type ExportedEService = z.infer<typeof ExportedEService>
+
+export const ExportedAgreement = Agreement.pick({
+  id: true,
+  eserviceId: true,
+  descriptorId: true,
+  producerId: true,
+  consumerId: true,
+  state: true,
+  suspendedByConsumer: true,
+  suspendedByProducer: true,
+  suspendedByPlatform: true,
+  createdAt: true,
+  updatedAt: true,
+  suspendedAt: true,
+  stamps: true,
+} satisfies StrictPick<Agreement>)
+export type ExportedAgreement = z.infer<typeof ExportedAgreement>

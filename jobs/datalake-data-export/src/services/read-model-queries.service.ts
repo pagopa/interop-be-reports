@@ -1,5 +1,5 @@
 import { ReadModelClient } from '@interop-be-reports/commons'
-import { ExportedEService, ExportedTenant } from '../models.js'
+import { ExportedAgreement, ExportedEService, ExportedTenant } from '../models.js'
 
 export class ReadModelQueriesService {
   constructor(private readonly readModel: ReadModelClient) {}
@@ -18,8 +18,11 @@ export class ReadModelQueriesService {
       .toArray()
   }
 
-  public async getAgreements(): Promise<Array<unknown>> {
-    return []
+  public async getAgreements(): Promise<Array<ExportedAgreement>> {
+    return this.readModel.agreements
+      .find()
+      .map(({ data }) => ExportedAgreement.parse(data))
+      .toArray()
   }
 
   public async getPurposes(): Promise<Array<unknown>> {
