@@ -53,7 +53,6 @@ export const Purpose = z.object({
   createdAt: z.string().pipe(z.coerce.date()),
   updatedAt: z.string().pipe(z.coerce.date()).optional(),
   isFreeOfCharge: z.boolean(),
-  isRiskAnalysisValid: z.boolean(),
   freeOfChargeReason: z.string().optional(),
 })
 

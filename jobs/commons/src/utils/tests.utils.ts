@@ -140,6 +140,5 @@ export const getPurposeMock = createMockFactory<Purpose>({
   versions: [{ id: '1', state: 'Active', dailyCalls: 1, createdAt: new Date() }],
   createdAt: new Date(),
   title: 'title',
-  isRiskAnalysisValid: true,
   isFreeOfCharge: false,
 })

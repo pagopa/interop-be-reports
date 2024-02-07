@@ -87,7 +87,6 @@ export const ExportedPurpose = Purpose.pick({
   description: true,
   createdAt: true,
   updatedAt: true,
-  isRiskAnalysisValid: true,
   isFreeOfCharge: true,
   freeOfChargeReason: true,
 } satisfies StrictPick<Purpose>).and(z.object({ versions: z.array(ExportedPurposeVersion) }))
