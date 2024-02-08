@@ -34,7 +34,7 @@ export class TokensStore {
         date_format(from_unixtime(cast(issuedAt as bigint) / 1000), '%Y-%m-%d') as day, 
         count(*) as tokens 
       FROM 
-        ${env.ATHENA_TOKENS_DB_NAME} 
+        ${env.ATHENA_TOKENS_TABLE_NAME} 
       GROUP BY 
         date_format(from_unixtime(cast(issuedAt as bigint) / 1000), '%Y-%m-%d') 
       ORDER BY 
