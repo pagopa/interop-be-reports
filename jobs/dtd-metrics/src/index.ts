@@ -11,6 +11,8 @@ import {
   getTenantDistributionMetric,
   getMacroCategoriesOnboardingTrendMetric,
   getTenantOnboardingTrendMetric,
+  getTotalTokensMetric,
+  getTokensTrendMetric,
 } from './metrics/index.js'
 import {
   GithubClient,
@@ -56,6 +58,8 @@ try {
     .addMetric('entiChePubblicanoPiuEService', getTopProducersMetric)
     .addMetric('flussiDiRichiesteFraEnti', getTopProducersBySubscribersMetric)
     .addMetric('eServicePiuRichiesti', getMostSubscribedEServicesMetric)
+    .addMetric('totaleRichiesteDiAccesso', getTotalTokensMetric)
+    .addMetric('attivitaDellaPiattaforma', getTokensTrendMetric)
     .produceMetrics({
       filter: env.METRICS_FILTER,
     })
@@ -87,8 +91,6 @@ try {
   )
 
   log.info('Done!')
-} catch (err) {
-  log.error('An error occurred while producing metrics:', err as Error)
 } finally {
   await readModel.close()
 }

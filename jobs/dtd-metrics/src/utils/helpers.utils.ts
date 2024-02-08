@@ -2,6 +2,7 @@ import { logInfo, logWarn, logError } from '@interop-be-reports/commons'
 import { randomUUID } from 'crypto'
 import { sub } from 'date-fns'
 import { json2csv as _json2csv } from 'json-2-csv'
+import { TokensByDay } from '../services/tokens-store.service.js'
 
 export function getMonthsAgoDate(numMonths: number): Date {
   const result = sub(new Date(), { months: numMonths })
@@ -57,6 +58,10 @@ export function json2csv(data: object[]): string {
     .join(',')
 
   return [newHeader, ...records].join('\n')
+}
+
+export function aggregateTokensCount(tokensByDay: TokensByDay): number {
+  return tokensByDay.reduce((acc, { tokens }) => acc + tokens, 0)
 }
 
 export function getOldestDate(data: Array<Date>): Date {

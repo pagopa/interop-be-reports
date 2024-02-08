@@ -1,6 +1,7 @@
 import {
   GetObjectCommand,
   ListObjectsV2Command,
+  ListObjectsV2CommandOutput,
   NoSuchKey,
   PutObjectCommand,
   S3Client,
@@ -57,7 +58,7 @@ export class AwsS3BucketClient {
    * @param path The path of the data to be retrieved.
    * @returns The data stored in the specified path as a string.
    */
-  public async getJSONData(path: string): Promise<string | undefined> {
+  public async getData(path: string): Promise<string | undefined> {
     try {
       const response = await this.s3Client.send(
         new GetObjectCommand({
@@ -71,11 +72,9 @@ export class AwsS3BucketClient {
       // NoSuchKey is thrown when the key does not exist.
       // AWS S3 does not distinguish between “NoSuchKey” and “AccessDenied”.
       // This is a security measure to prevent attackers from discovering information about the existence of keys.
-      if (statusCode === 403)
-        throw new NoSuchKey({ $metadata: response.$metadata, message: 'Access Denied' })
+      if (statusCode === 403) throw new NoSuchKey({ $metadata: response.$metadata, message: 'Access Denied' })
 
-      const data = await response.Body?.transformToString()
-      return data ? JSON.parse(data) : undefined
+      return await response.Body?.transformToString()
     } catch (e) {
       if (e instanceof NoSuchKey) return undefined
       else throw e
@@ -87,13 +86,22 @@ export class AwsS3BucketClient {
    * @returns The list of objects .
    * */
   async getBucketContentList(): Promise<Array<string>> {
-    const response = await this.s3Client.send(
-      new ListObjectsV2Command({
-        Bucket: this.bucket,
-      })
-    )
-    const contentKeys = response.Contents?.map((content) => content.Key).filter(Boolean) ?? []
-    return contentKeys as Array<string>
+    let response: ListObjectsV2CommandOutput | undefined = undefined
+    const contentKeys: Array<string> = []
+
+    do {
+      const ContinuationToken: string | undefined = response ? response.NextContinuationToken : undefined
+      response = await this.s3Client.send(
+        new ListObjectsV2Command({
+          Bucket: this.bucket,
+          ContinuationToken,
+        })
+      )
+      const keys = (response.Contents?.map((c) => c.Key).filter(Boolean) ?? []) as string[]
+      contentKeys.push(...keys)
+    } while (response && response.IsTruncated)
+
+    return contentKeys
   }
 
   /**

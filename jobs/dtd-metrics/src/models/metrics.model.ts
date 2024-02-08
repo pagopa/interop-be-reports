@@ -137,6 +137,16 @@ export type TopProducersMetricItem = z.infer<typeof TopProducersMetricItem>
 export const TopProducersMetric = TimedMetric(z.array(TopProducersMetricItem))
 export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 
+export const TotalTokensMetric = z.object({
+  totalCount: z.number(),
+  lastMonthCount: z.number(),
+  variation: z.number(),
+})
+export type TotalTokensMetric = z.infer<typeof TotalTokensMetric>
+
+export const TokensTrendMetric = TimedMetric(z.array(z.object({ date: z.date(), count: z.number() })))
+export type TokensTrendMetric = z.infer<typeof TokensTrendMetric>
+
 export const Metric = z.union([
   z.object({ name: z.literal('totaleEnti'), data: OnboardedTenantsCountMetric }),
   z.object({ name: z.literal('andamentoDelleAdesioni'), data: TenantOnboardingTrendMetric }),
@@ -147,6 +157,8 @@ export const Metric = z.union([
   z.object({ name: z.literal('entiChePubblicanoPiuEService'), data: TopProducersMetric }),
   z.object({ name: z.literal('flussiDiRichiesteFraEnti'), data: TopProducersBySubscribersMetric }),
   z.object({ name: z.literal('eServicePiuRichiesti'), data: MostSubscribedEServicesMetric }),
+  z.object({ name: z.literal('totaleRichiesteDiAccesso'), data: TotalTokensMetric }),
+  z.object({ name: z.literal('attivitaDellaPiattaforma'), data: TokensTrendMetric }),
 ])
 
 export type Metric = z.infer<typeof Metric>
