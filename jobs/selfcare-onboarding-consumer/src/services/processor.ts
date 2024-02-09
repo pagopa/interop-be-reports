@@ -35,7 +35,7 @@ export const processMessage = (refreshableToken: RefreshableInteropToken, tenant
       const institution = parsed.data.institution
 
       if (allowedOrigins.indexOf(institution.origin) < 0) {
-        logWarn(correlationId, `Skipping message for partition ${partition} with offset ${message.offset} - Not allowed origin: ${institution.origin}`)
+        logWarn(correlationId, `Skipping message for partition ${partition} with offset ${message.offset} - Not allowed origin. SelfcareId: ${parsed.data.internalIstitutionID} Origin: ${institution.origin} OriginId: ${institution.originId}`)
         return
       }
 
