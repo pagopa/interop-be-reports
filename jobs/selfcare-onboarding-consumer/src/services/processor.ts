@@ -6,7 +6,7 @@ import { InteropContext } from "../model/interop-context.js";
 import { MailKind, SelfcareTenantSeed } from "../model/tenant-process.js";
 import crypto from "crypto"
 
-export const processMessage = (refreshableToken: RefreshableInteropToken, tenantProcess: TenantProcessService, productName: string) => async (message: KafkaMessage, partition: number): Promise<void> => {
+export const processMessage = (refreshableToken: RefreshableInteropToken, tenantProcess: TenantProcessService, productName: string, allowedOrigins: string[]) => async (message: KafkaMessage, partition: number): Promise<void> => {
   const correlationId = crypto.randomUUID()
 
   try {
@@ -31,10 +31,16 @@ export const processMessage = (refreshableToken: RefreshableInteropToken, tenant
     const parsed = EventPayload.safeParse(jsonPayload);
 
     if (parsed.success) {
-      const token = await refreshableToken.get()
-      const context: InteropContext = { bearerToken: token.serialized, correlationId }
 
       const institution = parsed.data.institution
+
+      if (allowedOrigins.indexOf(institution.origin) < 0) {
+        logWarn(correlationId, `Skipping message for partition ${partition} with offset ${message.offset} - Not allowed origin: ${institution.origin}`)
+        return
+      }
+
+      const token = await refreshableToken.get()
+      const context: InteropContext = { bearerToken: token.serialized, correlationId }
 
       const seed: SelfcareTenantSeed = {
         externalId: {
