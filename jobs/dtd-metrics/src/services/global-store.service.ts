@@ -155,11 +155,14 @@ export class GlobalStoreService {
     const macroCategories = MACRO_CATEGORIES.map(enrichMacroCategory)
     const macroCategoryTenants = macroCategories.flatMap(({ tenants }) => tenants)
 
-    if (tenants.length !== macroCategoryTenants.length) {
-      throw new Error(
-        `Tenants length (${tenants.length}) and macro category tenants length (${macroCategoryTenants.length}) mismatch`
-      )
+    // Log the tenants that are not in any macro category
+    for (const tenant of tenants) {
+      const isTenantInAnyMacroCategory = macroCategoryTenants.some(({ id }) => id === tenant.id)
+      if (!isTenantInAnyMacroCategory) {
+        log.warn(`Tenant ${tenant.name} (${tenant.id}) is not in any macro category`)
+      }
     }
+
     if (config?.cache) this.cacheInitializationData({ macroCategories, tenants: macroCategoryTenants })
     return new GlobalStoreService(macroCategoryTenants, macroCategories)
   }
