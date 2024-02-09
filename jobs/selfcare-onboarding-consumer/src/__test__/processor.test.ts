@@ -143,7 +143,7 @@ describe('Message processor', () => {
 
   })
 
-  it('should skipt upsert of tenant with not allowed origin', async () => {
+  it('should skip upsert of tenant with not allowed origin', async () => {
 
     const message = { ...kafkaMessage, value: Buffer.from(JSON.stringify({ ...correctEventPayload, institution: { ...correctInstitutionEventField, origin: "not-allowed", originId: "ipa_123", taxCode: "tax789", subUnitType: null, subUnitCode: null } })) }
 
