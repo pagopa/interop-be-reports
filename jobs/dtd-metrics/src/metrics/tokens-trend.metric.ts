@@ -6,7 +6,7 @@ import { sub } from 'date-fns'
 export const getTokensTrendMetric: MetricFactoryFn<'attivitaDellaPiattaforma'> = async () => {
   const { tokensByDay } = await TokensStore.getInstance()
 
-  function getTimeseriesFromTokensByDay({
+  function generateTokensTrendData({
     oldestDate,
     jump,
   }: {
@@ -15,29 +15,30 @@ export const getTokensTrendMetric: MetricFactoryFn<'attivitaDellaPiattaforma'> =
   }): Array<{ date: Date; count: number }> {
     let currentDate = new Date()
     currentDate.setHours(0, 0, 0, 0)
-    let currentCount: number = aggregateTokensCount(tokensByDay)
-    const timeseriesData: Array<{ date: Date; count: number }> = [{ date: currentDate, count: currentCount }]
+    const data: Array<{ date: Date; count: number }> = []
 
-    while (oldestDate <= currentDate) {
-      currentDate = sub(currentDate, jump)
-      currentDate.setHours(0, 0, 0, 0)
-      currentCount = aggregateTokensCount(tokensByDay.filter(({ day }) => day <= currentDate))
-      timeseriesData.push({ date: currentDate, count: currentCount })
+    while (currentDate >= oldestDate) {
+      const nextDate = sub(currentDate, jump)
+      nextDate.setHours(0, 0, 0, 0)
+      // Get the tokens count from the current date to the next date
+      const count = aggregateTokensCount(tokensByDay.filter(({ day }) => day <= currentDate && day > nextDate))
+      data.push({ date: currentDate, count })
+      currentDate = nextDate
     }
 
-    return timeseriesData.reverse()
+    return data.reverse()
   }
 
   return {
-    lastSixMonths: getTimeseriesFromTokensByDay({
+    lastSixMonths: generateTokensTrendData({
       oldestDate: getMonthsAgoDate(6),
       jump: { days: 5 },
     }),
-    lastTwelveMonths: getTimeseriesFromTokensByDay({
+    lastTwelveMonths: generateTokensTrendData({
       oldestDate: getMonthsAgoDate(12),
       jump: { days: 10 },
     }),
-    fromTheBeginning: getTimeseriesFromTokensByDay({
+    fromTheBeginning: generateTokensTrendData({
       oldestDate: tokensByDay[0].day,
       jump: { months: 1 },
     }),
