@@ -21,7 +21,7 @@ const tenantProcess = new TenantProcessService(env.TENANT_PROCESS_URL)
 
 await refreshableToken.init()
 
-const configuredProcessor = processMessage(refreshableToken, tenantProcess, env.INTEROP_PRODUCT)
+const configuredProcessor = processMessage(refreshableToken, tenantProcess, env.INTEROP_PRODUCT, env.ALLOWED_ORIGINS)
 
 consumer.run({
   eachMessage: async ({ message, partition }) => {

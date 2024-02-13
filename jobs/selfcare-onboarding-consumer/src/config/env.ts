@@ -14,6 +14,7 @@ const Env = z.object({
     .transform((value) => value.toUpperCase() === 'TRUE'),
 
   INTEROP_PRODUCT: z.string(),
+  ALLOWED_ORIGINS: z.string().transform((value) => value.split(',')),
 
   TENANT_PROCESS_URL: z.string(),
 
