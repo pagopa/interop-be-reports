@@ -7,7 +7,7 @@ import { logError, logInfo, logWarn } from '@interop-be-reports/commons'
  * Get the path where to store the ndjson file
  */
 export function getNdjsonBucketKey(dataType: DataType, date: Date): string {
-  return format(date, `'/${dataType}/'yyyyMMdd'/'yyyyMMdd'_'HHmmss'_${randomUUID()}.ndjson'`)
+  return format(date, `'${dataType}/'yyyyMMdd'/'yyyyMMdd'_'HHmmss'_${randomUUID()}.ndjson'`)
 }
 
 /**
