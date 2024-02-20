@@ -18,7 +18,6 @@ export const ExportedTenant = Tenant.pick({
   selfcareId: true,
   externalId: true,
   createdAt: true,
-  updatedAt: true,
   onboardedAt: true,
   name: true,
 } satisfies StrictPick<Tenant>)
@@ -61,7 +60,6 @@ export const ExportedAgreement = Agreement.pick({
   suspendedByProducer: true,
   suspendedByPlatform: true,
   createdAt: true,
-  updatedAt: true,
   suspendedAt: true,
   stamps: true,
 } satisfies StrictPick<Agreement>)
@@ -71,7 +69,6 @@ const ExportedPurposeVersion = PurposeVersion.pick({
   id: true,
   state: true,
   createdAt: true,
-  updatedAt: true,
   suspendedAt: true,
   firstActivationAt: true,
   expectedApprovalDate: true,
@@ -86,7 +83,6 @@ export const ExportedPurpose = Purpose.pick({
   title: true,
   description: true,
   createdAt: true,
-  updatedAt: true,
   isFreeOfCharge: true,
   freeOfChargeReason: true,
 } satisfies StrictPick<Purpose>).and(z.object({ versions: z.array(ExportedPurposeVersion) }))
