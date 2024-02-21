@@ -1,7 +1,7 @@
 import { InteropTokenGenerator, RefreshableInteropToken, generateInternalTokenMock, interopToken, tokenConfig } from "@interop-be-reports/commons"
 import { processMessage } from "../services/processor.js"
 import { TenantProcessService } from "../services/tenantProcessService.js"
-import { correctEventPayload, correctInstitutionEventField, interopProductName, kafkaMessage, selfcareUpsertTenantMock } from "./helpers.js"
+import { allowedOrigins, correctEventPayload, correctInstitutionEventField, interopProductName, kafkaMessage, selfcareUpsertTenantMock } from "./helpers.js"
 
 
 describe('Message processor', () => {
@@ -10,7 +10,7 @@ describe('Message processor', () => {
   const refreshableTokenMock = new RefreshableInteropToken(tokenGeneratorMock)
   const tenantProcessMock = new TenantProcessService("url")
 
-  const configuredProcessor = processMessage(refreshableTokenMock, tenantProcessMock, interopProductName)
+  const configuredProcessor = processMessage(refreshableTokenMock, tenantProcessMock, interopProductName, allowedOrigins)
 
   const loggerMock = vitest.fn()
 
@@ -123,9 +123,9 @@ describe('Message processor', () => {
   })
 
 
-  it('should upsert non-PA tenant', async () => {
+  it('should upsert non-PA tenant with allowed origin', async () => {
 
-    const message = { ...kafkaMessage, value: Buffer.from(JSON.stringify({ ...correctEventPayload, institution: { ...correctInstitutionEventField, origin: "OTHER", originId: "ipa_123", taxCode: "tax789", subUnitType: null, subUnitCode: null } })) }
+    const message = { ...kafkaMessage, value: Buffer.from(JSON.stringify({ ...correctEventPayload, institution: { ...correctInstitutionEventField, origin: "ANAC", originId: "ipa_123", taxCode: "tax789", subUnitType: null, subUnitCode: null } })) }
 
     await configuredProcessor(message, 0)
 
@@ -134,12 +134,23 @@ describe('Message processor', () => {
     expect(selfcareUpsertTenantSpy).toHaveBeenCalledWith(
       expect.objectContaining(
         {
-          externalId: { origin: "OTHER", value: "tax789" },
+          externalId: { origin: "ANAC", value: "tax789" },
           selfcareId: correctEventPayload.internalIstitutionID,
           name: correctInstitutionEventField.description,
         }),
       expect.objectContaining({ bearerToken: interopToken.serialized })
     )
+
+  })
+
+  it('should skip upsert of tenant with not allowed origin', async () => {
+
+    const message = { ...kafkaMessage, value: Buffer.from(JSON.stringify({ ...correctEventPayload, institution: { ...correctInstitutionEventField, origin: "not-allowed", originId: "ipa_123", taxCode: "tax789", subUnitType: null, subUnitCode: null } })) }
+
+    await configuredProcessor(message, 0)
+
+    expect(refreshableInternalTokenSpy).toBeCalledTimes(0)
+    expect(selfcareUpsertTenantSpy).toBeCalledTimes(0)
 
   })
 })

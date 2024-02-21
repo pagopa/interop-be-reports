@@ -4,6 +4,7 @@ import { MessageSetEntry } from "kafkajs"
 import { interopToken } from "@interop-be-reports/commons"
 
 export const interopProductName = "test-interop-product"
+export const allowedOrigins = ["IPA", "ANAC", "IVASS"]
 
 export const selfcareUpsertTenantMock = (_seed: SelfcareTenantSeed, _context: InteropContext): Promise<SelfcareUpsertTenantResponse> => Promise.resolve({ id: "tenant-id" })
 

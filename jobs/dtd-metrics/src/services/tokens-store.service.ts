@@ -1,7 +1,7 @@
 import { z } from 'zod'
+import { AthenaClientService } from './athena-client.service.js'
 import { Row } from '@aws-sdk/client-athena'
 import { env } from '../configs/env.js'
-import { AthenaClientService } from '@interop-be-reports/commons'
 import { aggregateTokensCount } from '../utils/helpers.utils.js'
 
 export const TokensByDay = z.array(z.object({ day: z.date(), tokens: z.number() }))
@@ -34,7 +34,7 @@ export class TokensStore {
         date_format(from_unixtime(cast(issuedAt as bigint) / 1000), '%Y-%m-%d') as day, 
         count(*) as tokens 
       FROM 
-        ${env.ATHENA_TOKENS_DB_NAME} 
+        ${env.ATHENA_TOKENS_TABLE_NAME} 
       GROUP BY 
         date_format(from_unixtime(cast(issuedAt as bigint) / 1000), '%Y-%m-%d') 
       ORDER BY 

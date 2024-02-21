@@ -19,27 +19,7 @@ export const Env = z.object({
     .transform((value) => value === 'true')
     .optional(),
 
-  STORAGE_BUCKET: z.string(),
-  GITHUB_REPO: z.string(),
-  GITHUB_REPO_OWNER: z.string(),
-  GITHUB_ACCESS_TOKEN: z.string(),
-  FILENAME: z.string(),
-
-  ATHENA_TOKENS_TABLE_NAME: z.string(),
-  ATHENA_OUTPUT_BUCKET: z.string(),
-
-  // If set, only metrics with names matching this string will be produced
-  METRICS_FILTER: z.string().optional(),
-  // If set, a JSON file with the metrics output will be produced
-  PRODUCE_OUTPUT_JSON: z
-    .string()
-    .optional()
-    .transform((value) => value === 'true'),
-  // If set, the data that needs to fetch the global store will be cached, used to speed up development
-  CACHE_GLOBAL_STORE: z
-    .string()
-    .optional()
-    .transform((value) => value === 'true'),
+  DATALAKE_STORAGE_BUCKET: z.string(),
 })
 
 export type Env = z.infer<typeof Env>

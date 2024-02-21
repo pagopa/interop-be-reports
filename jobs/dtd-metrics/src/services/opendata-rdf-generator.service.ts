@@ -307,20 +307,7 @@ const METRICS_FILES = [
     title: 'Totale richieste di accesso',
     description: 'Numero totale di richieste di accesso ai dati',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
-    publisherName: 'PagoPA S.p.A.',
-    publisherCode: '5N2TR557',
-    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
-    modified: TODAY_DATE,
-    issued: TODAY_DATE,
-  },
-  {
-    fileKey: 'attivitaDellaPiattaformaLastTwelveMonths',
-    filename: getFilename('attivitaDellaPiattaformaLastTwelveMonths'),
-    title: 'Attività della piattaforma (ultimi dodici mesi)',
-    description: 'Numero di richieste giornaliere di accesso ai dati (ultimi dodici mesi)',
-    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -330,10 +317,23 @@ const METRICS_FILES = [
   {
     fileKey: 'attivitaDellaPiattaformaLastSixMonths',
     filename: getFilename('attivitaDellaPiattaformaLastSixMonths'),
-    title: 'Attività della piattaforma (ultimi sei mesi)',
-    description: 'Numero di richieste giornaliere di accesso ai dati (ultimi sei mesi)',
+    title: 'Attività della piattaforma - ultimi 6 mesi',
+    description: 'Numero di richieste giornaliere di accesso ai dati',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
+    publisherName: 'PagoPA S.p.A.',
+    publisherCode: '5N2TR557',
+    keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
+    modified: TODAY_DATE,
+    issued: TODAY_DATE,
+  },
+  {
+    fileKey: 'attivitaDellaPiattaformaLastTwelveMonths',
+    filename: getFilename('attivitaDellaPiattaformaLastTwelveMonths'),
+    title: 'Attività della piattaforma - ultimi 12 mesi',
+    description: 'Numero di richieste giornaliere di accesso ai dati',
+    rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -343,10 +343,10 @@ const METRICS_FILES = [
   {
     fileKey: 'attivitaDellaPiattaformaFromTheBeginning',
     filename: getFilename('attivitaDellaPiattaformaFromTheBeginning'),
-    title: 'Attività della piattaforma (dall’inizio del servizio)',
-    description: 'Numero di richieste giornaliere di accesso ai dati (dall’inizio del servizio)',
+    title: 'Attività della piattaforma - inizio del servizio',
+    description: 'Numero di richieste giornaliere di accesso ai dati',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
-    rightsHolderCode: 'pcm',
+    rightsHolderCode: 'AA1D3A2',
     publisherName: 'PagoPA S.p.A.',
     publisherCode: '5N2TR557',
     keywords: ['PDND', 'API', 'PNRR', 'Interoperabilità'],
@@ -464,7 +464,7 @@ export class MetricsOpenDataRdfGenerator {
 <dcatapit:Distribution rdf:about="${GITHUB_REPO_URL}/${filename}.csv">
   <dcat:accessURL rdf:resource="${csvfileUrl}"/>
   <dct:license>
-    <dcatapit:LicenseDocument rdf:about="https://w3id.org/italia/controlled-vocabulary/licences/A11:CCO10">
+    <dcatapit:LicenseDocument rdf:about="https://w3id.org/italia/controlled-vocabulary/licences/A11_CCO10">
       <rdf:type rdf:resource="dct:LicenseDocument"/>
       <dct:type rdf:resource="http://purl.org/adms/licencetype/Attribution"/>
       <foaf:name>Creative Commons CC0 1.0 Universale - Public Domain Dedication (CC0 1.0)</foaf:name>
@@ -478,7 +478,7 @@ export class MetricsOpenDataRdfGenerator {
 <dcatapit:Distribution rdf:about="${GITHUB_REPO_URL}/${filename}.json">
   <dcat:accessURL rdf:resource="${csvfileJSON}"/>
   <dct:license>
-    <dcatapit:LicenseDocument rdf:about="https://w3id.org/italia/controlled-vocabulary/licences/A11:CCO10">
+    <dcatapit:LicenseDocument rdf:about="https://w3id.org/italia/controlled-vocabulary/licences/A11_CCO10">
       <rdf:type rdf:resource="dct:LicenseDocument"/>
       <dct:type rdf:resource="http://purl.org/adms/licencetype/Attribution"/>
       <foaf:name>Creative Commons CC0 1.0 Universale - Public Domain Dedication (CC0 1.0)</foaf:name>
