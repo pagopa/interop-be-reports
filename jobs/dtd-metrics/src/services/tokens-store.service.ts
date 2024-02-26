@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { AthenaClientService } from './athena-client.service.js'
 import { Row } from '@aws-sdk/client-athena'
 import { env } from '../configs/env.js'
 import { aggregateTokensCount } from '../utils/helpers.utils.js'
+import { AthenaClientService } from '@interop-be-reports/commons'
 
 export const TokensByDay = z.array(z.object({ day: z.date(), tokens: z.number() }))
 export type TokensByDay = z.infer<typeof TokensByDay>

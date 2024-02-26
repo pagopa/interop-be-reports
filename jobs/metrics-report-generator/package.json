@@ -1,13 +1,9 @@
 {
-  "name": "@interop-be-reports/commons",
-  "version": "1.0.0",
+  "name": "metrics-report-generator",
   "main": "./dist/index.js",
   "type": "module",
-  "exports": {
-    ".": "./dist/index.js"
-  },
   "scripts": {
-    "test": "vitest run",
+    "test": "echo \"Error: no test specified\"",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:autofix": "eslint . --ext .ts,.tsx --fix",
     "format:check": "prettier --check src",
@@ -18,7 +14,6 @@
   "devDependencies": {
     "@types/lodash": "4.14.196",
     "@types/node": "20.4.9",
-    "@types/nodemailer": "6.4.9",
     "@typescript-eslint/eslint-plugin": "6.3.0",
     "@typescript-eslint/parser": "6.3.0",
     "eslint": "8.46.0",
@@ -28,16 +23,12 @@
     "vitest": "0.34.1"
   },
   "dependencies": {
-    "@aws-sdk/client-athena": "^3.495.0",
-    "@aws-sdk/client-dynamodb": "^3.387.0",
-    "@aws-sdk/client-kms": "^3.387.0",
     "@aws-sdk/client-s3": "^3.387.0",
-    "@aws-sdk/util-dynamodb": "^3.387.0",
-    "axios": "^1.4.0",
+    "@interop-be-reports/commons": "workspace:*",
     "dotenv": "^16.3.1",
+    "exceljs": "^4.4.0",
     "lodash": "^4.17.21",
     "mongodb": "^5.7.0",
-    "nodemailer": "^6.9.4",
     "zod": "^3.21.4"
   }
 }

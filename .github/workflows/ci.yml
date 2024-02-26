@@ -62,6 +62,8 @@ jobs:
             package_path: ./jobs/dtd-catalog-total-load-exporter
           - image_name: ivass-certified-attributes-importer
             package_path: ./jobs/ivass-certified-attributes-importer
+          - image_name: metrics-report-generator
+            package_path: ./jobs/metrics-report-generator
           - image_name: datalake-data-export
             package_path: ./jobs/datalake-data-export
 
