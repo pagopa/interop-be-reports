@@ -134,7 +134,15 @@ export const TopProducersMetricItem = z.object({
 
 export type TopProducersMetricItem = z.infer<typeof TopProducersMetricItem>
 
-export const TopProducersMetric = TimedMetric(z.array(TopProducersMetricItem))
+export const TopProducersMetric = TimedMetric(
+  z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      data: z.array(TopProducersMetricItem),
+    })
+  )
+)
 export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 
 export const TotalTokensMetric = z.object({
