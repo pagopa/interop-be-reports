@@ -10,6 +10,7 @@ const ProducerAgreement = z.object({
 })
 
 const ProducerAgreements = z.object({
+  id: z.string(),
   name: z.string(),
   agreements: z.array(ProducerAgreement),
 })
@@ -59,6 +60,7 @@ export const getTopProducersBySubscribersMetric: MetricFactoryFn<'flussiDiRichie
       {
         $project: {
           _id: 0,
+          id: { $arrayElemAt: ['$producer.data.id', 0] },
           name: { $arrayElemAt: ['$producer.data.name', 0] },
           agreements: 1,
         },
@@ -68,10 +70,12 @@ export const getTopProducersBySubscribersMetric: MetricFactoryFn<'flussiDiRichie
     .toArray()
 
   const produceMetricByDate = (
+    tenantsIds: string[],
     date: Date | undefined
-  ): TopProducersBySubscribersMetric['fromTheBeginning' | 'lastSixMonths' | 'lastTwelveMonths'] => {
+  ): TopProducersBySubscribersMetric[keyof TopProducersBySubscribersMetric][number]['data'] => {
     return (
       agreementsGroupedByProducers
+        .filter((producer) => tenantsIds.includes(producer.id))
         .map((producer) => {
           return {
             producerName: producer.name,
@@ -110,9 +114,28 @@ export const getTopProducersBySubscribersMetric: MetricFactoryFn<'flussiDiRichie
     )
   }
 
-  return TopProducersBySubscribersMetric.parse({
-    lastSixMonths: produceMetricByDate(sixMonthsAgoDate),
-    lastTwelveMonths: produceMetricByDate(twelveMonthsAgoDate),
-    fromTheBeginning: produceMetricByDate(fromTheBeginningDate),
-  })
+  const allTenantsIds = globalStore.tenants.map((tenant) => tenant.id)
+  const macroCategoriesData = [
+    { id: '0', name: 'Totale', tenantsIds: allTenantsIds },
+    ...globalStore.macroCategories.map((category) => ({
+      id: category.id,
+      name: category.name,
+      tenantsIds: category.tenantsIds,
+    })),
+  ]
+
+  const getTopProducersBySubscribersMetricData = (
+    date?: Date
+  ): TopProducersBySubscribersMetric[keyof TopProducersBySubscribersMetric] =>
+    macroCategoriesData.map(({ id, name, tenantsIds }) => ({
+      id,
+      name,
+      data: produceMetricByDate(tenantsIds, date),
+    }))
+
+  return {
+    lastSixMonths: getTopProducersBySubscribersMetricData(sixMonthsAgoDate),
+    lastTwelveMonths: getTopProducersBySubscribersMetricData(twelveMonthsAgoDate),
+    fromTheBeginning: getTopProducersBySubscribersMetricData(fromTheBeginningDate),
+  }
 }

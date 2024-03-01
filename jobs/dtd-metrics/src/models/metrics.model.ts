@@ -49,12 +49,18 @@ export type MostSubscribedEServicesMetric = z.infer<typeof MostSubscribedEServic
 export const TopProducersBySubscribersMetric = TimedMetric(
   z.array(
     z.object({
-      producerName: z.string(),
-      macroCategories: z.array(
+      id: z.string(),
+      name: z.string(),
+      data: z.array(
         z.object({
-          id: z.string(),
-          name: z.string(),
-          subscribersCount: z.number(),
+          producerName: z.string(),
+          macroCategories: z.array(
+            z.object({
+              id: z.string(),
+              name: z.string(),
+              subscribersCount: z.number(),
+            })
+          ),
         })
       ),
     })

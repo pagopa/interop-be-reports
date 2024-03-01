@@ -58,12 +58,14 @@ describe('getTopProducersBySubscribersMetric', () => {
         data: getTenantMock({
           id: producer1Uuid,
           name: 'Producer 1',
+          attributes: [{ id: comuneAttributeUuid, type: 'PersistentCertifiedAttribute' }],
         }),
       },
       {
         data: getTenantMock({
           id: producer2Uuid,
           name: 'Producer 2',
+          attributes: [{ id: comuneAttributeUuid, type: 'PersistentCertifiedAttribute' }],
         }),
       },
       {
@@ -100,7 +102,7 @@ describe('getTopProducersBySubscribersMetric', () => {
     const globalStore = await GlobalStoreService.init(readModelMock)
     const result = await getTopProducersBySubscribersMetric(readModelMock, globalStore)
 
-    const producer1 = result.fromTheBeginning[0]
+    const producer1 = result.fromTheBeginning[0].data[0]
     expect(producer1.producerName).toStrictEqual('Producer 1')
 
     const producer1Comuni = producer1.macroCategories.find((a) => (a.name as MacroCategoryName) === 'Comuni')
@@ -112,7 +114,7 @@ describe('getTopProducersBySubscribersMetric', () => {
     expect(producer1Comuni?.subscribersCount).toStrictEqual(1)
     expect(producer1AziendeOspedaliere?.subscribersCount).toStrictEqual(1)
 
-    const producer2 = result.fromTheBeginning[1]
+    const producer2 = result.fromTheBeginning[0].data[1]
     expect(producer2.producerName).toStrictEqual('Producer 2')
     const producer2Comuni = producer2.macroCategories.find((a) => (a.name as MacroCategoryName) === 'Comuni')
     const producer2AziendeOspedaliere = producer2.macroCategories.find(
