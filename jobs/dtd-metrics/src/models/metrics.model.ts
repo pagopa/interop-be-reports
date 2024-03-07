@@ -34,11 +34,17 @@ export const MostSubscribedEServicesMetric = TimedMetric(
     z.object({
       id: z.string(),
       name: z.string(),
-      mostSubscribedEServices: z.array(
+      data: z.array(
         z.object({
-          eserviceName: z.string(),
-          producerName: z.string(),
-          subscribersCount: z.number(),
+          id: z.string(),
+          name: z.string(),
+          mostSubscribedEServices: z.array(
+            z.object({
+              eserviceName: z.string(),
+              producerName: z.string(),
+              subscribersCount: z.number(),
+            })
+          ),
         })
       ),
     })

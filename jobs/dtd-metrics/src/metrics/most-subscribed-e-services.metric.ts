@@ -3,8 +3,8 @@ import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { z } from 'zod'
 import orderBy from 'lodash/orderBy.js'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
-import { MostSubscribedEServicesMetric } from '../models/metrics.model.js'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
+import { MostSubscribedEServicesMetric } from '../models/metrics.model.js'
 
 type RelevantAgreementInfo = { macrocategoryId: string; consumerName: string; consumerId: string; createdAt: Date }
 type EServiceMap = Record<
@@ -92,7 +92,7 @@ export const getMostSubscribedEServicesMetric: MetricFactoryFn<'eServicePiuRichi
 
     // Add to the array the macrocategory this tenant belongs to
     acc[next.eserviceId].agreements.push({
-      macrocategoryId: macrocategoryId ?? '-1',
+      macrocategoryId: macrocategoryId,
       consumerName: consumer.name,
       consumerId: consumer.id,
       createdAt: next.createdAt,
@@ -122,50 +122,67 @@ export const getMostSubscribedEServicesMetric: MetricFactoryFn<'eServicePiuRichi
    * We have all the data we need to create the metric.
    */
 
-  const sixMonthsAgoDate = getMonthsAgoDate(6)
-  const twelveMonthsAgoDate = getMonthsAgoDate(12)
-  const fromTheBeginningDate = undefined
+  const macroCategories = [
+    { id: '0', name: 'Totale', tenantsIds: globalStore.tenants.map((tenant) => tenant.id) },
+    ...globalStore.macroCategories.map((category) => ({
+      id: category.id,
+      name: category.name,
+      tenantsIds: category.tenantsIds,
+    })),
+  ]
 
-  const [lastSixMonths, lastTwelveMonths, fromTheBeginning] = [
-    sixMonthsAgoDate,
-    twelveMonthsAgoDate,
-    fromTheBeginningDate,
-  ].map((date) => {
-    return [{ id: '0', name: 'Tutte' }, ...MACRO_CATEGORIES].map((m) => {
-      const getSubscribersCount = (eservice: EServiceCollectionItem, date: Date | undefined): number => {
-        const agreements = date ? eservice.agreements.filter((a) => a.createdAt >= date) : eservice.agreements
-
-        // Some subscribers can have more than one agreement, we want to count them only once
-        const activeSubscribers = agreements.reduce<Array<RelevantAgreementInfo>>((acc, next) => {
-          if (!acc.some((a) => a.consumerId === next.consumerId)) {
-            acc.push(next)
-          }
-          return acc
-        }, [])
-
-        // If the macrocategory id is 0, we count all the active subscribers
-        if (m.id === '0') {
-          return activeSubscribers.length
-        }
-
-        // Otherwise, we count the active subscribers that belong to the macrocategory
-        return activeSubscribers.filter((a) => a.macrocategoryId === m.id).length
-      }
-
-      const counted = eserviceCollection.map((e) => ({
-        eserviceName: e.eserviceName,
-        producerName: e.producerName,
-        subscribersCount: getSubscribersCount(e, date),
-      }))
-
+  function getMetricData(date?: Date): MostSubscribedEServicesMetric[keyof MostSubscribedEServicesMetric] {
+    return macroCategories.map((macroCategoryProducer) => {
       return {
-        id: m.id,
-        name: m.name,
-        // Sort the entries by count, and extract the first 10 results (top 10)
-        mostSubscribedEServices: orderBy(counted, 'subscribersCount', 'desc').slice(0, 10),
+        id: macroCategoryProducer.id,
+        name: macroCategoryProducer.name,
+        data: [{ id: '0', name: 'Tutte' }, ...MACRO_CATEGORIES].map((macroCategoryConsumer) => {
+          const counted = eserviceCollection
+            .filter(({ producerId }) => macroCategoryProducer.tenantsIds.includes(producerId))
+            .map((e) => ({
+              eserviceName: e.eserviceName,
+              producerName: e.producerName,
+              subscribersCount: getMacroCategoryEServiceSubscribersCount(macroCategoryConsumer.id, e, date),
+            }))
+
+          return {
+            id: macroCategoryConsumer.id,
+            name: macroCategoryConsumer.name,
+            // Sort the entries by count, and extract the first 10 results (top 10)
+            mostSubscribedEServices: orderBy(counted, 'subscribersCount', 'desc').slice(0, 10),
+          }
+        }),
       }
     })
-  })
+  }
 
-  return MostSubscribedEServicesMetric.parse({ lastSixMonths, lastTwelveMonths, fromTheBeginning })
+  return {
+    lastSixMonths: getMetricData(getMonthsAgoDate(6)),
+    lastTwelveMonths: getMetricData(getMonthsAgoDate(12)),
+    fromTheBeginning: getMetricData(),
+  }
+}
+
+function getMacroCategoryEServiceSubscribersCount(
+  macroCategoryId: string,
+  eservice: EServiceCollectionItem,
+  date: Date | undefined
+): number {
+  const agreements = date ? eservice.agreements.filter((a) => a.createdAt >= date) : eservice.agreements
+
+  // Some subscribers can have more than one agreement, we want to count them only once
+  const activeSubscribers = agreements.reduce<Array<RelevantAgreementInfo>>((acc, next) => {
+    if (!acc.some((a) => a.consumerId === next.consumerId)) {
+      acc.push(next)
+    }
+    return acc
+  }, [])
+
+  // If the macrocategory id is 0, we count all the active subscribers
+  if (macroCategoryId === '0') {
+    return activeSubscribers.length
+  }
+
+  // Otherwise, we count the active subscribers that belong to the macrocategory
+  return activeSubscribers.filter((a) => a.macrocategoryId === macroCategoryId).length
 }

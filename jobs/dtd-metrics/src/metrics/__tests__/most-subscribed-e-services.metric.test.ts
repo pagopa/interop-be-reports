@@ -193,7 +193,7 @@ describe('getMostSubscribedEServicesMetric', () => {
     const globalStore = await GlobalStoreService.init(readModelMock)
     const result = await getMostSubscribedEServicesMetric(readModelMock, globalStore)
 
-    const comuniTop10 = result.fromTheBeginning.find(
+    const comuniTop10 = result.fromTheBeginning[0].data.find(
       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
     )?.mostSubscribedEServices
 
@@ -205,7 +205,7 @@ describe('getMostSubscribedEServicesMetric', () => {
     expect(comuniTop10?.[1].producerName).toStrictEqual('Producer')
     expect(comuniTop10?.[1].subscribersCount).toStrictEqual(1)
 
-    const aziendeOspedaliereTop10 = result.fromTheBeginning.find(
+    const aziendeOspedaliereTop10 = result.fromTheBeginning[0].data.find(
       (a) => (a.name as MacroCategoryName) === 'Aziende Ospedaliere e ASL'
     )?.mostSubscribedEServices
 
