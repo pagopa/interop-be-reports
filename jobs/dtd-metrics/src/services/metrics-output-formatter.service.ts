@@ -47,7 +47,7 @@ export class MetricsOutputFormatterService {
       case 'eServicePiuRichiesti':
       case 'flussiDiRichiesteFraEnti':
       case 'entiChePubblicanoPiuEService':
-      case 'statoDiCompletamentoAdesioni':
+      case 'andamentoDelleAdesioniPerCategoria':
       case 'attivitaDellaPiattaforma':
         return [
           {
@@ -84,7 +84,7 @@ export class MetricsOutputFormatterService {
       case 'eServicePiuRichiesti':
       case 'flussiDiRichiesteFraEnti':
       case 'entiChePubblicanoPiuEService':
-      case 'statoDiCompletamentoAdesioni':
+      case 'andamentoDelleAdesioniPerCategoria':
       case 'attivitaDellaPiattaforma':
         return [
           {

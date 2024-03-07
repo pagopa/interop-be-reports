@@ -150,7 +150,7 @@ export type TokensTrendMetric = z.infer<typeof TokensTrendMetric>
 export const Metric = z.union([
   z.object({ name: z.literal('totaleEnti'), data: OnboardedTenantsCountMetric }),
   z.object({ name: z.literal('andamentoDelleAdesioni'), data: TenantOnboardingTrendMetric }),
-  z.object({ name: z.literal('statoDiCompletamentoAdesioni'), data: MacroCategoriesOnboardingTrendMetric }),
+  z.object({ name: z.literal('andamentoDelleAdesioniPerCategoria'), data: MacroCategoriesOnboardingTrendMetric }),
   z.object({ name: z.literal('distribuzioneDegliEntiPerAttivita'), data: TenantDistributionMetric }),
   z.object({ name: z.literal('eservicePubblicati'), data: PublishedEServicesMetric }),
   z.object({ name: z.literal('entiErogatoriDiEService'), data: EServicesByMacroCategoriesMetric }),
