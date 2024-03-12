@@ -263,8 +263,8 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'flussiDiRichiesteFraEntiLastSixMonths',
-    filename: getFilename('flussiDiRichiesteFraEntiLastSixMonths'),
+    fileKey: 'connessioniFraEntiLastSixMonths',
+    filename: getFilename('connessioniFraEntiLastSixMonths'),
     title: 'PDND - Enti erogatori ed enti abilitati alla fruizione - ultimi 6 mesi',
     description: 'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
@@ -276,8 +276,8 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'flussiDiRichiesteFraEntiLastTwelveMonths',
-    filename: getFilename('flussiDiRichiesteFraEntiLastTwelveMonths'),
+    fileKey: 'connessioniFraEntiLastTwelveMonths',
+    filename: getFilename('connessioniFraEntiLastTwelveMonths'),
     title: 'PDND - Enti erogatori ed enti abilitati alla fruizione - ultimi 12 mesi',
     description: 'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
@@ -289,8 +289,8 @@ const METRICS_FILES = [
     issued: TODAY_DATE,
   },
   {
-    fileKey: 'flussiDiRichiesteFraEntiFromTheBeginning',
-    filename: getFilename('flussiDiRichiesteFraEntiFromTheBeginning'),
+    fileKey: 'connessioniFraEntiFromTheBeginning',
+    filename: getFilename('connessioniFraEntiFromTheBeginning'),
     title: 'PDND - Enti erogatori ed enti abilitati alla fruizione - inizio del servizio',
     description: 'I 10 enti con maggior numero di richieste di fruizione suddivise per categoria di enti fruitori',
     rightsHolderName: 'PCM - Dipartimento per la trasformazione digitale',
