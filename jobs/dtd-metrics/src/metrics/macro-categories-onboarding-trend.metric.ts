@@ -3,7 +3,7 @@ import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { MacroCategoriesOnboardingTrendMetric } from '../models/metrics.model.js'
 import { MACRO_CATEGORIES } from '../configs/macro-categories.js'
 
-export const getMacroCategoriesOnboardingTrendMetric: MetricFactoryFn<'statoDiCompletamentoAdesioni'> = (
+export const getMacroCategoriesOnboardingTrendMetric: MetricFactoryFn<'andamentoDelleAdesioniPerCategoria'> = (
   _readModel,
   globalStore
 ) => {

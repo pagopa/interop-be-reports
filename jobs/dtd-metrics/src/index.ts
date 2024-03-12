@@ -51,7 +51,7 @@ try {
   const metrics = await new MetricsProducerService(readModel, globalStore)
     .addMetric('totaleEnti', getOnboardedTenantsCountMetric)
     .addMetric('andamentoDelleAdesioni', getTenantOnboardingTrendMetric)
-    .addMetric('statoDiCompletamentoAdesioni', getMacroCategoriesOnboardingTrendMetric)
+    .addMetric('andamentoDelleAdesioniPerCategoria', getMacroCategoriesOnboardingTrendMetric)
     .addMetric('distribuzioneDegliEntiPerAttivita', getTenantDistributionMetric)
     .addMetric('eservicePubblicati', getPublishedEServicesMetric)
     .addMetric('entiErogatoriDiEService', getEServicesByMacroCategoriesMetric)
