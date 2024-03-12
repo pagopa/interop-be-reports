@@ -1,14 +1,30 @@
-import { AthenaClientService } from '@interop-be-reports/commons'
+import { AthenaClientService, ReadModelClient, SafeMap } from '@interop-be-reports/commons'
 import { env } from '../configs/env.js'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { getMonthsAgoDate } from '../utils/helpers.utils.js'
 import { z } from 'zod'
+import { GlobalStoreService } from '../services/global-store.service.js'
 
-export const getMostUsedEServicesMetric: MetricFactoryFn<'eServicePiuUtilizzati'> = async (_readModel, globalStore) => {
+export const getMostUsedEServicesMetric: MetricFactoryFn<'eServicePiuUtilizzati'> = async (readModel, globalStore) => {
   const athena = new AthenaClientService({ outputLocation: `s3://${env.ATHENA_OUTPUT_BUCKET}` })
 
-  const monthsAgo = getMonthsAgoDate(6)
+  const sixMonthsAgoDate = getMonthsAgoDate(6)
+  const twelveMonthsAgoDate = getMonthsAgoDate(12)
+  const fromTheBeginningDate = undefined
 
+  return {
+    sixMonthsAgo: await getMostUsedEServices(athena, globalStore, readModel, sixMonthsAgoDate),
+    twelveMonthsAgo: await getMostUsedEServices(athena, globalStore, readModel, twelveMonthsAgoDate),
+    fromTheBeginning: await getMostUsedEServices(athena, globalStore, readModel, fromTheBeginningDate),
+  }
+}
+
+async function getMostUsedEServices(
+  athena: AthenaClientService,
+  globalStore: GlobalStoreService,
+  readModel: ReadModelClient,
+  date?: Date
+): Promise<unknown> {
   const { ResultSet } = await athena.query(
     `
     SELECT
@@ -17,8 +33,7 @@ export const getMostUsedEServicesMetric: MetricFactoryFn<'eServicePiuUtilizzati'
       count(*) as tokens
     FROM
       ${env.ATHENA_TOKENS_TABLE_NAME}
-    WHERE
-      issuedAt >= ${monthsAgo.getTime()}
+    ${date ? `WHERE issuedAt >= ${date.getTime()}` : ''}
     GROUP BY
       eserviceId,
       organizationId
@@ -27,9 +42,7 @@ export const getMostUsedEServicesMetric: MetricFactoryFn<'eServicePiuUtilizzati'
     `
   )
 
-  const Results = z.array(z.object({ eserviceId: z.string(), consumerId: z.string() }))
-
-  const results = Results.parse(
+  const results = z.array(z.object({ eserviceId: z.string(), consumerId: z.string() })).parse(
     ResultSet?.Rows?.slice(1).map((row) => ({
       eserviceId: row.Data?.[0].VarCharValue,
       consumerId: row.Data?.[1].VarCharValue,
@@ -44,10 +57,43 @@ export const getMostUsedEServicesMetric: MetricFactoryFn<'eServicePiuUtilizzati'
     return acc
   }, {})
 
-  const mostUsedEServices = Object.entries(aggregatedResults).map(([eserviceId, consumers]) => ({
-    eserviceId,
-    consumers: Array.from(consumers).map((id) => [id, globalStore.getMacroCategoryFromTenantId(id)?.name]),
-  }))
+  const eservicesMap = await getEServicesMap(readModel, Object.keys(aggregatedResults))
 
-  return mostUsedEServices
+  return Object.entries(aggregatedResults).map(([eserviceId, activeConsumers]) => {
+    const eservice = eservicesMap.get(eserviceId)
+    const producerName = globalStore.getTenantFromId(eservice?.producerId)?.name
+    const totalActiveConsumers = activeConsumers.size
+    const activeConsumersByMacroCategory = Array.from(activeConsumers)
+      .map((consumerId) => globalStore.getMacroCategoryFromTenantId(consumerId))
+      .filter(Boolean)
+      .reduce<{ macroCategoryName: string; count: number }[]>((acc, macroCategory) => {
+        const existing = acc.find((c) => c.macroCategoryName === macroCategory?.name)
+        if (existing) {
+          existing.count++
+        } else {
+          acc.push({ macroCategoryName: macroCategory?.name ?? 'Unknown', count: 1 })
+        }
+        return acc
+      }, [])
+    return {
+      name: eservice.name,
+      producerName,  
+      totalActiveConsumers,
+      activeConsumersByMacroCategory,
+    }
+  })
+}
+
+const EService = z.object({ id: z.string(), name: z.string(), producerId: z.string() })
+type EService = z.infer<typeof EService>
+
+async function getEServicesMap(
+  readModel: ReadModelClient,
+  eserviceIds: Array<string>
+): Promise<SafeMap<string, EService>> {
+  const eservices = await readModel.eservices
+    .find({ 'data.id': { $in: eserviceIds } })
+    .map(({ data }) => EService.parse(data))
+    .toArray()
+  return new SafeMap(eservices.map((eservice) => [eservice.id, eservice]))
 }
