@@ -1,4 +1,4 @@
-import { getAgreementMock, getTenantMock } from '@interop-be-reports/commons'
+import { getAgreementMock, getEServiceMock, getTenantMock } from '@interop-be-reports/commons'
 import { MacroCategoryCodeFor, readModelMock, seedCollection } from '../../utils/tests.utils.js'
 import { randomUUID } from 'crypto'
 import { GlobalStoreService } from '../../services/global-store.service.js'
@@ -47,6 +47,12 @@ describe('getTenantDistributionMetric', () => {
       { data: getAgreementMock({ consumerId: bothUUID, producerId: producerUUID, state: 'Active' }) },
       { data: getAgreementMock({ consumerId: consumerUUID, producerId: bothUUID, state: 'Active' }) },
       { data: getAgreementMock({ consumerId: consumerUUID, producerId: producerUUID, state: 'Active' }) },
+    ])
+
+    await seedCollection('eservices', [
+      { data: getEServiceMock({ producerId: producerUUID, descriptors: [{ state: 'Archived' }] }) },
+      { data: getEServiceMock({ producerId: bothUUID, descriptors: [{ state: 'Published' }] }) },
+      { data: getEServiceMock({ producerId: producerUUID, descriptors: [{ state: 'Suspended' }] }) },
     ])
 
     await seedCollection('attributes', [
