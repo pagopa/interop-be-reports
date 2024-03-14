@@ -34,11 +34,17 @@ export const MostSubscribedEServicesMetric = TimedMetric(
     z.object({
       id: z.string(),
       name: z.string(),
-      mostSubscribedEServices: z.array(
+      data: z.array(
         z.object({
-          eserviceName: z.string(),
-          producerName: z.string(),
-          subscribersCount: z.number(),
+          id: z.string(),
+          name: z.string(),
+          mostSubscribedEServices: z.array(
+            z.object({
+              eserviceName: z.string(),
+              producerName: z.string(),
+              subscribersCount: z.number(),
+            })
+          ),
         })
       ),
     })
@@ -49,12 +55,18 @@ export type MostSubscribedEServicesMetric = z.infer<typeof MostSubscribedEServic
 export const TopProducersBySubscribersMetric = TimedMetric(
   z.array(
     z.object({
-      producerName: z.string(),
-      macroCategories: z.array(
+      id: z.string(),
+      name: z.string(),
+      data: z.array(
         z.object({
-          id: z.string(),
-          name: z.string(),
-          subscribersCount: z.number(),
+          producerName: z.string(),
+          macroCategories: z.array(
+            z.object({
+              id: z.string(),
+              name: z.string(),
+              subscribersCount: z.number(),
+            })
+          ),
         })
       ),
     })
@@ -64,7 +76,7 @@ export type TopProducersBySubscribersMetric = z.infer<typeof TopProducersBySubsc
 
 export const TenantDistributionMetric = z.array(
   z.object({
-    activity: z.enum(['Solo fruitore', 'Solo erogatore', 'Sia fruitore che erogatore', 'Solo accesso']),
+    activity: z.enum(['Solo fruitori', 'Solo erogatori', 'Sia fruitori che erogatori', 'Solo accesso']),
     count: z.number(),
   })
 )
@@ -134,7 +146,15 @@ export const TopProducersMetricItem = z.object({
 
 export type TopProducersMetricItem = z.infer<typeof TopProducersMetricItem>
 
-export const TopProducersMetric = TimedMetric(z.array(TopProducersMetricItem))
+export const TopProducersMetric = TimedMetric(
+  z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      data: z.array(TopProducersMetricItem),
+    })
+  )
+)
 export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 
 export const TotalTokensMetric = z.object({
@@ -168,12 +188,12 @@ export type MostUsedEServicesMetric = z.infer<typeof MostUsedEServicesMetric>
 export const Metric = z.union([
   z.object({ name: z.literal('totaleEnti'), data: OnboardedTenantsCountMetric }),
   z.object({ name: z.literal('andamentoDelleAdesioni'), data: TenantOnboardingTrendMetric }),
-  z.object({ name: z.literal('statoDiCompletamentoAdesioni'), data: MacroCategoriesOnboardingTrendMetric }),
+  z.object({ name: z.literal('andamentoDelleAdesioniPerCategoria'), data: MacroCategoriesOnboardingTrendMetric }),
   z.object({ name: z.literal('distribuzioneDegliEntiPerAttivita'), data: TenantDistributionMetric }),
   z.object({ name: z.literal('eservicePubblicati'), data: PublishedEServicesMetric }),
   z.object({ name: z.literal('entiErogatoriDiEService'), data: EServicesByMacroCategoriesMetric }),
   z.object({ name: z.literal('entiChePubblicanoPiuEService'), data: TopProducersMetric }),
-  z.object({ name: z.literal('flussiDiRichiesteFraEnti'), data: TopProducersBySubscribersMetric }),
+  z.object({ name: z.literal('connessioniFraEnti'), data: TopProducersBySubscribersMetric }),
   z.object({ name: z.literal('eServicePiuRichiesti'), data: MostSubscribedEServicesMetric }),
   z.object({ name: z.literal('totaleRichiesteDiAccesso'), data: TotalTokensMetric }),
   z.object({ name: z.literal('attivitaDellaPiattaforma'), data: TokensTrendMetric }),

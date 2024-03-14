@@ -7,52 +7,41 @@ export const getTenantDistributionMetric: MetricFactoryFn<'distribuzioneDegliEnt
   readModel,
   globalStore
 ) => {
-  const activeAgreements = await readModel.agreements
-    .find(
-      { 'data.state': { $in: ['Active', 'Suspended'] satisfies Array<AgreementState> } },
-      {
-        projection: {
-          _id: 0,
-          'data.producerId': 1,
-          'data.consumerId': 1,
-        },
-      }
-    )
-    .map(({ data }) =>
-      z
-        .object({
-          producerId: z.string(),
-          consumerId: z.string(),
-        })
-        .parse(data)
-    )
+  const agreementConsumers = await readModel.agreements
+    .find({ 'data.state': { $in: ['Active', 'Suspended'] satisfies Array<AgreementState> } })
+    .map(({ data }) => z.string().parse(data.consumerId))
     .toArray()
 
-  const agreementsConsumersIds = new Set(activeAgreements.map((agreement) => agreement.consumerId))
-  const agreementsProducersIds = new Set(activeAgreements.map((agreement) => agreement.producerId))
+  const eserviceProducers = await readModel.eservices
+    .find({ 'data.descriptors.state': { $in: ['Published', 'Suspended'] } })
+    .map(({ data }) => z.string().parse(data.producerId))
+    .toArray()
+
+  const consumers = new Set(agreementConsumers)
+  const producers = new Set(eserviceProducers)
 
   function checkIsConsumer(tenantId: string): boolean {
-    return agreementsConsumersIds.has(tenantId)
+    return consumers.has(tenantId)
   }
 
   function checkIsProducer(tenantId: string): boolean {
-    return agreementsProducersIds.has(tenantId)
+    return producers.has(tenantId)
   }
 
   type TenantDistributionItem = TenantDistributionMetric[number]
 
   const onlyConsumers: TenantDistributionItem = {
-    activity: 'Solo fruitore',
+    activity: 'Solo fruitori',
     count: 0,
   }
 
   const onlyProducers: TenantDistributionItem = {
-    activity: 'Solo erogatore',
+    activity: 'Solo erogatori',
     count: 0,
   }
 
   const bothConsumersAndProducers: TenantDistributionItem = {
-    activity: 'Sia fruitore che erogatore',
+    activity: 'Sia fruitori che erogatori',
     count: 0,
   }
 

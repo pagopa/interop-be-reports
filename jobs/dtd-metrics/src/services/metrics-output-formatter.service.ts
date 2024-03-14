@@ -45,9 +45,9 @@ export class MetricsOutputFormatterService {
       case 'andamentoDelleAdesioni':
         return [{ filename: this.getFilename(metric.name, 'json'), data: JSON.stringify(metric.data) }]
       case 'eServicePiuRichiesti':
-      case 'flussiDiRichiesteFraEnti':
+      case 'connessioniFraEnti':
       case 'entiChePubblicanoPiuEService':
-      case 'statoDiCompletamentoAdesioni':
+      case 'andamentoDelleAdesioniPerCategoria':
       case 'attivitaDellaPiattaforma':
       case 'eServicePiuUtilizzati':
         return [
@@ -83,9 +83,9 @@ export class MetricsOutputFormatterService {
       case 'andamentoDelleAdesioni':
         return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv(metric.data) }]
       case 'eServicePiuRichiesti':
-      case 'flussiDiRichiesteFraEnti':
+      case 'connessioniFraEnti':
       case 'entiChePubblicanoPiuEService':
-      case 'statoDiCompletamentoAdesioni':
+      case 'andamentoDelleAdesioniPerCategoria':
       case 'attivitaDellaPiattaforma':
       case 'eServicePiuUtilizzati':
         return [
