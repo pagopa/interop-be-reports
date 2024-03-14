@@ -147,7 +147,22 @@ export type TotalTokensMetric = z.infer<typeof TotalTokensMetric>
 export const TokensTrendMetric = TimedMetric(z.array(z.object({ date: z.date(), count: z.number() })))
 export type TokensTrendMetric = z.infer<typeof TokensTrendMetric>
 
-export const MostUsedEServicesMetric = z.any()
+export const MostUsedEServicesMetric = TimedMetric(
+  z.array(
+    z.object({
+      id: z.date(),
+      name: z.number(),
+      data: z.array(
+        z.object({
+          eserviceName: z.string(),
+          producerName: z.string(),
+          totalActiveConsumers: z.number(),
+          activeConsumersByMacroCategory: z.array(z.object({ macroCategoryName: z.string(), count: z.number() })),
+        })
+      ),
+    })
+  )
+)
 export type MostUsedEServicesMetric = z.infer<typeof MostUsedEServicesMetric>
 
 export const Metric = z.union([
