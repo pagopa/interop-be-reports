@@ -56,7 +56,7 @@ try {
     .addMetric('eservicePubblicati', getPublishedEServicesMetric)
     .addMetric('entiErogatoriDiEService', getEServicesByMacroCategoriesMetric)
     .addMetric('entiChePubblicanoPiuEService', getTopProducersMetric)
-    .addMetric('flussiDiRichiesteFraEnti', getTopProducersBySubscribersMetric)
+    .addMetric('connessioniFraEnti', getTopProducersBySubscribersMetric)
     .addMetric('eServicePiuRichiesti', getMostSubscribedEServicesMetric)
     .addMetric('totaleRichiesteDiAccesso', getTotalTokensMetric)
     .addMetric('attivitaDellaPiattaforma', getTokensTrendMetric)

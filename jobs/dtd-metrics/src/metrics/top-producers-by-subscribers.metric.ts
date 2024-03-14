@@ -18,7 +18,7 @@ const ProducerAgreements = z.object({
 /**
  * @see https://pagopa.atlassian.net/browse/PIN-3747
  */
-export const getTopProducersBySubscribersMetric: MetricFactoryFn<'flussiDiRichiesteFraEnti'> = async (
+export const getTopProducersBySubscribersMetric: MetricFactoryFn<'connessioniFraEnti'> = async (
   readModel,
   globalStore
 ) => {
