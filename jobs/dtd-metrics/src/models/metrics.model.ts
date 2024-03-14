@@ -34,11 +34,17 @@ export const MostSubscribedEServicesMetric = TimedMetric(
     z.object({
       id: z.string(),
       name: z.string(),
-      mostSubscribedEServices: z.array(
+      data: z.array(
         z.object({
-          eserviceName: z.string(),
-          producerName: z.string(),
-          subscribersCount: z.number(),
+          id: z.string(),
+          name: z.string(),
+          mostSubscribedEServices: z.array(
+            z.object({
+              eserviceName: z.string(),
+              producerName: z.string(),
+              subscribersCount: z.number(),
+            })
+          ),
         })
       ),
     })
@@ -49,12 +55,18 @@ export type MostSubscribedEServicesMetric = z.infer<typeof MostSubscribedEServic
 export const TopProducersBySubscribersMetric = TimedMetric(
   z.array(
     z.object({
-      producerName: z.string(),
-      macroCategories: z.array(
+      id: z.string(),
+      name: z.string(),
+      data: z.array(
         z.object({
-          id: z.string(),
-          name: z.string(),
-          subscribersCount: z.number(),
+          producerName: z.string(),
+          macroCategories: z.array(
+            z.object({
+              id: z.string(),
+              name: z.string(),
+              subscribersCount: z.number(),
+            })
+          ),
         })
       ),
     })
@@ -134,7 +146,15 @@ export const TopProducersMetricItem = z.object({
 
 export type TopProducersMetricItem = z.infer<typeof TopProducersMetricItem>
 
-export const TopProducersMetric = TimedMetric(z.array(TopProducersMetricItem))
+export const TopProducersMetric = TimedMetric(
+  z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      data: z.array(TopProducersMetricItem),
+    })
+  )
+)
 export type TopProducersMetric = z.infer<typeof TopProducersMetric>
 
 export const TotalTokensMetric = z.object({
