@@ -170,8 +170,8 @@ export type TokensTrendMetric = z.infer<typeof TokensTrendMetric>
 export const MostUsedEServicesMetric = TimedMetric(
   z.array(
     z.object({
-      id: z.date(),
-      name: z.number(),
+      id: z.string(),
+      name: z.string(),
       data: z.array(
         z.object({
           eserviceName: z.string(),
