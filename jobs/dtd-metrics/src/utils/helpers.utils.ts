@@ -14,7 +14,7 @@ export function getVariationPercentage(variation: number, current: number): numb
   const previous = current - variation
   if (previous === 0) return 0
   const percentage = ((current - previous) / previous) * 100
-  return Number(percentage.toFixed(2))
+  return Number(percentage.toFixed(1))
 }
 
 const cidJob = randomUUID()
