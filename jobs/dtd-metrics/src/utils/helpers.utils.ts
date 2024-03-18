@@ -10,12 +10,14 @@ export function getMonthsAgoDate(numMonths: number): Date {
   return result
 }
 
-export function getVariationPercentage(current: number, total: number): number {
-  return total === 0 ? 0 : Number(((current / total) * 100).toFixed(1))
+export function getVariationPercentage(variation: number, current: number): number {
+  const previous = current - variation
+  if (previous === 0) return 0
+  const percentage = ((current - previous) / previous) * 100
+  return Number(percentage.toFixed(2))
 }
 
 const cidJob = randomUUID()
-
 export const log = {
   info: logInfo.bind(null, cidJob),
   warn: logWarn.bind(null, cidJob),

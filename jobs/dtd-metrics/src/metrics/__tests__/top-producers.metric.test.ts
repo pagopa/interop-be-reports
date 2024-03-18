@@ -77,8 +77,6 @@ describe('getTopProducersMetric', () => {
     const globalStore = await GlobalStoreService.init(readModelMock)
     const result = await getTopProducersMetric(readModelMock, globalStore)
 
-    console.log(JSON.stringify(result, null, 2))
-
     expect(result.lastSixMonths[0].data.length).toEqual(1)
     expect(result.lastSixMonths[0].data[0]).toEqual({ producerName: 'Producer 2', count: 1 })
 
