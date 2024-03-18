@@ -132,5 +132,6 @@ async function getEServicesMap(
     .find({ 'data.id': { $in: eserviceIds } })
     .map(({ data }) => EService.parse(data))
     .toArray()
+
   return new SafeMap(eservices.map((eservice) => [eservice.id, eservice]))
 }
