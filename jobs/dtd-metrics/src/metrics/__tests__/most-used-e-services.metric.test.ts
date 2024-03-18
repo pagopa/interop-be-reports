@@ -107,9 +107,9 @@ describe('getTotalTokensMetric', () => {
     expect(total.id).toBe('0')
 
     expect(total.data[0].totalActiveConsumers).toBe(4)
-    expect(total.data[0].activeConsumersByMacroCategory[0].macroCategoryName).toBe('Comuni' satisfies MacroCategoryName)
+    expect(total.data[0].activeConsumersByMacroCategory[0].name).toBe('Comuni' satisfies MacroCategoryName)
     expect(total.data[0].activeConsumersByMacroCategory[0].count).toBe(3)
-    expect(total.data[0].activeConsumersByMacroCategory[1].macroCategoryName).toBe(
+    expect(total.data[0].activeConsumersByMacroCategory[1].name).toBe(
       'Aziende Ospedaliere e ASL' satisfies MacroCategoryName
     )
     expect(total.data[0].activeConsumersByMacroCategory[1].count).toBe(1)
