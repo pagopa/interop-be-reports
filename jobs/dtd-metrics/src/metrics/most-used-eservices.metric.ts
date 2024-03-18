@@ -86,12 +86,13 @@ async function getMostUsedEServicesPerMacroCategory(
           // Some consumers may not have a macro category, filter them out
           .filter(Boolean)
           // Count the number of consumers for each macro category
-          .reduce<{ macroCategoryName: string; count: number }[]>((acc, macroCategory) => {
-            const existing = acc.find((c) => c.macroCategoryName === macroCategory?.name)
+          .reduce<{ id: string; name: string; count: number }[]>((acc, macroCategory) => {
+            if (!macroCategory) return acc
+            const existing = acc.find((c) => c.id === macroCategory?.id)
             if (existing) {
               existing.count++
             } else {
-              acc.push({ macroCategoryName: macroCategory?.name ?? 'Unknown', count: 1 })
+              acc.push({ id: macroCategory.id, name: macroCategory.name, count: 1 })
             }
             return acc
           }, [])

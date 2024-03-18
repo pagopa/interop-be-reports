@@ -177,7 +177,7 @@ export const MostUsedEServicesMetric = TimedMetric(
           eserviceName: z.string(),
           producerName: z.string(),
           totalActiveConsumers: z.number(),
-          activeConsumersByMacroCategory: z.array(z.object({ macroCategoryName: z.string(), count: z.number() })),
+          activeConsumersByMacroCategory: z.array(z.object({ id: z.string(), name: z.string(), count: z.number() })),
         })
       ),
     })
