@@ -44,7 +44,7 @@ export class TokensQueriesService {
     return ResultSet.Rows.slice(1).map((row) => {
       if (!row.Data) throw new Error('Invalid row data')
 
-      const [agreementId, purposeId, date, tokencount, tokenDuration] = row.Data.map((data) => data.VarCharValue)
+      const [agreementId, purposeId, date, tokenDuration, tokencount] = row.Data.map((data) => data.VarCharValue)
 
       return TokensDataQueryResult.parse({
         agreementId,
