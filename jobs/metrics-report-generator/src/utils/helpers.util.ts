@@ -81,7 +81,7 @@ export function generateTokensWorksheetTableData(
   tokens: TokensDataQueryResult[],
   agreementsMap: Map<string, AgreementQueryData>
 ): TokensWorksheetTableData[] {
-  return tokens.map(({ agreementId, purposeId, date, tokencount, tokenDuration }) => {
+  return tokens.map(({ agreementId, purposeId, date, tokenDuration, tokencount }) => {
     const agreement = agreementsMap.get(agreementId)
 
     if (!agreement) log.warn(`[Tokens Worksheet] Agreement ${agreementId} not found in readmodel`)
