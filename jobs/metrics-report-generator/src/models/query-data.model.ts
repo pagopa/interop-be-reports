@@ -11,7 +11,7 @@ import { z } from 'zod'
 export const EServiceQueryData = EService.pick({ id: true, name: true, producerId: true }).and(
   z.object({
     descriptors: z.array(
-      EServiceDescriptor.pick({ id: true, createdAt: true, state: true }).and(
+      EServiceDescriptor.pick({ id: true, createdAt: true, state: true, voucherLifespan: true }).and(
         z.object({ interface: CatalogDocument.pick({ checksum: true }).optional() })
       )
     ),

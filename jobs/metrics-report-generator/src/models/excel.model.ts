@@ -8,7 +8,7 @@ export const AgreementsWorksheetTableData = z.object({
   ProducerId: z.string(),
   Consumer: z.string(),
   ConsumerId: z.string(),
-  Agreement: z.string(),
+  AgreementId: z.string(),
   Purposes: z.string(),
   PurposeIds: z.string(),
 })
@@ -22,6 +22,7 @@ export const DescriptorsWorksheetTableData = z.object({
   DescriptorId: z.string(),
   State: DescriptorState,
   Fingerprint: z.string(),
+  TokenDuration: z.string(),
 })
 export type DescriptorsWorksheetTableData = z.infer<typeof DescriptorsWorksheetTableData>
 
