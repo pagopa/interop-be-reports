@@ -39,7 +39,7 @@ export class AthenaClientService {
     // Polls until the query execution is complete
     await this.pollUntilComplete(QueryExecutionId)
 
-    let NextToken: string | undefined
+    let nextToken: string | undefined
     let result: GetQueryResultsCommandOutput | undefined
 
     do {
