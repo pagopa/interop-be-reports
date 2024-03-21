@@ -39,8 +39,19 @@ export class AthenaClientService {
     // Polls until the query execution is complete
     await this.pollUntilComplete(QueryExecutionId)
 
-    // Get the query results
-    return await this.athena.send(new GetQueryResultsCommand({ QueryExecutionId }))
+    let NextToken: string | undefined
+    let result: GetQueryResultsCommandOutput | undefined
+
+    do {
+      const queryResult = await this.athena.send(new GetQueryResultsCommand({ QueryExecutionId, NextToken }))
+      NextToken = queryResult.NextToken
+      if (!result) result = queryResult
+      else if (queryResult.ResultSet?.Rows) result.ResultSet?.Rows?.push(...queryResult.ResultSet.Rows)
+    } while (NextToken)
+
+    if (!result) throw new Error('No result was returned from Athena')
+
+    return result
   }
 
   private async pollUntilComplete(queryExecutionId: string, retries = POLL_QUERY_EXECUTION_RETRIES): Promise<void> {
