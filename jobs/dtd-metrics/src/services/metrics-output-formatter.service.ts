@@ -42,6 +42,7 @@ export class MetricsOutputFormatterService {
       case 'totaleEnti':
       case 'distribuzioneDegliEntiPerAttivita':
       case 'totaleRichiesteDiAccesso':
+      case 'connessioniTotali':
       case 'andamentoDelleAdesioni':
         return [{ filename: this.getFilename(metric.name, 'json'), data: JSON.stringify(metric.data) }]
       case 'eServicePiuRichiesti':
@@ -75,6 +76,7 @@ export class MetricsOutputFormatterService {
     switch (metric.name) {
       case 'eservicePubblicati':
       case 'totaleRichiesteDiAccesso':
+      case 'connessioniTotali':
         return [{ filename: this.getFilename(metric.name, 'csv'), data: json2csv([metric.data]) }]
       case 'totaleEnti':
       case 'distribuzioneDegliEntiPerAttivita':

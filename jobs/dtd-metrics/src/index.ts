@@ -13,6 +13,7 @@ import {
   getTenantOnboardingTrendMetric,
   getTotalTokensMetric,
   getTokensTrendMetric,
+  getTotalConnectionsMetric,
 } from './metrics/index.js'
 import {
   GithubClient,
@@ -60,6 +61,7 @@ try {
     .addMetric('eServicePiuRichiesti', getMostSubscribedEServicesMetric)
     .addMetric('totaleRichiesteDiAccesso', getTotalTokensMetric)
     .addMetric('attivitaDellaPiattaforma', getTokensTrendMetric)
+    .addMetric('connessioniTotali', getTotalConnectionsMetric)
     .produceMetrics({
       filter: env.METRICS_FILTER,
     })
