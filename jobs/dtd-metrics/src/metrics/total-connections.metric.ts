@@ -1,25 +1,31 @@
 import { AgreementState } from '@interop-be-reports/commons'
 import { MetricFactoryFn } from '../services/metrics-producer.service.js'
 import { getMonthsAgoDate, getVariationPercentage } from '../utils/helpers.utils.js'
-import { z } from 'zod'
+import { Document } from 'mongodb'
 
 export const getTotalConnectionsMetric: MetricFactoryFn<'connessioniTotali'> = async (readModel) => {
-  const agreements = await readModel.agreements
-    .find({
-      'data.state': {
-        $in: ['Active', 'Suspended'] satisfies Array<AgreementState>,
-      },
-    })
-    .map(({ data }) => z.coerce.date().parse(data.createdAt))
-    .toArray()
+  const activeAgrementsFilter: Document = {
+    'data.state': {
+      $in: ['Active', 'Suspended'] satisfies Array<AgreementState>,
+    },
+  }
 
-  const totalCount = agreements.length
-  const lastMonthCount = agreements.filter((d) => d > getMonthsAgoDate(1)).length
-  const variation = getVariationPercentage(lastMonthCount, totalCount)
+  const agreementsCountPromise = readModel.agreements.countDocuments(activeAgrementsFilter)
+  const lastMonthAgreementsCountPromise = readModel.agreements.countDocuments({
+    ...activeAgrementsFilter,
+    'data.createdAt': { $gt: getMonthsAgoDate(1).toISOString() },
+  })
+
+  const [agreementsCount, lastMonthAgreementsCount] = await Promise.all([
+    agreementsCountPromise,
+    lastMonthAgreementsCountPromise,
+  ])
+
+  const variation = getVariationPercentage(lastMonthAgreementsCount, agreementsCount)
 
   return {
-    totalCount,
-    lastMonthCount,
+    totalCount: agreementsCount,
+    lastMonthCount: lastMonthAgreementsCount,
     variation,
   }
 }
