@@ -43,11 +43,11 @@ export class AthenaClientService {
     let result: GetQueryResultsCommandOutput | undefined
 
     do {
-      const queryResult = await this.athena.send(new GetQueryResultsCommand({ QueryExecutionId, NextToken }))
-      NextToken = queryResult.NextToken
+      const queryResult = await this.athena.send(new GetQueryResultsCommand({ QueryExecutionId, NextToken: nextToken }))
+      nextToken = queryResult.NextToken
       if (!result) result = queryResult
       else if (queryResult.ResultSet?.Rows) result.ResultSet?.Rows?.push(...queryResult.ResultSet.Rows)
-    } while (NextToken)
+    } while (nextToken)
 
     if (!result) throw new Error('No result was returned from Athena')
 
