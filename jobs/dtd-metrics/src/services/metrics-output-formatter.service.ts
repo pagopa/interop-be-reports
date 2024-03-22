@@ -49,6 +49,7 @@ export class MetricsOutputFormatterService {
       case 'entiChePubblicanoPiuEService':
       case 'andamentoDelleAdesioniPerCategoria':
       case 'attivitaDellaPiattaforma':
+      case 'eserviceConPiuTokenStaccati':
         return [
           {
             filename: this.getFilename(metric.name, 'json', 'fromTheBeginning'),
@@ -86,6 +87,7 @@ export class MetricsOutputFormatterService {
       case 'entiChePubblicanoPiuEService':
       case 'andamentoDelleAdesioniPerCategoria':
       case 'attivitaDellaPiattaforma':
+      case 'eserviceConPiuTokenStaccati':
         return [
           {
             filename: this.getFilename(metric.name, 'csv', 'fromTheBeginning'),
