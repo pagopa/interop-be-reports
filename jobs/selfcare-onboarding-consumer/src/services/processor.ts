@@ -42,10 +42,12 @@ export const processMessage = (refreshableToken: RefreshableInteropToken, tenant
       const token = await refreshableToken.get()
       const context: InteropContext = { bearerToken: token.serialized, correlationId }
 
+      const externalIdValue = institution.origin == ORIGIN_IPA ? (institution.subUnitCode || institution.originId) : (institution.taxCode || institution.originId)
+
       const seed: SelfcareTenantSeed = {
         externalId: {
           origin: institution.origin,
-          value: institution.origin == ORIGIN_IPA ? institution.subUnitCode || institution.originId : institution.taxCode
+          value: externalIdValue
         },
         selfcareId: parsed.data.internalIstitutionID,
         name: institution.description,
