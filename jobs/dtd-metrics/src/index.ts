@@ -13,6 +13,7 @@ import {
   getTenantOnboardingTrendMetric,
   getTotalTokensMetric,
   getTokensTrendMetric,
+  getEServicesWithMostTokensMetric,
   getTotalConnectionsMetric,
 } from './metrics/index.js'
 import {
@@ -61,6 +62,7 @@ try {
     .addMetric('eServicePiuRichiesti', getMostSubscribedEServicesMetric)
     .addMetric('totaleRichiesteDiAccesso', getTotalTokensMetric)
     .addMetric('attivitaDellaPiattaforma', getTokensTrendMetric)
+    .addMetric('eserviceConPiuTokenStaccati', getEServicesWithMostTokensMetric)
     .addMetric('connessioniTotali', getTotalConnectionsMetric)
     .produceMetrics({
       filter: env.METRICS_FILTER,
