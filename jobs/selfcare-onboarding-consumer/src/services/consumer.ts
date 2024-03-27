@@ -1,4 +1,4 @@
-import { Consumer, Kafka, logLevel } from "kafkajs";
+import { Consumer, EachMessagePayload, Kafka, logLevel } from "kafkajs";
 import { Env } from "../config/env.js";
 import { SimpleKafkaLogCreator } from "./simpleKafkaLogger.js";
 
@@ -57,3 +57,13 @@ async function resetPartitionsOffsets(env: Env, kafka: Kafka, consumer: Consumer
   topics.topics.flatMap(t => t.partitions).map(p => consumer.seek({ topic: env.TOPIC_NAME, partition: p.partitionId, offset: "-2" }))
   await admin.disconnect()
 }
+
+export const commitMessageOffsets = async (
+  consumer: Consumer,
+  payload: EachMessagePayload
+): Promise<void> => {
+  const { topic, partition, message } = payload;
+  await consumer.commitOffsets([
+    { topic, partition, offset: (Number(message.offset) + 1).toString() },
+  ]);
+};

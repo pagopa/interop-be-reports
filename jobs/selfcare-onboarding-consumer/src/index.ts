@@ -1,5 +1,5 @@
 import { env } from "./config/env.js";
-import { exitWithError, initConsumer } from "./services/consumer.js";
+import { commitMessageOffsets, exitWithError, initConsumer } from "./services/consumer.js";
 import { processMessage } from "./services/processor.js";
 import { InteropTokenGenerator, RefreshableInteropToken, TokenGenerationConfig } from '@interop-be-reports/commons'
 import { TenantProcessService } from "./services/tenantProcessService.js";
@@ -24,9 +24,11 @@ await refreshableToken.init()
 const configuredProcessor = processMessage(refreshableToken, tenantProcess, env.INTEROP_PRODUCT, env.ALLOWED_ORIGINS)
 
 consumer.run({
-  eachMessage: async ({ message, partition }) => {
+  autoCommit: false,
+  eachMessage: async (payload) => {
     try {
-      return await configuredProcessor(message, partition)
+      await configuredProcessor(payload.message, payload.partition)
+      await commitMessageOffsets(consumer, payload)
     } catch (err) {
       // TODO Terminate the consumer in case of error? or use a DLQ and proceed?
       exitWithError(consumer, err)
