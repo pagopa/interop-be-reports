@@ -31,4 +31,4 @@ RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
 RUN pnpm dlx turbo run build --filter=metrics-report-generator
 
-CMD node ./jobs/metrics-report-generator/dist
+CMD node --max-old-space-size=8192 ./jobs/metrics-report-generator/dist
