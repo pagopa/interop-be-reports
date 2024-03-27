@@ -23,7 +23,9 @@ export function generateAgreementsWorksheetTableData(
   tenantsMap: Map<string, TenantQueryData>
 ): AgreementsWorksheetTableData[] {
   return agreements.map<AgreementsWorksheetTableData>((agreement) => {
-    const agreementPurposes = purposes.filter((purpose) => purpose.eserviceId === agreement.eserviceId && purpose.consumerId === agreement.consumerId)
+    const agreementPurposes = purposes.filter(
+      (purpose) => purpose.eserviceId === agreement.eserviceId && purpose.consumerId === agreement.consumerId
+    )
     const consumer = tenantsMap.get(agreement.consumerId)
     const producer = tenantsMap.get(agreement.producerId)
     const eservice = eservicesMap.get(agreement.eserviceId)
@@ -35,11 +37,12 @@ export function generateAgreementsWorksheetTableData(
     return {
       EserviceId: agreement.eserviceId,
       Eservice: eservice?.name ?? '',
-      Producer: producer?.externalId.value ?? '',
       ProducerId: agreement.producerId,
-      Consumer: consumer?.externalId.value ?? '',
+      Producer: producer?.externalId.value ?? '',
       ConsumerId: agreement.consumerId,
-      Agreement: agreement.id,
+      Consumer: consumer?.externalId.value ?? '',
+      AgreementId: agreement.id,
+      State: agreement.state,
       Purposes: agreementPurposes.map((purpose) => purpose.title).join(','),
       PurposeIds: agreementPurposes.map((purpose) => purpose.id).join(','),
     }
@@ -63,7 +66,7 @@ export function generateDescriptorsWorksheetTableData(
 
       if (!tenant) log.warn(`[Descriptors Worksheet] Tenant producer ${eservice.producerId} not found in readmodel`)
 
-      const data = {
+      const data: DescriptorsWorksheetTableData = {
         Name: eservice.name,
         CreatedAt: descriptor.createdAt.toISOString(),
         ProducerId: eservice.producerId,
@@ -71,6 +74,7 @@ export function generateDescriptorsWorksheetTableData(
         DescriptorId: descriptor.id,
         State: descriptor.state,
         Fingerprint: interfaceChecksum,
+        TokenDuration: descriptor.voucherLifespan.toString(),
       }
       return [...acc, data]
     }, [])
@@ -81,7 +85,7 @@ export function generateTokensWorksheetTableData(
   tokens: TokensDataQueryResult[],
   agreementsMap: Map<string, AgreementQueryData>
 ): TokensWorksheetTableData[] {
-  return tokens.map(({ agreementId, purposeId, date, tokencount, tokenDuration }) => {
+  return tokens.map(({ agreementId, purposeId, date, tokenDuration, tokencount }) => {
     const agreement = agreementsMap.get(agreementId)
 
     if (!agreement) log.warn(`[Tokens Worksheet] Agreement ${agreementId} not found in readmodel`)

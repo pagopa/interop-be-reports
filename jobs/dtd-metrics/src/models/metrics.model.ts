@@ -185,6 +185,26 @@ export const MostUsedEServicesMetric = TimedMetric(
 )
 export type MostUsedEServicesMetric = z.infer<typeof MostUsedEServicesMetric>
 
+export const EServicesWithMostTokensMetric = TimedMetric(
+  z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      data: z.array(
+        z.object({ eserviceId: z.string(), eserviceName: z.string(), producerName: z.string(), tokenCount: z.number() })
+      ),
+    })
+  )
+)
+export type EServicesWithMostTokensMetric = z.infer<typeof EServicesWithMostTokensMetric>
+
+export const TotalConnectionsMetric = z.object({
+  totalCount: z.number(),
+  lastMonthCount: z.number(),
+  variation: z.number(),
+})
+export type TotalConnectionsMetric = z.infer<typeof TotalConnectionsMetric>
+
 export const Metric = z.union([
   z.object({ name: z.literal('totaleEnti'), data: OnboardedTenantsCountMetric }),
   z.object({ name: z.literal('andamentoDelleAdesioni'), data: TenantOnboardingTrendMetric }),
@@ -198,6 +218,8 @@ export const Metric = z.union([
   z.object({ name: z.literal('totaleRichiesteDiAccesso'), data: TotalTokensMetric }),
   z.object({ name: z.literal('attivitaDellaPiattaforma'), data: TokensTrendMetric }),
   z.object({ name: z.literal('eServicePiuUtilizzati'), data: MostUsedEServicesMetric }),
+  z.object({ name: z.literal('eserviceConPiuTokenStaccati'), data: EServicesWithMostTokensMetric }),
+  z.object({ name: z.literal('connessioniTotali'), data: TotalConnectionsMetric }),
 ])
 
 export type Metric = z.infer<typeof Metric>
