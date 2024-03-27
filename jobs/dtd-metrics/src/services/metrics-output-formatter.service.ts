@@ -50,6 +50,7 @@ export class MetricsOutputFormatterService {
       case 'entiChePubblicanoPiuEService':
       case 'andamentoDelleAdesioniPerCategoria':
       case 'attivitaDellaPiattaforma':
+      case 'eServicePiuUtilizzati':
       case 'eserviceConPiuTokenStaccati':
         return [
           {
@@ -89,6 +90,7 @@ export class MetricsOutputFormatterService {
       case 'entiChePubblicanoPiuEService':
       case 'andamentoDelleAdesioniPerCategoria':
       case 'attivitaDellaPiattaforma':
+      case 'eServicePiuUtilizzati':
       case 'eserviceConPiuTokenStaccati':
         return [
           {
