@@ -38,6 +38,7 @@ export class ReadModelQueriesService {
         'data.descriptors.createdAt': 1,
         'data.descriptors.state': 1,
         'data.descriptors.interface.checksum': 1,
+        'data.descriptors.voucherLifespan': 1,
       },
     })
   }
